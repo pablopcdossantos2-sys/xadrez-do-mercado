@@ -13,6 +13,8 @@ from __future__ import annotations
 import argparse
 import csv
 import io
+import http.client
+import time
 import json
 import re
 import sys
@@ -73,15 +75,22 @@ def fetch_zip(trade_date: date) -> bytes | None:
             "Accept": "application/zip,application/octet-stream,*/*",
         },
     )
-    try:
-        with urllib.request.urlopen(request, timeout=45) as response:
-            return response.read()
-    except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-            return None
-        raise
-    except urllib.error.URLError as exc:
-        raise RuntimeError(f"B3 request failed for {trade_date}: {exc}") from exc
+    last_error: Exception | None = None
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                return response.read()
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return None
+            last_error = exc
+        except (urllib.error.URLError, http.client.IncompleteRead, ConnectionResetError, TimeoutError, OSError) as exc:
+            last_error = exc
+        if attempt < 3:
+            delay = 2 ** attempt
+            print(f"  RETRY {trade_date} after download interruption ({type(last_error).__name__}); waiting {delay}s")
+            time.sleep(delay)
+    raise RuntimeError(f"B3 request failed after retries for {trade_date}: {last_error}") from last_error
 
 
 def parse_price(value: str) -> float:
@@ -241,7 +250,7 @@ def choose_curated(candidates: list[dict], limit: int) -> list[dict]:
     return sorted(chosen, key=lambda x: x["tradeDate"])
 
 
-def build_day(trade_date: date, raw_rows: list[dict]) -> list[dict]:
+def build_day(trade_date: date, raw_rows) -> list[dict]:
     grouped: dict[str, list[tuple[int, float, float]]] = defaultdict(list)
     quantities: dict[str, float] = defaultdict(float)
 
@@ -306,9 +315,9 @@ def write_session(session: dict):
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--start-date", default="2026-09-15")
+    parser.add_argument("--start-date", default="2026-09-23")
     parser.add_argument("--end-date", default="2026-10-02")
-    parser.add_argument("--max-sessions", type=int, default=6)
+    parser.add_argument("--max-sessions", type=int, default=4)
     args = parser.parse_args()
 
     start = parse_date(args.start_date)
@@ -322,9 +331,9 @@ def main() -> int:
             continue
         print(f"FETCH {trade_date} ({len(blob) / 1_000_000:.1f} MB)")
         try:
-            rows = list(read_derivative_rows(blob, trade_date))
-            print(f"  rows={len(rows):,}")
-            candidates.extend(build_day(trade_date, rows))
+            day_candidates = build_day(trade_date, read_derivative_rows(blob, trade_date))
+            print(f"  candidate-assets={len(day_candidates)}")
+            candidates.extend(day_candidates)
         except (ValueError, zipfile.BadZipFile) as exc:
             print(f"  FAIL {trade_date}: {exc}", file=sys.stderr)
 
