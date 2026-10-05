@@ -6,7 +6,7 @@
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 15 shipped · 17 pending
+**Summary:** 32 items · 4 tiers · 19 shipped · 13 pending
 
 ---
 
@@ -154,9 +154,9 @@ Bar with markers at 09:30, 10:00, 11:30, 13:00, 15:00, 16:00.
 
 ### 19. "Speed run" mode
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-10 puzzles in 15 minutes, no debrief. Warm-up before the open.
+10 rapid decisions within a 15-minute session, with no intermediate debrief. Each round is evaluated automatically and the next puzzle loads without manual replay. Warm-up before the open.
 
 ### 20. Revenge trade warning
 
@@ -220,9 +220,9 @@ Web Audio API — click, chime, thud, tick, freeze shimmer. Toggle persisted.
 
 ### 29. Migrate to Vite + React + TypeScript
 
-**Effort:** High · **Status:** Recommended
+**Effort:** High · **Status:** ✅ SHIPPED
 
-When single-file exceeds ~2,000 LOC.
+The former single-file runtime is now a Vite application with React and TypeScript, split into typed modules for UI, analytics, data generation, persistence, translations, and state management.
 
 ### 30. Tests for pure functions
 
@@ -238,9 +238,9 @@ PWA with cache.
 
 ### 32. State via useReducer
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-Replace the 12+ interdependent useState hooks.
+Interactive application state is centralized in a typed React `useReducer`, with explicit actions for puzzle flow, replay, mode changes, persistence-related UI state, result evaluation, and Speed Run progression.
 
 ---
 
@@ -265,19 +265,19 @@ Replace the 12+ interdependent useState hooks.
 | 28 | Subtle sound | T4 | Low | Medium | ✅ SHIPPED |
 | 10 | Adaptive difficulty | T2 | Medium | High | Pending |
 | 21 | Real ELO (Glicko) | T4 | Medium | Medium-high | Pending |
-| 29 | Migration to Vite + TS | T4 | High | Enabler | Recommended |
+| 29 | Migration to Vite + TS | T4 | High | Enabler | ✅ SHIPPED |
 
 ### Quick wins — do first
 
-- ✅ All 15 shipped items
+- ✅ All 19 shipped items
 - → Adaptive difficulty (#10)
 - → Real ELO curve (#21)
 
 ### Structural investments
 
-- → Migration to Vite + TS (#29)
+- ✅ Migration to Vite + TS (#29)
 - → Tests for pure functions (#30)
-- → useReducer (#32)
+- ✅ useReducer (#32)
 
 ---
 
@@ -285,8 +285,8 @@ Replace the 12+ interdependent useState hooks.
 
 The two Tier 1 items that were still open are now closed. **AI validation** turned the "correct answer" from a hindsight tautology into a fair, multi-answer judgment, and the **generator realism** rewrite gave the app a foundation that actually resembles an MES/MNQ session. The tutorial now rewards the same things a real trading coach would: sound process, regardless of whether the market resolved it in your favor today.
 
-With 15 of 32 items shipped — including every Tier 1 and almost every Tier 2 — the next tier of work is about **depth** (adaptive difficulty, Glicko ELO, microstructure, macro events) and **engineering** (TypeScript migration, tests, useReducer). The learning loop is now complete enough that a serious user can improve on it without the tool fighting them.
+With 19 of 32 items shipped — including every Tier 1 and most of Tier 2 plus the requested structural investments — the remaining work is primarily about **depth** (adaptive difficulty, Glicko ELO, microstructure, macro events) and **infra** (tests, offline/PWA support, richer session features).
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.5 · 32 items · 4 tiers · 15 shipped · 17 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.5 · 32 items · 4 tiers · 19 shipped · 13 pending*
