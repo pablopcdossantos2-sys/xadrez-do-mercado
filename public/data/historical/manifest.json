@@ -5,7 +5,7 @@
     "provider": "B3",
     "feed": "derivatives tick-by-tick",
     "endpoint": "https://drp.b3.com.br/rapinegocios/tickercsv/{date}?type=1",
-    "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained."
+    "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained for WINFUT and WDOFUT."
   },
   "sessions": [
     {
@@ -18,13 +18,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-23?type=1",
       "tickCount": 6164014,
       "stats": {
-        "first": 187900.0,
-        "last": 186680.0,
-        "high": 190140.0,
-        "low": 186365.0,
+        "first": 187900,
+        "last": 186680,
+        "high": 190140,
+        "low": 186365,
         "rangePct": 0.02009,
         "trendPct": -0.006493,
-        "volume": 19831425.0,
+        "volume": 19831425,
         "tags": [
           "balanced"
         ]
@@ -47,13 +47,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-24?type=1",
       "tickCount": 6165264,
       "stats": {
-        "first": 186575.0,
-        "last": 184980.0,
-        "high": 187555.0,
-        "low": 184725.0,
+        "first": 186575,
+        "last": 184980,
+        "high": 187555,
+        "low": 184725,
         "rangePct": 0.015168,
         "trendPct": -0.008549,
-        "volume": 19580827.0,
+        "volume": 19580827,
         "tags": [
           "trend-down"
         ]
@@ -76,13 +76,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-25?type=1",
       "tickCount": 5431789,
       "stats": {
-        "first": 185320.0,
-        "last": 184700.0,
-        "high": 185400.0,
-        "low": 183125.0,
+        "first": 185320,
+        "last": 184700,
+        "high": 185400,
+        "low": 183125,
         "rangePct": 0.012276,
         "trendPct": -0.003346,
-        "volume": 17301995.0,
+        "volume": 17301995,
         "tags": [
           "balanced"
         ]
@@ -105,13 +105,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-30?type=1",
       "tickCount": 6696260,
       "stats": {
-        "first": 184700.0,
-        "last": 187700.0,
-        "high": 188860.0,
-        "low": 184500.0,
+        "first": 184700,
+        "last": 187700,
+        "high": 188860,
+        "low": 184500,
         "rangePct": 0.023606,
         "trendPct": 0.016243,
-        "volume": 20833410.0,
+        "volume": 20833410,
         "tags": [
           "trend-up"
         ]
@@ -134,13 +134,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-23?type=1",
       "tickCount": 596395,
       "stats": {
-        "first": 5135.0,
-        "last": 5173.0,
+        "first": 5135,
+        "last": 5173,
         "high": 5182.5,
-        "low": 5128.0,
+        "low": 5128,
         "rangePct": 0.010613,
         "trendPct": 0.0074,
-        "volume": 2919489.0,
+        "volume": 2919489,
         "tags": [
           "trend-up"
         ]
@@ -163,13 +163,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-24?type=1",
       "tickCount": 580467,
       "stats": {
-        "first": 5193.0,
+        "first": 5193,
         "last": 5198.5,
         "high": 5209.5,
-        "low": 5172.0,
+        "low": 5172,
         "rangePct": 0.007221,
         "trendPct": 0.001059,
-        "volume": 2700760.0,
+        "volume": 2700760,
         "tags": [
           "balanced"
         ]
@@ -192,13 +192,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-25?type=1",
       "tickCount": 505119,
       "stats": {
-        "first": 5194.0,
+        "first": 5194,
         "last": 5189.5,
-        "high": 5219.0,
-        "low": 5178.0,
+        "high": 5219,
+        "low": 5178,
         "rangePct": 0.007894,
         "trendPct": -0.000866,
-        "volume": 2362514.0,
+        "volume": 2362514,
         "tags": [
           "balanced"
         ]
@@ -221,13 +221,13 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-29?type=1",
       "tickCount": 556507,
       "stats": {
-        "first": 5212.0,
-        "last": 5203.0,
+        "first": 5212,
+        "last": 5203,
         "high": 5242.5,
-        "low": 5198.0,
+        "low": 5198,
         "rangePct": 0.008538,
         "trendPct": -0.001727,
-        "volume": 2473359.0,
+        "volume": 2473359,
         "tags": [
           "balanced"
         ]
@@ -239,122 +239,6 @@
         "1h": "/data/historical/WDOFUT/WDOV26/2026-09-29/1h.json"
       },
       "barCount1m": 570
-    },
-    {
-      "id": "BIT-2026-09-25-BITV26",
-      "asset": "BIT",
-      "contract": "BITV26",
-      "tradeDate": "2026-09-25",
-      "timezone": "America/Sao_Paulo",
-      "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-25?type=1",
-      "tickCount": 45777,
-      "stats": {
-        "first": 447700.0,
-        "last": 440400.0,
-        "high": 447700.0,
-        "low": 436880.0,
-        "rangePct": 0.024168,
-        "trendPct": -0.016306,
-        "volume": 209430.0,
-        "tags": [
-          "trend-down"
-        ]
-      },
-      "bars": {
-        "1m": "/data/historical/BIT/BITV26/2026-09-25/1m.json",
-        "5m": "/data/historical/BIT/BITV26/2026-09-25/5m.json",
-        "15m": "/data/historical/BIT/BITV26/2026-09-25/15m.json",
-        "1h": "/data/historical/BIT/BITV26/2026-09-25/1h.json"
-      },
-      "barCount1m": 657
-    },
-    {
-      "id": "BIT-2026-09-28-BITV26",
-      "asset": "BIT",
-      "contract": "BITV26",
-      "tradeDate": "2026-09-28",
-      "timezone": "America/Sao_Paulo",
-      "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-28?type=1",
-      "tickCount": 58388,
-      "stats": {
-        "first": 435340.0,
-        "last": 440940.0,
-        "high": 444520.0,
-        "low": 435340.0,
-        "rangePct": 0.021087,
-        "trendPct": 0.012864,
-        "volume": 253184.0,
-        "tags": [
-          "trend-up"
-        ]
-      },
-      "bars": {
-        "1m": "/data/historical/BIT/BITV26/2026-09-28/1m.json",
-        "5m": "/data/historical/BIT/BITV26/2026-09-28/5m.json",
-        "15m": "/data/historical/BIT/BITV26/2026-09-28/15m.json",
-        "1h": "/data/historical/BIT/BITV26/2026-09-28/1h.json"
-      },
-      "barCount1m": 631
-    },
-    {
-      "id": "BIT-2026-09-29-BITV26",
-      "asset": "BIT",
-      "contract": "BITV26",
-      "tradeDate": "2026-09-29",
-      "timezone": "America/Sao_Paulo",
-      "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-29?type=1",
-      "tickCount": 49579,
-      "stats": {
-        "first": 444960.0,
-        "last": 437840.0,
-        "high": 445780.0,
-        "low": 437520.0,
-        "rangePct": 0.018563,
-        "trendPct": -0.016001,
-        "volume": 197952.0,
-        "tags": [
-          "trend-down"
-        ]
-      },
-      "bars": {
-        "1m": "/data/historical/BIT/BITV26/2026-09-29/1m.json",
-        "5m": "/data/historical/BIT/BITV26/2026-09-29/5m.json",
-        "15m": "/data/historical/BIT/BITV26/2026-09-29/15m.json",
-        "1h": "/data/historical/BIT/BITV26/2026-09-29/1h.json"
-      },
-      "barCount1m": 659
-    },
-    {
-      "id": "BIT-2026-09-30-BITV26",
-      "asset": "BIT",
-      "contract": "BITV26",
-      "tradeDate": "2026-09-30",
-      "timezone": "America/Sao_Paulo",
-      "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-30?type=1",
-      "tickCount": 61122,
-      "stats": {
-        "first": 441740.0,
-        "last": 436840.0,
-        "high": 448800.0,
-        "low": 435980.0,
-        "rangePct": 0.029022,
-        "trendPct": -0.011092,
-        "volume": 265262.0,
-        "tags": [
-          "trend-down"
-        ]
-      },
-      "bars": {
-        "1m": "/data/historical/BIT/BITV26/2026-09-30/1m.json",
-        "5m": "/data/historical/BIT/BITV26/2026-09-30/5m.json",
-        "15m": "/data/historical/BIT/BITV26/2026-09-30/15m.json",
-        "1h": "/data/historical/BIT/BITV26/2026-09-30/1h.json"
-      },
-      "barCount1m": 632
     }
   ]
 }
