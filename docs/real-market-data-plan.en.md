@@ -51,7 +51,7 @@ Start with Brazilian instruments:
 - WDOFUT;
 - BIT.
 
-The first collection does not need to cover entire years. A small but diverse collection is enough to validate the experience:
+The first collection for each market family does not need to cover entire years. A small but diverse collection is enough to validate the experience:
 
 - trends;
 - breakouts and failures;
