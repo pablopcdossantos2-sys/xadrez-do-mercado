@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.6
+> **Strategic Document** · v1.7
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 17 shipped · 15 pending
+**Summary:** 32 items · 4 tiers · 19 shipped · 13 pending
 
 ---
 
@@ -206,15 +206,15 @@ This is the purest form of counterfactual training: not "what would have happene
 
 ## Executive summary
 
-**Seventeen of thirty-two items shipped.** Every Tier 1 and Tier 2 item is now complete. The two new additions — **adaptive difficulty** and **reverse replay** — close out the last of the "learning loop" work:
+**Nineteen of thirty-two items are now shipped.** Tier 2 is complete, while Tier 1 items 3 and 4 remain pending because their previously documented capabilities are not yet fully present in the audited codebase.
 
-- **Adaptive difficulty** ensures the user is always at the edge of their competence, keying off *process* (decisions matching the analyst) rather than outcome, so a lucky streak doesn't push them into hard mode.
-- **Reverse replay** lets the user *feel* the alternative side, not just read about it. It is the last missing piece of the "counterfactual" philosophy that has been central to this project since item #1.
+The two newly verified learning-loop items are **adaptive difficulty** and **reverse replay**:
 
-The learning system is now self-contained: it decides, replays, debriefs, calibrates, and lets the user step sideways into the road not taken.
+- **Adaptive difficulty** keeps the user in a target process-accuracy zone using a rolling 20-decision window, with difficulty changes driven by decision quality rather than lucky trade outcomes.
+- **Reverse replay** turns the existing counterfactual numbers into an interactive, non-scoring exploration of the same future sequence.
 
-What remains is mostly **depth** (real levels, microstructure, macro events), **meta-progression** (Glicko ELO, daily challenges, cards), and **engineering** (tests, offline PWA). None of them are on the critical path anymore — the tool already teaches.
+The remaining work is mostly **depth** (real levels, microstructure, macro events), **meta-progression** (Glicko ELO, daily challenges, cards), and **engineering** (tests, offline PWA). 
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.6 · 32 items · 4 tiers · 17 shipped · 15 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.7 · 32 items · 4 tiers · 19 shipped · 13 pending*
