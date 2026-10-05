@@ -6,7 +6,7 @@
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 19 entregues · 13 pendentes
+**Resumo:** 32 itens · 4 tiers · 23 entregues · 9 pendentes
 
 ---
 
@@ -97,7 +97,7 @@ O nível atual aparece num pequeno badge na barra superior do jogo, então o usu
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE (no repo)
 
 ### 16. Modo "Only structure" vs "Full context"
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
 ### 17. Replay reverso pós-resultado
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
@@ -109,13 +109,13 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 É a forma mais pura de treino contrafactual: não "o que teria acontecido" como um número estático de R, mas "aqui está o que o mercado fez, e aqui está como teria sido se você tivesse estado do outro lado."
 
 ### 18. Session clock visual
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
 ### 19. Modo "Speed run"
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE (no repo)
 
 ### 20. Revenge trade warning
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
 ---
 
@@ -151,7 +151,7 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 **Esforço:** Alto · **Status:** ✅ ENTREGUE (no repo)
 
 ### 30. Testes para funções puras
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
 ### 31. Modo offline (service worker)
 **Esforço:** Médio · **Status:** Pendente
@@ -189,13 +189,13 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 | 12 | Níveis RTH/ETH | T3 | Médio | Médio | Pendente |
 | 13 | Microestrutura | T3 | Alto | Médio-alto | Pendente |
 | 14 | Eventos macro | T3 | Médio | Médio | Pendente |
-| 16 | Only structure vs Full context | T3 | Baixo | Médio | Pendente |
-| 18 | Session clock | T3 | Baixo | Médio | Pendente |
-| 20 | Revenge trade warning | T3 | Baixo | Médio | Pendente |
+| 16 | Only structure vs Full context | T3 | Baixo | Médio | ✅ |
+| 18 | Session clock | T3 | Baixo | Médio | ✅ |
+| 20 | Revenge trade warning | T3 | Baixo | Médio | ✅ |
 | 21 | Curva de ELO (Glicko) | T4 | Médio | Médio-alto | Pendente |
 | 26 | Desafios diários | T4 | Médio | Médio | Pendente |
 | 27 | Cartas colecionáveis | T4 | Médio | Baixo | Pendente |
-| 30 | Testes de funções puras | T4 | Baixo | Engenharia | Pendente |
+| 30 | Testes de funções puras | T4 | Baixo | Engenharia | ✅ |
 | 31 | Modo offline (PWA) | T4 | Médio | Baixo | Pendente |
 
 ### Quick wins — faça primeiro
@@ -214,15 +214,19 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 
 ## Resumo executivo
 
-**Dezenove dos trinta e dois itens estão entregues.** O Tier 2 está completo, enquanto os itens 3 e 4 do Tier 1 permanecem pendentes porque as capacidades anteriormente documentadas ainda não estão totalmente presentes no código auditado.
+**Vinte e três dos trinta e dois itens estão entregues.** O Tier 2 está completo, enquanto os itens 3 e 4 do Tier 1 permanecem pendentes porque as capacidades anteriormente documentadas ainda não estão totalmente presentes no código auditado.
 
-Os dois itens de loop de aprendizado agora efetivamente verificados são **dificuldade adaptativa** e **replay reverso**:
+Os novos quick wins entregues agora incluem **Only structure vs Full context**, **Session clock visual** e **Revenge trade warning**, além de **testes de funções puras**. Eles se somam à **dificuldade adaptativa** e ao **replay reverso**:
 
-- **Dificuldade adaptativa** mantém o usuário em uma zona alvo de precisão de processo usando uma janela móvel de 20 decisões, alterando a dificuldade com base na qualidade da decisão, e não em resultados de sorte.
-- **Replay reverso** transforma os números contrafactuais existentes em uma exploração interativa e não contabilizada da mesma sequência futura.
+- **Only structure vs Full context** permite ocultar o contexto de mercado durante a decisão sem esconder o próprio gráfico.
+- **Session clock visual** acompanha o horário da última barra visível no replay.
+- **Revenge trade warning** cria uma pausa comportamental após uma perda antes da próxima decisão em Standard/Blind.
+- **Testes de funções puras** cobrem analytics e limiares de dificuldade adaptativa com Vitest.
+- **Dificuldade adaptativa** mantém o usuário em uma zona alvo de precisão de processo usando uma janela móvel de 20 decisões.
+- **Replay reverso** transforma os números contrafactuais em uma exploração interativa e não contabilizada da mesma sequência futura.
 
-O trabalho restante está concentrado em **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (testes, PWA offline).
+O trabalho restante está concentrado em **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (PWA offline).
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.7 · 32 itens · 4 tiers · 19 entregues · 13 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.8 · 32 itens · 4 tiers · 23 entregues · 9 pendentes*
