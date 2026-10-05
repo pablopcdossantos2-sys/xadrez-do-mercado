@@ -8,12 +8,13 @@
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import type { ChangeEvent, ReactNode } from 'react';
-import { analyzeDebrief, analyzePuzzle, computeDEMA, computeEMA, computeVWAP, detectTrap, REF_SL, REF_TP, simulateSide } from './analytics';
+import { analyzeDebrief, analyzePuzzle, detectTrap, REF_SL, REF_TP, simulateSide } from './analytics';
 import { generateMarketData } from './data';
 import { buildNextStats, reducer } from './reducer';
 import type { Action, AppState, Decision, Instrument, JournalEntry, Mode, Timeframe, TradeOutcome } from './types';
 import { exportJournalCsv, exportJournalJson, isFreezeReady, loadJournal, loadLanguage, loadSoundPreference, loadStats, saveJournal, saveLanguage, saveSoundPreference, saveStats } from './storage';
 import { translate, type TranslationKey } from './translations';
+import TapeChart from './TapeChart';
 import './styles.css';
 
 const SPEED_TOTAL_ROUNDS=10;
@@ -41,31 +42,6 @@ function fmtR(r:number){return (r>=0?'+':'')+r.toFixed(2)+'R';}
 function fmtDuration(ms:number){const s=Math.max(0,Math.round(ms/1000)),m=Math.floor(s/60);return m+':'+String(s%60).padStart(2,'0');}
 function rank(elo:number,t:T){return elo<1180?t('rankNovice'):elo<1260?t('rankDeveloping'):elo<1360?t('rankConsistent'):elo<1480?t('rankSharp'):t('rankInstitutional');}
 function Toggle({active,children,onClick}:{active:boolean;children:ReactNode;onClick:()=>void}){return <button className={'toggle '+(active?'active':'')} onClick={onClick}>{children}</button>;}
-
-function TapeChart({bars,showVwap,showEma,showDema,showLevels,showVol,blind,entryPrice,slPrice,tpPrice,t}:{bars:AppState['replayData'];showVwap:boolean;showEma:boolean;showDema:boolean;showLevels:boolean;showVol:boolean;blind:boolean;entryPrice:number|null;slPrice:number|null;tpPrice:number|null;t:T}){
-  const width=960,height=510,left=18,right=72,padBottom=showVol&&!blind?78:48,visible=bars.slice(-90);
-  if(!visible.length)return <div className="chart-empty">{t('loadingChart')}</div>;
-  const min=Math.min(...visible.map(x=>x.low)),max=Math.max(...visible.map(x=>x.high)),range=Math.max(1,max-min),top=18;
-  const x=(i:number)=>left+i*((width-left-right)/Math.max(1,visible.length-1));
-  const y=(p:number)=>top+(max-p)/range*(height-top-padBottom),barW=Math.max(3,(width-left-right)/visible.length*.58);
-  const vwap=blind||!showVwap?[]:computeVWAP(visible),ema=blind||!showEma?[]:computeEMA(visible,20),dema=blind||!showDema?[]:computeDEMA(visible,15);
-  const levels=blind||!showLevels?[]:[Math.max(...visible.slice(0,45).map(x=>x.high)),Math.min(...visible.slice(0,45).map(x=>x.low))];
-  const volMax=Math.max(...visible.map(x=>x.volume),1),poly=(a:{value:number}[])=>a.map((q,i)=>x(i)+','+y(q.value)).join(' ');
-  return <div className="chart-wrap"><svg className="tape-chart" viewBox={'0 0 '+width+' '+height} role="img" aria-label={t('candlesAria')}>
-    <rect width={width} height={height} fill="#0f141d"/>
-    {Array.from({length:6},(_,i)=>{const gy=top+i*((height-top-padBottom)/5);return <line key={i} x1={left} x2={width-right} y1={gy} y2={gy} stroke="#232b38"/>;})}
-    {levels.map((p,i)=><line key={i} x1={left} x2={width-right} y1={y(p)} y2={y(p)} stroke="#596476" strokeDasharray="5 5"/>)}
-    {visible.map((b,i)=>{const up=b.close>=b.open,cx=x(i),bodyTop=y(Math.max(b.open,b.close)),bodyBottom=y(Math.min(b.open,b.close)),vh=(b.volume/volMax)*(height-top-padBottom)*.18;return <g key={b.time}><line x1={cx} x2={cx} y1={y(b.high)} y2={y(b.low)} stroke={up?'#46c2a4':'#f16b67'} strokeWidth="1.15"/><rect x={cx-barW/2} y={bodyTop} width={barW} height={Math.max(1.4,bodyBottom-bodyTop)} fill={up?'#46c2a4':'#f16b67'} rx="1"/>{showVol&&!blind&&<rect x={cx-barW/2} y={height-padBottom-vh} width={barW} height={vh} fill={up?'#46c2a466':'#f16b674d'}/>}</g>;})}
-    {vwap.length>1&&<polyline points={poly(vwap)} fill="none" stroke="#d9a441" strokeWidth="2"/>}
-    {ema.length>1&&<polyline points={poly(ema)} fill="none" stroke="#61a5ff" strokeWidth="1.8"/>}
-    {dema.length>1&&<polyline points={poly(dema)} fill="none" stroke="#c084fc" strokeWidth="1.7"/>}
-    {!blind&&entryPrice!==null&&<line x1={left} x2={width-right} y1={y(entryPrice)} y2={y(entryPrice)} stroke="#6f8cff" strokeDasharray="4 4"/>}
-    {!blind&&slPrice!==null&&<line x1={left} x2={width-right} y1={y(slPrice)} y2={y(slPrice)} stroke="#f16b67" strokeDasharray="3 6"/>}
-    {!blind&&tpPrice!==null&&<line x1={left} x2={width-right} y1={y(tpPrice)} y2={y(tpPrice)} stroke="#46c2a4" strokeDasharray="3 6"/>}
-    {!blind&&Array.from({length:6},(_,i)=>{const p=max-i*range/5;return <text key={'p'+i} x={width-right+7} y={y(p)+3} fill="#657184" fontSize="10" fontFamily="monospace">{p.toFixed(2)}</text>;})}
-    {!blind&&[0,Math.floor(visible.length/2),visible.length-1].map((i)=><text key={'t'+i} x={x(i)} y={height-12} textAnchor="middle" fill="#657184" fontSize="9" fontFamily="monospace">{new Date(visible[i].time*1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</text>)}
-  </svg>{!blind&&<div className="chart-legend"><span>• {t('vwap')}</span><span>• {t('ema')}</span><span>• {t('dema')}</span><span className="legend-note">{t('syntheticData')}</span></div>}</div>;
-}
 
 function WeakSpots({state,t}:{state:AppState;t:T}){
   const groups=[state.stats.breakdown.bySetup,state.stats.breakdown.byTimeframe,state.stats.breakdown.byDirection,state.stats.breakdown.byInstrument];
