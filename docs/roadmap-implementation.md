@@ -28,3 +28,7 @@ The interactive application state is centralized in a typed React `useReducer`. 
 - Preserved previous statistics and journal data through versioned local-storage migration.
 - Added an explicit EN/PT-BR dictionary parity guard.
 - Corrected the documentation to distinguish synthetic procedural data from real historical market data.
+
+## Roadmap consistency audit
+
+The audit also reconciled roadmap claims with the actual implementation. Items 3 (AI validation against hindsight bias) and 4 (procedural-generator realism) were marked Pending because the current source did not contain the capabilities previously described as shipped. This avoids documenting functionality that is not actually present.
