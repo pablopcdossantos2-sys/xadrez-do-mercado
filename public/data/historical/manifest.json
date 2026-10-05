@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "generatedAt": "pending-bootstrap",
+  "source": {
+    "provider": "B3",
+    "feed": "derivatives tick-by-tick",
+    "endpoint": "https://drp.b3.com.br/rapinegocios/tickercsv/{date}?type=1",
+    "notes": "The bootstrap workflow downloads raw B3 files, filters WIN/WDO/BIT futures, aggregates them, and discards the raw ZIPs."
+  },
+  "sessions": []
+}
