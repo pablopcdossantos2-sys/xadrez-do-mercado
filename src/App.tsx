@@ -26,7 +26,7 @@ type T=(key:TranslationKey,vars?:Record<string,string|number>)=>string;
 function initialState():AppState{
   return {
     lang:loadLanguage(),soundEnabled:loadSoundPreference(),stats:loadStats(),journal:loadJournal(),
-    timeframe:'15m',instrument:'MES',mode:'standard',showVwap:true,showEma:true,showDema:false,showLevels:true,showVol:true,
+    timeframe:'15m',instrument:'MES',mode:'standard',showVwap:true,showEma:true,showDema:false,showLevels:true,showVol:true,contextMode:'full',
     phase:'HOME',puzzleData:{history:[],future:[]},replayData:[],aiData:null,userDecision:null,entryPrice:null,
     slOffset:REF_SL,tpOffset:REF_TP,playbackIdx:0,isPlaying:false,speed:3,tradeResult:null,rMultiple:0,eloDelta:0,
     debriefAxes:[],trap:null,skipReason:null,skipReasonMatch:null,aiSkipReason:null,freezeUsedThisPuzzle:false,freezeStreakValue:0,
