@@ -5,7 +5,7 @@ import { eloDelta } from '../src/rating';
 import { getAdaptiveDifficulty } from '../src/difficulty';
 import { parseOhlcvCsv, parseOhlcvJson, splitDataset } from '../src/realData';
 import { ACTIVE_ASSETS } from '../src/assets';
-import { selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
+import { selectHistoricalContractSessions, selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
 import type { Bar, JournalEntry } from '../src/types';
 
 function bar(close:number,open=close,high=Math.max(open,close),low=Math.min(open,close),time=0):Bar{
@@ -89,6 +89,16 @@ describe('real market data foundation',()=>{
     expect(a?.future).toHaveLength(38);
   });
 
+  it('prefers the longest same-contract historical run',()=>{
+    const base={timezone:'America/Sao_Paulo',source:'b3',sourceUrl:'x',tickCount:100,
+      stats:{first:1,last:1,high:1,low:1,rangePct:0,trendPct:0,volume:1,tags:[]},bars:{'1m':'/x.json'},barCount1m:120} as const;
+    const manifest={version:1,generatedAt:'x',source:{provider:'B3',feed:'deriv',endpoint:'x',notes:'x'},sessions:[
+      {...base,id:'a1',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-23'},
+      {...base,id:'a2',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-24'},
+      {...base,id:'b1',asset:'WINFUT',contract:'WINX26',tradeDate:'2026-09-25'}
+    ]} as const;
+    expect(selectHistoricalContractSessions(manifest,'WINFUT','1m').map(x=>x.id)).toEqual(['a1','a2']);
+  });
   it('filters historical sessions by asset and timeframe',()=>{
     const manifest={
       version:1,generatedAt:'x',
