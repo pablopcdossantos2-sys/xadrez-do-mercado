@@ -1,4 +1,4 @@
-const CACHE='trading-tape-puzzles-v1';
+const CACHE='xadrez-do-mercado-v1';
 const SHELL=['/','/manifest.webmanifest'];
 
 self.addEventListener('install',event=>{
