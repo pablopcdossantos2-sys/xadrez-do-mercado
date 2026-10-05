@@ -72,6 +72,7 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 - [Roadmap in Portuguese](docs/roadmap.pt-BR.md)
 - [Roadmap in English](docs/roadmap.en.md)
 - [Implementation notes](docs/roadmap-implementation.md)
+- [Real market data plan](docs/real-market-data-plan.en.md)
 - [Puzzle creation tutorial — Portuguese](docs/tutorial-create-puzzles.pt-BR.md)
 - [Puzzle creation tutorial — English](docs/tutorial-create-puzzles.md)
 
