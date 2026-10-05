@@ -132,7 +132,7 @@ export function buildNextStats(
 ):{stats:Stats;delta:number;freezeUsed:boolean;freezeStreak:number}{
   const processMatch=acceptedDecisions.includes(decision);
   const correct=result==='WIN'||(result==='SKIP'&&decision==='SKIP'&&processMatch)||(result==='FLATTEN'&&r>0&&processMatch);
-  const score:0|0.5|1=result==='FLATTEN'&&r!==0?.5:(correct?1:0);
+  const score:0|0.5|1=result==='FLATTEN'&&r!==0?0.5:(correct?1:0);
   const delta=eloDelta(current.elo,DIFFICULTY_RATING[difficulty],score);
 
   let streak=delta>0?current.streak+1:0;
