@@ -32,7 +32,6 @@ export type Action =
   | {type:'SET_SKIP_DRAFT';reason:string}
   | {type:'CLOSE_SKIP'}
   | {type:'SET_SKIP_REASON';reason:string;match:boolean;aiReason:string}
-  | {type:'SET_REPLAY';data:Bar[];idx:number}
   | {type:'TICK_REPLAY';idx:number;data:Bar[]}
   | {type:'SET_PLAYING';playing:boolean}
   | {type:'SET_SPEED';speed:number}
