@@ -1,4 +1,4 @@
-# Trading Tape Puzzles
+# Xadrez do Mercado
 
 *Read this in other languages: [English](README-en.md)*
 
@@ -76,7 +76,7 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 ## 👤 Autoria e desenvolvimento
 
-Trading Tape Puzzles é uma ferramenta de treinamento baseada em navegador, desenvolvida de forma independente por Pablo Phillipe Cândido dos Santos, destinada ao exercício de tomada de decisão de day traders de futuros por meio de puzzles de price action, replay de operações e debrief contrafactual.
+Xadrez do Mercado é uma ferramenta de treinamento baseada em navegador, desenvolvida de forma independente por Pablo Phillipe Cândido dos Santos, destinada ao exercício de tomada de decisão de day traders de futuros por meio de puzzles de price action, replay de operações e debrief contrafactual.
 
 O desenvolvimento contou com a utilização de ferramentas de inteligência artificial generativa como recurso auxiliar no processo de desenvolvimento, mantendo-se sob responsabilidade do autor a concepção, implementação, integração e verificação do projeto.
 
