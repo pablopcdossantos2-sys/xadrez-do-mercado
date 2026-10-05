@@ -34,8 +34,8 @@ Referências:
 
 Concluída.
 
-- Ativos: MES, MNQ, WINFUT, WDOFUT e BIT.
-- Códigos B3 dos ativos brasileiros: WIN, WDO e BIT.
+- Ativos: MES, MNQ, WINFUT e WDOFUT.
+- Códigos B3 dos ativos brasileiros: WIN e WDO.
 - Metadados por ativo em `src/assets.ts`.
 - Parser real de OHLCV em CSV/JSON em `src/realData.ts`.
 - Separação entre histórico visível e futuro do puzzle.
@@ -160,7 +160,6 @@ Consideraremos a migração histórica bem-sucedida quando houver:
 
 - pelo menos um conjunto histórico real funcional para WINFUT;
 - pelo menos um para WDOFUT;
-- pelo menos um para BIT;
 - suporte a 1m, 5m e 15m;
 - volume real;
 - metadados de contrato/sessão;
