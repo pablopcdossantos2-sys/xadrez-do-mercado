@@ -1,6 +1,6 @@
 {
-  "name":"Trading Tape Puzzles",
-  "short_name":"Tape Puzzles",
+  "name":"Xadrez do Mercado",
+  "short_name":"Xadrez do Mercado",
   "start_url":"/",
   "display":"standalone",
   "background_color":"#090d14",
