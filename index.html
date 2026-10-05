@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trading Tape Puzzles</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  html, body, #root { height: 100%; margin: 0; }
+  body { background: #0E1117; color: #d1d4dc; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #131722; }
+  ::-webkit-scrollbar-thumb { background: #2b2b43; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #363c4e; }
+  input[type="range"] { accent-color: #2962FF; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useCallback, useMemo, useContext, createContext } = React;
+
+/* ============================================================================
+   i18n
+============================================================================ */
+const TRANSLATIONS = {
+  en: {
+    appName: 'Tape Puzzles',
+    elo: 'ELO', solved: 'Solved', accuracy: 'Accuracy', streak: 'Streak', tradesR: 'Trades R',
+    best: 'best',
+    loading: 'Loading Puzzle',
+    headerDecision: 'Decision',
+    decisionQ: 'Long, short, or skip?',
+    marketContext: 'Market Context',
+    yourCall: 'Your Call',
+    long: 'Long', short: 'Short', skip: 'Skip',
+    shortcutsLsk: 'Shortcuts: L = long · S = short · K = skip',
+    playbook: 'Playbook',
+    ruleGraded: 'rule-graded',
+    puzzle: 'Puzzle',
+    bracket: 'Bracket', entry: 'Entry', stop: 'Stop', target: 'Target',
+    stopLoss: 'Stop Loss', takeProfit: 'Take Profit',
+    play: 'Play', pause: 'Pause', flatten: 'Flatten',
+    speed: 'Speed', bar: 'Bar',
+    spacePlayHint: 'Space: play/pause · F: flatten · →: step',
+    resultWin: 'Target Hit', resultLoss: 'Stopped Out', resultTimeout: 'Time Expired',
+    resultFlat: 'Flattened', resultSkip: 'Skipped',
+    correctMove: 'Correct move', eloDelta: 'ELO',
+    debrief: 'Debrief & Why',
+    nextPuzzle: 'Next Puzzle', nextHint: 'Shortcut: N',
+    contextAtDecision: 'Context at Decision',
+    awaitingData: 'Awaiting data…',
+    whatIf: 'What if…',
+    yourTrade: 'Your trade',
+    altLong: 'If Long', altShort: 'If Short', altSkip: 'If Skip',
+    bestMove: 'best',
+    counterfactualNote: 'Reference bracket 12 / 24 pts (1:2 R) applied to the same future bars.',
+    outcomeWin: 'TP hit', outcomeLoss: 'SL hit', outcomeTimeout: 'Timeout', outcomeSkip: 'No trade',
+    barsHeld: 'bars',
+    rowSessionMove: 'Session move',
+    rowRange: 'Total range',
+    rowAtr: 'ATR(14)',
+    rowVwap: 'Price vs VWAP',
+    rowLastClose: 'Last close',
+    rowOpen: 'Session open',
+    contextTpl: 'Range of {range} pts. Price {vwapDir} VWAP by {distVwap} pts ({atrPct} ATR). ATR(14) ≈ {atr} pts. Last close at {lastClose}.',
+    vwapAbove: 'above', vwapBelow: 'below',
+    expl_LONG: 'Price tested local support and formed a clean rejection. Path of least resistance is LONG — the long target was reached before any stop, and recent momentum confirmed continuation.',
+    expl_SHORT: 'Price failed to break immediate resistance and showed loss of momentum. SHORT is the highest-expectancy read — the short target printed before any stop and bearish structure held.',
+    expl_SKIP: 'The setup is ambiguous: neither long nor short reached its target before the respective stop within the replay window. No edge — the highest-expectancy move is SKIP (preserve capital).',
+  },
+  pt: {
+    appName: 'Tape Puzzles',
+    elo: 'ELO', solved: 'Resolvidos', accuracy: 'Precisão', streak: 'Sequência', tradesR: 'R Total',
+    best: 'recorde',
+    loading: 'Carregando Puzzle',
+    headerDecision: 'Decisão',
+    decisionQ: 'Long, short, ou skip?',
+    marketContext: 'Contexto de Mercado',
+    yourCall: 'Sua Decisão',
+    long: 'Long', short: 'Short', skip: 'Skip',
+    shortcutsLsk: 'Atalhos: L = long · S = short · K = skip',
+    playbook: 'Playbook',
+    ruleGraded: 'regra-avaliado',
+    puzzle: 'Puzzle',
+    bracket: 'Bracket', entry: 'Entrada', stop: 'Stop', target: 'Alvo',
+    stopLoss: 'Stop Loss', takeProfit: 'Take Profit',
+    play: 'Play', pause: 'Pausar', flatten: 'Zerar',
+    speed: 'Velocidade', bar: 'Barra',
+    spacePlayHint: 'Espaço: play/pause · F: zerar · →: passo',
+    resultWin: 'Alvo Atingido', resultLoss: 'Stopado', resultTimeout: 'Tempo Esgotado',
+    resultFlat: 'Zerado', resultSkip: 'Pulado',
+    correctMove: 'Jogada correta', eloDelta: 'ELO',
+    debrief: 'Debrief & Motivo',
+    nextPuzzle: 'Próximo Puzzle', nextHint: 'Atalho: N',
+    contextAtDecision: 'Contexto na Decisão',
+    awaitingData: 'Aguardando dados…',
+    whatIf: 'E se…',
+    yourTrade: 'Sua jogada',
+    altLong: 'Se Long', altShort: 'Se Short', altSkip: 'Se Skip',
+    bestMove: 'melhor',
+    counterfactualNote: 'Bracket de referência 12 / 24 pts (1:2 R) aplicado às mesmas barras futuras.',
+    outcomeWin: 'TP batido', outcomeLoss: 'SL batido', outcomeTimeout: 'Timeout', outcomeSkip: 'Sem trade',
+    barsHeld: 'barras',
+    rowSessionMove: 'Variação da sessão',
+    rowRange: 'Range total',
+    rowAtr: 'ATR(14)',
+    rowVwap: 'Preço vs VWAP',
+    rowLastClose: 'Último close',
+    rowOpen: 'Abertura da sessão',
+    contextTpl: 'Range de {range} pts. Preço {vwapDir} do VWAP em {distVwap} pts ({atrPct} ATR). ATR(14) ≈ {atr} pts. Último close em {lastClose}.',
+    vwapAbove: 'acima', vwapBelow: 'abaixo',
+    expl_LONG: 'O preço testou suporte local e formou rejeição limpa. O caminho de menor resistência é LONG — o alvo de long foi atingido antes de qualquer stop, e o momentum recente confirmou a continuidade.',
+    expl_SHORT: 'O preço falhou em romper a resistência imediata e mostrou perda de momentum. SHORT é a leitura de maior expectância — o alvo de short bateu antes de qualquer stop e a estrutura de baixa se manteve.',
+    expl_SKIP: 'O setup é ambíguo: nem o long nem o short atingiram o alvo antes do respectivo stop dentro da janela de replay. Sem edge — a jogada de maior valor esperado é SKIP (preservar capital).',
+  },
+};
+
+const I18nCtx = createContext({ lang: 'en', t: (k) => k, setLang: () => {} });
+const useT = () => useContext(I18nCtx);
+
+function makeT(lang) {
+  return (key, vars) => {
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    let s = dict[key] ?? TRANSLATIONS.en[key] ?? key;
+    if (vars) {
+      for (const k of Object.keys(vars)) {
+        s = s.split(`{${k}}`).join(String(vars[k]));
+      }
+    }
+    return s;
+  };
+}
+
+/* ============================================================================
+   Icons
+============================================================================ */
+const PlayIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+    <path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z" />
+  </svg>
+);
+const PauseIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+    <path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z" />
+  </svg>
+);
+const StepIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+    <path d="M200,32V224a8,8,0,0,1-16,0V40L72.43,205.82a15.93,15.93,0,0,1-16.14.36A15.82,15.82,0,0,1,48,192.38V63.62A15.82,15.82,0,0,1,56.29,49.82a15.93,15.93,0,0,1,16.14.36L184,216V32a8,8,0,0,1,16,0Z" />
+  </svg>
+);
+const TrophyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+    <path d="M240,88a48.05,48.05,0,0,1-48,48H181.71a64.12,64.12,0,0,1-16.1,38.16l-13.88,15.42a32,32,0,0,0-7.73,20.89V224a16,16,0,0,1-16,16H128a16,16,0,0,1-16-16V210.47a32,32,0,0,0-7.73-20.89l-13.88-15.42A64.12,64.12,0,0,1,74.29,136H64a48,48,0,0,1,0-96H192a48.05,48.05,0,0,1,48,48Z" />
+  </svg>
+);
+
+/* ============================================================================
+   Market data generation
+============================================================================ */
+const TF_SEC = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600 };
+const TF_VOL_MULT = { '1m': 0.6, '5m': 1.0, '15m': 1.8, '1h': 3.2 };
+
+function generateMarketData(timeframe, instrument) {
+  const stepSec = TF_SEC[timeframe] || 900;
+  const volUnit = TF_VOL_MULT[timeframe] || 1;
+  const basePrice = instrument === 'MES' ? 4200 : 15500;
+  const volatility = (timeframe === '1m' ? 0.9 : timeframe === '5m' ? 2.4 : timeframe === '15m' ? 5.5 : 11) * volUnit;
+
+  const bars = [];
+  const total = 120;
+  const decisionIdx = 82;
+
+  const sessionStart = new Date();
+  sessionStart.setHours(9, 30, 0, 0);
+  let t = Math.floor(sessionStart.getTime() / 1000) - decisionIdx * stepSec;
+
+  let price = basePrice + (Math.random() - 0.5) * 200;
+  let trendBias = (Math.random() - 0.5) * 1.5;
+
+  for (let i = 0; i < total; i++) {
+    if (i === 0 || i % 22 === 0) trendBias = (Math.random() - 0.5) * 3.2;
+    const localBias = i > decisionIdx - 8 && i <= decisionIdx ? trendBias * 1.6 : trendBias;
+
+    const open = price;
+    const move = localBias + (Math.random() - 0.5) * volatility;
+    const close = open + move;
+    const hi = Math.max(open, close) + Math.random() * volatility * 0.55;
+    const lo = Math.min(open, close) - Math.random() * volatility * 0.55;
+    const vol = Math.round(2500 + Math.random() * 4500 + Math.abs(move) * 800);
+
+    bars.push({
+      time: t,
+      open: +open.toFixed(2),
+      high: +hi.toFixed(2),
+      low: +lo.toFixed(2),
+      close: +close.toFixed(2),
+      volume: vol,
+    });
+    price = close;
+    t += stepSec;
+  }
+  return { history: bars.slice(0, decisionIdx), future: bars.slice(decisionIdx, total) };
+}
+
+/* ============================================================================
+   Indicators
+============================================================================ */
+function computeEMA(bars, period) {
+  const k = 2 / (period + 1);
+  let ema = null;
+  const out = [];
+  for (const b of bars) {
+    ema = ema === null ? b.close : b.close * k + ema * (1 - k);
+    out.push({ time: b.time, value: +ema.toFixed(4) });
+  }
+  return out;
+}
+function computeDEMA(bars, period) {
+  const ema1 = computeEMA(bars, period);
+  const fake = ema1.map(e => ({ time: e.time, close: e.value }));
+  const ema2 = computeEMA(fake, period);
+  return ema1.map((e, i) => ({ time: e.time, value: +(2 * e.value - ema2[i].value).toFixed(4) }));
+}
+function computeVWAP(bars) {
+  let cumPV = 0, cumV = 0;
+  const out = [];
+  for (const b of bars) {
+    const typical = (b.high + b.low + b.close) / 3;
+    cumPV += typical * (b.volume || 1);
+    cumV += (b.volume || 1);
+    out.push({ time: b.time, value: +(cumPV / cumV).toFixed(4) });
+  }
+  return out;
+}
+function computeATR(bars, period = 14) {
+  if (bars.length < period + 1) return 0;
+  let sum = 0;
+  for (let i = bars.length - period; i < bars.length; i++) {
+    const prev = bars[i - 1];
+    const cur = bars[i];
+    const tr = Math.max(cur.high - cur.low, Math.abs(cur.high - prev.close), Math.abs(cur.low - prev.close));
+    sum += tr;
+  }
+  return sum / period;
+}
+
+/* ============================================================================
+   Setup classifier (Playbook)
+============================================================================ */
+function classifySetup({ history, atr, vwap, ema }) {
+  const L = history.length;
+  if (L < 25 || !atr) return { id: 'neutral', en: 'Neutral Tape', pt: 'Tape Neutro', bias: 'skip' };
+
+  const last = history[L - 1];
+  const prev = history[L - 2];
+  const highs = history.map(b => b.high);
+  const lows = history.map(b => b.low);
+
+  const priorHigh = Math.max(...highs.slice(-30, -4));
+  const priorLow = Math.min(...lows.slice(-30, -4));
+
+  for (let i = Math.max(0, L - 3); i < L; i++) {
+    const b = history[i];
+    if (b.low < priorLow && b.close > priorLow && last.close > priorLow) {
+      return { id: 'liq_sweep_long', en: 'Liquidity Sweep — Long', pt: 'Varredura de Liquidez — Long', bias: 'long' };
+    }
+    if (b.high > priorHigh && b.close < priorHigh && last.close < priorHigh) {
+      return { id: 'liq_sweep_short', en: 'Liquidity Sweep — Short', pt: 'Varredura de Liquidez — Short', bias: 'short' };
+    }
+  }
+
+  if (vwap) {
+    if (prev.close < vwap && last.close > vwap) return { id: 'vwap_reclaim', en: 'VWAP Reclaim', pt: 'Reclaim de VWAP', bias: 'long' };
+    if (prev.close > vwap && last.close < vwap) return { id: 'vwap_reject',  en: 'VWAP Rejection', pt: 'Rejeição do VWAP', bias: 'short' };
+  }
+
+  const or = history.slice(0, 6);
+  const orh = Math.max(...or.map(b => b.high));
+  const orl = Math.min(...or.map(b => b.low));
+  const nearORH = Math.abs(last.close - orh) < atr * 2;
+  const nearORL = Math.abs(last.close - orl) < atr * 2;
+  if (nearORH && last.close > orh) return { id: 'orb_long',  en: 'Opening Range Breakout — Long',  pt: 'Rompimento do Range de Abertura — Long',  bias: 'long' };
+  if (nearORL && last.close < orl) return { id: 'orb_short', en: 'Opening Range Breakout — Short', pt: 'Rompimento do Range de Abertura — Short', bias: 'short' };
+
+  const last10 = history.slice(-10);
+  const recentLow = Math.min(...last10.map(b => b.low));
+  const priorLow20 = Math.min(...lows.slice(-30, -10));
+  const recentHigh = Math.max(...last10.map(b => b.high));
+  const priorHigh20 = Math.max(...highs.slice(-30, -10));
+  if (recentLow < priorLow20 && last.close > priorLow20) return { id: 'failed_breakdown', en: 'Failed Breakdown', pt: 'Rompimento Falho de Baixa', bias: 'long' };
+  if (recentHigh > priorHigh20 && last.close < priorHigh20) return { id: 'failed_breakout',  en: 'Failed Breakout',  pt: 'Rompimento Falho de Alta',  bias: 'short' };
+
+  if (ema) {
+    const dist = last.close - ema;
+    const nearEma = Math.abs(dist) < atr * 0.9;
+    if (nearEma && last.close > last.open && dist < 0) return { id: 'pullback_long',  en: 'Trend Pullback — Long',  pt: 'Pullback de Tendência — Long',  bias: 'long' };
+    if (nearEma && last.close < last.open && dist > 0) return { id: 'pullback_short', en: 'Trend Pullback — Short', pt: 'Pullback de Tendência — Short', bias: 'short' };
+  }
+
+  const r20h = Math.max(...highs.slice(-20));
+  const r20l = Math.min(...lows.slice(-20));
+  const range = r20h - r20l;
+  if (range > atr * 4) {
+    const mid = (r20h + r20l) / 2;
+    const topZone = r20h - atr * 0.6;
+    const botZone = r20l + atr * 0.6;
+    if (last.high > topZone && last.close < last.high - atr * 0.3 && last.close > mid) {
+      return { id: 'range_fade_short', en: 'Range Fade — Short', pt: 'Fade de Range — Short', bias: 'short' };
+    }
+    if (last.low < botZone && last.close > last.low + atr * 0.3 && last.close < mid) {
+      return { id: 'range_fade_long', en: 'Range Fade — Long', pt: 'Fade de Range — Long', bias: 'long' };
+    }
+  }
+
+  const anchor = history[Math.max(0, L - 6)];
+  const move = last.close - anchor.open;
+  if (move > atr * 1.5)  return { id: 'momentum_long',  en: 'Momentum Push — Long',  pt: 'Impulso — Long',  bias: 'long' };
+  if (move < -atr * 1.5) return { id: 'momentum_short', en: 'Momentum Push — Short', pt: 'Impulso — Short', bias: 'short' };
+
+  return { id: 'consolidation', en: 'Consolidation', pt: 'Consolidação', bias: 'skip' };
+}
+
+/* ============================================================================
+   Simulação de um lado (contrafactual + IA)
+============================================================================ */
+function simulateSide(future, entry, side, slPts, tpPts) {
+  const slPrice = side === 'LONG' ? entry - slPts : entry + slPts;
+  const tpPrice = side === 'LONG' ? entry + tpPts : entry - tpPts;
+  for (let i = 0; i < future.length; i++) {
+    const b = future[i];
+    let hitSL = false, hitTP = false;
+    if (side === 'LONG') {
+      if (b.low  <= slPrice) hitSL = true;
+      if (b.high >= tpPrice) hitTP = true;
+    } else {
+      if (b.high >= slPrice) hitSL = true;
+      if (b.low  <= tpPrice) hitTP = true;
+    }
+    if (hitSL) return { result: 'LOSS', r: -1, bars: i + 1, exit: slPrice };
+    if (hitTP) return { result: 'WIN',  r: +(tpPts / slPts).toFixed(2), bars: i + 1, exit: tpPrice };
+  }
+  const last = future[future.length - 1];
+  const diff = side === 'LONG' ? last.close - entry : entry - last.close;
+  return { result: 'TIMEOUT', r: +(diff / slPts).toFixed(2), bars: future.length, exit: last.close };
+}
+
+/* ============================================================================
+   Analisador do puzzle (IA + contrafactual + setup)
+============================================================================ */
+const REF_SL = 12, REF_TP = 24;
+
+function analyzePuzzle(history, future) {
+  const entry = history[history.length - 1].close;
+  const atr = computeATR(history, 14) || 1;
+  const vwapArr = computeVWAP(history);
+  const vwap = vwapArr[vwapArr.length - 1].value;
+  const emaArr = computeEMA(history, 20);
+  const ema = emaArr[emaArr.length - 1].value;
+
+  const setup = classifySetup({ history, atr, vwap, ema });
+
+  const longOut  = simulateSide(future, entry, 'LONG',  REF_SL, REF_TP);
+  const shortOut = simulateSide(future, entry, 'SHORT', REF_SL, REF_TP);
+  const skipOut  = { result: 'SKIP', r: 0, bars: 0, exit: entry };
+  const outcomes = { LONG: longOut, SHORT: shortOut, SKIP: skipOut };
+
+  const opts = [
+    { d: 'LONG',  r: longOut.r,  bars: longOut.bars  || 999 },
+    { d: 'SHORT', r: shortOut.r, bars: shortOut.bars || 999 },
+    { d: 'SKIP',  r: 0,         bars: 0 },
+  ];
+  opts.sort((a, b) => (b.r !== a.r ? b.r - a.r : a.bars - b.bars));
+  const decision = opts[0].r > 0.5 ? opts[0].d : 'SKIP';
+
+  const high = Math.max(...history.map(b => b.high));
+  const low  = Math.min(...history.map(b => b.low));
+  const range = high - low;
+  const distVwap = entry - vwap;
+
+  return {
+    decision, setup, outcomes,
+    entryPrice: entry, atr, vwap, range, high, low,
+    vwapDir: distVwap >= 0 ? 'above' : 'below',
+    distVwapAbs: Math.abs(distVwap),
+    atrPct: Math.abs(distVwap) / (atr || 1),
+    lastClose: entry,
+  };
+}
+
+/* ============================================================================
+   Chart
+============================================================================ */
+function TradingChart({
+  historyData, replayData,
+  showVwap, showEma, showDema, showLevels, showVol,
+  slPrice, tpPrice, entryPrice,
+  puzzleKey,
+}) {
+  const containerRef = useRef(null);
+  const chartRef = useRef(null);
+  const candleRef = useRef(null);
+  const volRef = useRef(null);
+  const emaRef = useRef(null);
+  const demaRef = useRef(null);
+  const vwapRef = useRef(null);
+  const slLineRef = useRef(null);
+  const tpLineRef = useRef(null);
+  const entryLineRef = useRef(null);
+  const levelLinesRef = useRef([]);
+  const roRef = useRef(null);
+
+  useEffect(() => {
+    if (!window.LightweightCharts || !containerRef.current) return;
+    const LWC = window.LightweightCharts;
+    const el = containerRef.current;
+
+    const chart = LWC.createChart(el, {
+      width: el.clientWidth || 800,
+      height: el.clientHeight || 500,
+      layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc' },
+      grid: { vertLines: { color: '#1f2430' }, horzLines: { color: '#1f2430' } },
+      crosshair: { mode: LWC.CrosshairMode.Normal },
+      rightPriceScale: { borderColor: '#2B2B43', scaleMargins: { top: 0.08, bottom: 0.22 } },
+      timeScale: { borderColor: '#2B2B43', timeVisible: true, secondsVisible: false, rightOffset: 6 },
+    });
+
+    const candle = chart.addCandlestickSeries({
+      upColor: '#26a69a', downColor: '#ef5350',
+      borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+    });
+
+    const vol = chart.addHistogramSeries({
+      color: '#26a69a80',
+      priceFormat: { type: 'volume' },
+      priceScaleId: 'vol',
+      priceLineVisible: false, lastValueVisible: false,
+    });
+    chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+
+    chartRef.current = chart;
+    candleRef.current = candle;
+    volRef.current = vol;
+
+    const ro = new ResizeObserver(() => {
+      if (!containerRef.current || !chartRef.current) return;
+      chartRef.current.applyOptions({
+        width: containerRef.current.clientWidth,
+        height: containerRef.current.clientHeight,
+      });
+    });
+    ro.observe(el);
+    roRef.current = ro;
+
+    return () => {
+      ro.disconnect();
+      try { chart.remove(); } catch (e) {}
+      chartRef.current = null; candleRef.current = null; volRef.current = null;
+      emaRef.current = null; demaRef.current = null; vwapRef.current = null;
+      slLineRef.current = null; tpLineRef.current = null; entryLineRef.current = null;
+      levelLinesRef.current = [];
+    };
+  }, []);
+
+  const allBars = useMemo(() => [...historyData, ...replayData], [historyData, replayData]);
+
+  useEffect(() => {
+    if (!candleRef.current || !volRef.current || allBars.length === 0) return;
+    candleRef.current.setData(allBars.map(b => ({ time: b.time, open: b.open, high: b.high, low: b.low, close: b.close })));
+    volRef.current.setData(allBars.map(b => ({
+      time: b.time, value: b.volume || 1000,
+      color: b.close >= b.open ? 'rgba(38,166,154,0.45)' : 'rgba(239,83,80,0.45)',
+    })));
+    volRef.current.applyOptions({ visible: !!showVol });
+  }, [allBars, showVol]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart || allBars.length === 0) return;
+
+    const ensureSeries = (ref, options, data) => {
+      if (!ref.current) {
+        ref.current = chart.addLineSeries({ priceLineVisible: false, lastValueVisible: false, ...options });
+      }
+      ref.current.setData(data);
+    };
+    const removeSeries = (ref) => {
+      if (ref.current) { try { chart.removeSeries(ref.current); } catch (e) {} ref.current = null; }
+    };
+
+    if (showEma) ensureSeries(emaRef, { color: '#2962FF', lineWidth: 2 }, computeEMA(allBars, Math.min(200, Math.max(20, Math.floor(allBars.length / 3)))));
+    else removeSeries(emaRef);
+
+    if (showDema) ensureSeries(demaRef, { color: '#FF9800', lineWidth: 2 }, computeDEMA(allBars, 15));
+    else removeSeries(demaRef);
+
+    if (showVwap) ensureSeries(vwapRef, { color: '#9C27B0', lineWidth: 2 }, computeVWAP(allBars));
+    else removeSeries(vwapRef);
+  }, [allBars, showEma, showDema, showVwap]);
+
+  useEffect(() => {
+    const series = candleRef.current;
+    if (!series) return;
+    for (const l of levelLinesRef.current) { try { series.removePriceLine(l); } catch (e) {} }
+    levelLinesRef.current = [];
+    if (!showLevels || historyData.length === 0) return;
+
+    const highs = historyData.map(b => b.high);
+    const lows = historyData.map(b => b.low);
+    const mid = Math.floor(historyData.length / 2);
+    const pdh = Math.max(...highs.slice(0, mid));
+    const pdl = Math.min(...lows.slice(0, mid));
+    const onh = Math.max(...highs.slice(mid));
+    const onl = Math.min(...lows.slice(mid));
+
+    const LWC = window.LightweightCharts;
+    const defs = [
+      { price: pdh, color: '#ef5350aa', title: 'PDH' },
+      { price: pdl, color: '#26a69aaa', title: 'PDL' },
+      { price: onh, color: '#ef5350aa', title: 'ONH' },
+      { price: onl, color: '#26a69aaa', title: 'ONL' },
+    ];
+    for (const d of defs) {
+      levelLinesRef.current.push(series.createPriceLine({
+        price: d.price, color: d.color, lineWidth: 1,
+        lineStyle: LWC.LineStyle.Dotted, axisLabelVisible: true, title: d.title,
+      }));
+    }
+  }, [historyData, showLevels, puzzleKey]);
+
+  useEffect(() => {
+    const series = candleRef.current;
+    if (!series) return;
+    const LWC = window.LightweightCharts;
+    const update = (ref, price, color, title) => {
+      if (ref.current) { try { series.removePriceLine(ref.current); } catch (e) {} ref.current = null; }
+      if (price !== null && price !== undefined && !Number.isNaN(price)) {
+        try {
+          ref.current = series.createPriceLine({
+            price, color, lineWidth: 2,
+            lineStyle: LWC.LineStyle.Dashed, axisLabelVisible: true, title,
+          });
+        } catch (e) {}
+      }
+    };
+    update(slLineRef, slPrice, '#ef5350', 'STOP');
+    update(tpLineRef, tpPrice, '#26a69a', 'TARGET');
+    update(entryLineRef, entryPrice, '#2962FF', 'ENTRY');
+  }, [slPrice, tpPrice, entryPrice, puzzleKey]);
+
+  useEffect(() => {
+    const series = candleRef.current;
+    if (!series) return;
+    for (const ref of [slLineRef, tpLineRef, entryLineRef]) {
+      if (ref.current) { try { series.removePriceLine(ref.current); } catch (e) {} ref.current = null; }
+    }
+    for (const l of levelLinesRef.current) { try { series.removePriceLine(l); } catch (e) {} }
+    levelLinesRef.current = [];
+  }, [puzzleKey]);
+
+  return <div ref={containerRef} className="w-full h-full relative" />;
+}
+
+/* ============================================================================
+   Small UI components
+============================================================================ */
+function StatCell({ label, value, color }) {
+  return (
+    <div className="flex flex-col items-center">
+      <span className="text-gray-500 text-[10px] uppercase tracking-wider">{label}</span>
+      <span className={`font-bold text-base ${color || 'text-white'}`}>{value}</span>
+    </div>
+  );
+}
+
+function ToggleBtn({ label, on, setter }) {
+  return (
+    <button onClick={() => setter(!on)}
+      className={`px-2 py-1 rounded border ${on ? 'bg-[#2B2B43] text-white border-blue-500/50' : 'text-gray-500 border-transparent hover:text-gray-300'}`}>
+      {label}
+    </button>
+  );
+}
+
+/* ============================================================================
+   Counterfactual panel
+============================================================================ */
+function CounterfactualPanel({ outcomes, userDecision, tradeResult, userR }) {
+  const { t } = useT();
+  const opts = ['LONG', 'SHORT', 'SKIP'];
+
+  const best = opts.reduce((acc, k) => {
+    const r = outcomes[k]?.r ?? 0;
+    if (!acc || r > acc.r) return { key: k, r };
+    return acc;
+  }, null);
+
+  const resultLabel = (key) => {
+    const o = outcomes[key];
+    if (!o || o.result === 'SKIP') return t('outcomeSkip');
+    if (o.result === 'WIN') return t('outcomeWin');
+    if (o.result === 'LOSS') return t('outcomeLoss');
+    return t('outcomeTimeout');
+  };
+  const resultColor = (key) => {
+    const o = outcomes[key];
+    if (!o || o.result === 'SKIP') return 'text-gray-400';
+    if (o.result === 'WIN') return 'text-[#26a69a]';
+    if (o.result === 'LOSS') return 'text-[#ef5350]';
+    return 'text-gray-300';
+  };
+  const rFmt = (r) => `${r > 0 ? '+' : ''}${Number(r).toFixed(2)}R`;
+
+  return (
+    <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
+      <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-2">
+        {t('whatIf')}
+      </h3>
+
+      <div className="space-y-1.5">
+        {opts.map(k => {
+          const o = outcomes[k];
+          const isUser = userDecision === k;
+          const isBest = best && best.key === k && best.r > 0.5;
+          const label = k === 'LONG' ? t('altLong') : k === 'SHORT' ? t('altShort') : t('altSkip');
+          const r = o?.r ?? 0;
+          return (
+            <div key={k}
+              className={`flex items-center justify-between text-xs font-mono rounded px-2 py-1.5 border ${
+                isUser ? 'border-blue-500/60 bg-blue-500/5' : 'border-transparent'
+              }`}>
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-300 w-16">{label}</span>
+                {isUser && <span className="text-[9px] uppercase bg-blue-600 text-white px-1.5 rounded">{t('yourTrade')}</span>}
+                {isBest && <span className="text-[9px] uppercase bg-[#26a69a]/25 text-[#26a69a] px-1.5 rounded">{t('bestMove')}</span>}
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={resultColor(k)}>{resultLabel(k)}</span>
+                <span className={`font-bold ${r > 0 ? 'text-[#26a69a]' : r < 0 ? 'text-[#ef5350]' : 'text-gray-400'} w-14 text-right`}>
+                  {k === 'SKIP' ? '0.00R' : rFmt(r)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {userDecision !== 'SKIP' && tradeResult && (
+        <div className="mt-2 pt-2 border-t border-[#2B2B43] text-[10px] text-gray-500">
+          {t('yourTrade')}: <span className="font-mono">{rFmt(userR)}</span>
+        </div>
+      )}
+      <p className="text-[10px] text-gray-500 mt-2 italic leading-snug">
+        {t('counterfactualNote')}
+      </p>
+    </div>
+  );
+}
+
+/* ============================================================================
+   App
+============================================================================ */
+function App() {
+  const [lang, setLang] = useState(() => {
+    try { return localStorage.getItem('tape_puzzle_lang') || 'en'; } catch (e) { return 'en'; }
+  });
+  useEffect(() => { try { localStorage.setItem('tape_puzzle_lang', lang); } catch (e) {} }, [lang]);
+
+  const t = useMemo(() => makeT(lang), [lang]);
+  const i18nValue = useMemo(() => ({ lang, t, setLang }), [lang, t]);
+
+  const [stats, setStats] = useState(() => {
+    try {
+      const s = localStorage.getItem('tape_puzzle_stats_v3');
+      if (s) return JSON.parse(s);
+    } catch (e) {}
+    return { elo: 1236, solved: 0, correct: 0, streak: 0, bestStreak: 0, rSum: 0 };
+  });
+  useEffect(() => {
+    try { localStorage.setItem('tape_puzzle_stats_v3', JSON.stringify(stats)); } catch (e) {}
+  }, [stats]);
+
+  const [timeframe, setTimeframe] = useState('15m');
+  const [instrument, setInstrument] = useState('MES');
+
+  const [showVwap, setShowVwap] = useState(true);
+  const [showEma, setShowEma] = useState(true);
+  const [showDema, setShowDema] = useState(false);
+  const [showLevels, setShowLevels] = useState(true);
+  const [showVol, setShowVol] = useState(true);
+
+  const [phase, setPhase] = useState('LOADING');
+  const [puzzleData, setPuzzleData] = useState({ history: [], future: [] });
+  const [replayData, setReplayData] = useState([]);
+  const [aiData, setAiData] = useState(null);
+  const [userDecision, setUserDecision] = useState(null);
+  const [entryPrice, setEntryPrice] = useState(null);
+  const [slOffset, setSlOffset] = useState(REF_SL);
+  const [tpOffset, setTpOffset] = useState(REF_TP);
+  const [playbackIdx, setPlaybackIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(3);
+  const [tradeResult, setTradeResult] = useState(null);
+  const [rMultiple, setRMultiple] = useState(0);
+  const [puzzleId, setPuzzleId] = useState(1001);
+  const [eloDelta, setEloDelta] = useState(0);
+
+  const loadNewPuzzle = useCallback((tfArg, instrArg) => {
+    const tf = tfArg || timeframe;
+    const instr = instrArg || instrument;
+    setPhase('LOADING');
+    setReplayData([]);
+    setPlaybackIdx(0);
+    setIsPlaying(false);
+    setTradeResult(null);
+    setUserDecision(null);
+    setEntryPrice(null);
+    setRMultiple(0);
+    setEloDelta(0);
+    setSlOffset(REF_SL);
+    setTpOffset(REF_TP);
+    setPuzzleId(p => p + 1);
+
+    setTimeout(() => {
+      const data = generateMarketData(tf, instr);
+      const analysis = analyzePuzzle(data.history, data.future);
+      setPuzzleData(data);
+      setAiData(analysis);
+      setPhase('DECISION');
+    }, 220);
+  }, [timeframe, instrument]);
+
+  useEffect(() => { loadNewPuzzle('15m', 'MES'); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { loadNewPuzzle(timeframe, instrument); /* eslint-disable-next-line */ }, [timeframe, instrument]);
+
+  const slPrice = entryPrice !== null && userDecision !== 'SKIP'
+    ? (userDecision === 'LONG' ? entryPrice - slOffset : entryPrice + slOffset) : null;
+  const tpPrice = entryPrice !== null && userDecision !== 'SKIP'
+    ? (userDecision === 'LONG' ? entryPrice + tpOffset : entryPrice - tpOffset) : null;
+
+  const evaluateResult = useCallback((resultType, rMult) => {
+    setPhase('RESULT');
+    setTradeResult(resultType);
+    setRMultiple(rMult ?? 0);
+    setIsPlaying(false);
+
+    const aiDec = aiData ? aiData.decision : 'SKIP';
+    const isCorrect =
+      resultType === 'WIN' ||
+      (resultType === 'SKIP' && userDecision === 'SKIP' && aiDec === 'SKIP') ||
+      (resultType === 'FLATTEN' && (rMult ?? 0) > 0 && aiDec === userDecision);
+
+    let delta = 0;
+    if (resultType === 'WIN' || (resultType === 'SKIP' && userDecision === 'SKIP' && aiDec === 'SKIP')) delta = 18;
+    else if (resultType === 'FLATTEN' && (rMult ?? 0) > 0) delta = 8;
+    else delta = -15;
+
+    setEloDelta(delta);
+
+    setStats(prev => {
+      const newStreak = delta > 0 ? prev.streak + 1 : 0;
+      return {
+        elo: Math.max(0, prev.elo + delta),
+        solved: prev.solved + 1,
+        correct: prev.correct + (isCorrect ? 1 : 0),
+        streak: newStreak,
+        bestStreak: Math.max(prev.bestStreak || 0, newStreak),
+        rSum: +(prev.rSum + (rMult ?? 0)).toFixed(2),
+      };
+    });
+  }, [aiData, userDecision]);
+
+  const handleDecision = useCallback((decision) => {
+    if (phase !== 'DECISION') return;
+    setUserDecision(decision);
+    const currentPrice = puzzleData.history[puzzleData.history.length - 1].close;
+    setEntryPrice(currentPrice);
+    if (decision === 'SKIP') evaluateResult('SKIP', 0);
+    else setPhase('REPLAY');
+  }, [phase, puzzleData.history, evaluateResult]);
+
+  const advancePlayback = useCallback(() => {
+    if (phase !== 'REPLAY') return;
+    if (playbackIdx >= puzzleData.future.length) {
+      setIsPlaying(false);
+      evaluateResult('TIMEOUT', 0);
+      return;
+    }
+    const nextBar = puzzleData.future[playbackIdx];
+    setReplayData(prev => [...prev, nextBar]);
+    setPlaybackIdx(prev => prev + 1);
+
+    if (userDecision === 'SKIP') return;
+
+    let hitSL = false, hitTP = false;
+    if (userDecision === 'LONG') {
+      if (nextBar.low  <= slPrice) hitSL = true;
+      if (nextBar.high >= tpPrice) hitTP = true;
+    } else if (userDecision === 'SHORT') {
+      if (nextBar.high >= slPrice) hitSL = true;
+      if (nextBar.low  <= tpPrice) hitTP = true;
+    }
+    if (hitSL && hitTP) hitTP = false;
+
+    if (hitTP) {
+      const r = +(tpOffset / slOffset).toFixed(2);
+      evaluateResult('WIN', r);
+    } else if (hitSL) {
+      evaluateResult('LOSS', -1);
+    }
+  }, [phase, playbackIdx, puzzleData.future, userDecision, slPrice, tpPrice, slOffset, tpOffset, evaluateResult]);
+
+  useEffect(() => {
+    if (!isPlaying || phase !== 'REPLAY') return;
+    const intervalMs = Math.max(60, 450 / speed);
+    const id = setInterval(advancePlayback, intervalMs);
+    return () => clearInterval(id);
+  }, [isPlaying, speed, advancePlayback, phase]);
+
+  const handleFlatten = useCallback(() => {
+    if (phase !== 'REPLAY' || replayData.length === 0) {
+      evaluateResult('FLATTEN', 0);
+      return;
+    }
+    const last = replayData[replayData.length - 1].close;
+    const diff = userDecision === 'LONG' ? last - entryPrice : entryPrice - last;
+    const r = +(diff / slOffset).toFixed(2);
+    evaluateResult('FLATTEN', r);
+  }, [phase, replayData, entryPrice, userDecision, slOffset, evaluateResult]);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target && ['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+      if (phase === 'DECISION') {
+        if (e.key === 'l' || e.key === 'L') handleDecision('LONG');
+        if (e.key === 's' || e.key === 'S') handleDecision('SHORT');
+        if (e.key === 'k' || e.key === 'K') handleDecision('SKIP');
+      } else if (phase === 'REPLAY') {
+        if (e.key === ' ') { e.preventDefault(); setIsPlaying(p => !p); }
+        if (e.key === 'ArrowRight') advancePlayback();
+        if (e.key === 'f' || e.key === 'F') handleFlatten();
+      } else if (phase === 'RESULT') {
+        if (e.key === 'n' || e.key === 'N') loadNewPuzzle();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, handleDecision, advancePlayback, handleFlatten, loadNewPuzzle]);
+
+  const accuracy = stats.solved === 0 ? 0 : Math.round((stats.correct / stats.solved) * 100);
+
+  const contextRows = useMemo(() => {
+    if (!aiData || puzzleData.history.length === 0) return [];
+    const h = puzzleData.history;
+    const first = h[0].open;
+    const last = h[h.length - 1].close;
+    const openDiff = ((last - first) / first) * 100;
+    const atr = aiData.atr || 0;
+    const vwapDist = last - aiData.vwap;
+    const range = aiData.range || 0;
+
+    const clsPct = (v) => v >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]';
+    const fmtPct = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
+
+    return [
+      { k: t('rowSessionMove'), v: fmtPct(openDiff), c: clsPct(openDiff) },
+      { k: t('rowRange'),       v: `${range.toFixed(1)} pts`, c: 'text-gray-200' },
+      { k: t('rowAtr'),         v: `${atr.toFixed(2)} pts (${Math.round(atr * 4)} ticks)`, c: 'text-gray-200' },
+      { k: t('rowVwap'),        v: `${vwapDist >= 0 ? '+' : ''}${vwapDist.toFixed(2)} pts (${atr ? (vwapDist / atr).toFixed(2) : '0'} ATR)`, c: clsPct(vwapDist) },
+      { k: t('rowLastClose'),   v: last.toFixed(2), c: 'text-white' },
+      { k: t('rowOpen'),        v: h[0].open.toFixed(2), c: 'text-gray-200' },
+    ];
+  }, [aiData, puzzleData.history, t]);
+
+  const contextText = useMemo(() => {
+    if (!aiData) return '';
+    const vwapDir = aiData.vwapDir === 'above' ? t('vwapAbove') : t('vwapBelow');
+    return t('contextTpl', {
+      range: aiData.range.toFixed(1),
+      vwapDir,
+      distVwap: aiData.distVwapAbs.toFixed(2),
+      atrPct: aiData.atrPct.toFixed(2),
+      atr: aiData.atr.toFixed(2),
+      lastClose: aiData.lastClose.toFixed(2),
+    });
+  }, [aiData, t, lang]);
+
+  const setupLabel = aiData?.setup ? (lang === 'pt' ? aiData.setup.pt : aiData.setup.en) : '';
+
+  const rrRatio = +(tpOffset / slOffset).toFixed(2);
+
+  const resultTitle = useMemo(() => {
+    if (!tradeResult) return '';
+    if (tradeResult === 'WIN')     return `${t('resultWin')} (+${rMultiple}R)`;
+    if (tradeResult === 'LOSS')    return `${t('resultLoss')} (-1.0R)`;
+    if (tradeResult === 'TIMEOUT') return `${t('resultTimeout')} (0R)`;
+    if (tradeResult === 'FLATTEN') return `${t('resultFlat')} (${rMultiple >= 0 ? '+' : ''}${rMultiple}R)`;
+    return `${t('resultSkip')} (0R)`;
+  }, [tradeResult, rMultiple, t]);
+
+  return (
+    <I18nCtx.Provider value={i18nValue}>
+      <div className="flex flex-col h-screen w-screen bg-[#0E1117] text-gray-200 overflow-hidden select-none">
+
+        <div className="flex flex-wrap justify-between items-center px-4 py-2 bg-[#131722] border-b border-[#2B2B43] z-10 text-xs md:text-sm">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5 text-white font-bold">
+              <TrophyIcon />
+              <span>{t('appName')}</span>
+            </div>
+            <div className="flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43]">
+              {['MES', 'MNQ'].map(i => (
+                <button key={i} onClick={() => setInstrument(i)}
+                  className={`px-2 py-0.5 rounded ${instrument === i ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>
+                  {i}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center space-x-6 font-mono">
+            <StatCell label={t('elo')} value={stats.elo} />
+            <StatCell label={t('solved')} value={stats.solved} />
+            <StatCell label={t('accuracy')} value={`${accuracy}%`} />
+            <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
+            <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`}
+              color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <div className="flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43]">
+              {['1m', '5m', '15m', '1h'].map(tf => (
+                <button key={tf} onClick={() => setTimeframe(tf)}
+                  className={`px-2 py-0.5 rounded ${timeframe === tf ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>
+                  {tf}
+                </button>
+              ))}
+            </div>
+            <div className="hidden md:flex space-x-1 border-l border-[#2B2B43] pl-2">
+              <ToggleBtn label="VWAP" on={showVwap} setter={setShowVwap} />
+              <ToggleBtn label="200 EMA" on={showEma} setter={setShowEma} />
+              <ToggleBtn label="DEMA" on={showDema} setter={setShowDema} />
+              <ToggleBtn label="Levels" on={showLevels} setter={setShowLevels} />
+              <ToggleBtn label="Vol" on={showVol} setter={setShowVol} />
+            </div>
+            <div className="flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43] ml-2">
+              {['en', 'pt'].map(l => (
+                <button key={l} onClick={() => setLang(l)}
+                  className={`px-2 py-0.5 rounded font-mono text-[11px] uppercase ${lang === l ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden relative min-h-0">
+
+          <div className="flex-1 bg-[#131722] relative min-w-0">
+            {phase === 'LOADING' && (
+              <div className="absolute inset-0 z-30 bg-[#131722]/85 flex flex-col items-center justify-center backdrop-blur-sm">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3" />
+                <span className="text-sm font-mono text-gray-400">{t('loading')} #{puzzleId}…</span>
+              </div>
+            )}
+            <TradingChart
+              puzzleKey={puzzleId}
+              historyData={puzzleData.history}
+              replayData={replayData}
+              showVwap={showVwap} showEma={showEma} showDema={showDema}
+              showLevels={showLevels} showVol={showVol}
+              slPrice={slPrice} tpPrice={tpPrice} entryPrice={entryPrice}
+            />
+          </div>
+
+          <div className="w-[380px] shrink-0 bg-[#1A1E29] border-l border-[#2B2B43] flex flex-col p-4 overflow-y-auto">
+
+            <div className="flex justify-between items-start mb-4 border-b border-[#2B2B43] pb-3">
+              <div className="min-w-0">
+                <h2 className="text-sm font-bold text-white truncate">
+                  {instrument} • {timeframe} • {t('headerDecision')}
+                </h2>
+                <p className="text-xs text-gray-400">{t('decisionQ')}</p>
+                {aiData?.setup && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    <span className="text-[10px] font-mono bg-[#2B2B43] text-gray-300 px-2 py-0.5 rounded">
+                      {t('playbook')} · {t('ruleGraded')}
+                    </span>
+                    <span className="text-[10px] font-mono bg-[#2962FF]/20 text-[#6f8cff] px-2 py-0.5 rounded">
+                      {setupLabel}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <span className="text-[11px] font-mono bg-[#2B2B43] px-2 py-0.5 rounded text-gray-300 shrink-0 ml-2">
+                #{puzzleId}
+              </span>
+            </div>
+
+            {phase === 'DECISION' && aiData && (
+              <div className="space-y-4 mb-4">
+                <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
+                  <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-1">
+                    {t('marketContext')}
+                  </h3>
+                  <p className="text-xs text-gray-300 leading-relaxed">{contextText}</p>
+                </div>
+
+                <div>
+                  <h3 className="text-xs font-semibold mb-2 text-gray-300">{t('yourCall')}</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button onClick={() => handleDecision('LONG')}
+                      className="py-2.5 bg-gradient-to-t from-[#26a69a] to-[#33b8ab] text-white rounded font-bold shadow hover:opacity-90 transition">
+                      {t('long')}
+                    </button>
+                    <button onClick={() => handleDecision('SHORT')}
+                      className="py-2.5 bg-gradient-to-t from-[#ef5350] to-[#f46c69] text-white rounded font-bold shadow hover:opacity-90 transition">
+                      {t('short')}
+                    </button>
+                    <button onClick={() => handleDecision('SKIP')}
+                      className="py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded font-bold shadow transition">
+                      {t('skip')}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-2 text-center font-mono">
+                    {t('shortcutsLsk')}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {phase === 'REPLAY' && (
+              <div className="space-y-4 mb-4">
+                <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold text-gray-300">{t('bracket')}</span>
+                    <span className={`text-[11px] px-2 py-0.5 rounded font-bold ${
+                      userDecision === 'LONG' ? 'bg-[#26a69a]/20 text-[#26a69a]' : 'bg-[#ef5350]/20 text-[#ef5350]'
+                    }`}>{userDecision} · RR {rrRatio}:1</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
+                    <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]">
+                      <div className="text-gray-500 text-[10px] uppercase">{t('entry')}</div>
+                      <div className="text-[#2962FF] font-bold">{entryPrice ? entryPrice.toFixed(2) : '—'}</div>
+                    </div>
+                    <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]">
+                      <div className="text-gray-500 text-[10px] uppercase">{t('stop')}</div>
+                      <div className="text-[#ef5350] font-bold">{slPrice !== null ? slPrice.toFixed(2) : '—'}</div>
+                    </div>
+                    <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]">
+                      <div className="text-gray-500 text-[10px] uppercase">{t('target')}</div>
+                      <div className="text-[#26a69a] font-bold">{tpPrice !== null ? tpPrice.toFixed(2) : '—'}</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-[11px] text-gray-400 mb-1">
+                      <span>{t('stopLoss')}</span>
+                      <span className="font-mono text-white">{slOffset} pts</span>
+                    </div>
+                    <input type="range" min="4" max="40" value={slOffset}
+                      onChange={(e) => setSlOffset(Number(e.target.value))} className="w-full" />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-[11px] text-gray-400 mb-1">
+                      <span>{t('takeProfit')}</span>
+                      <span className="font-mono text-white">{tpOffset} pts</span>
+                    </div>
+                    <input type="range" min="8" max="80" value={tpOffset}
+                      onChange={(e) => setTpOffset(Number(e.target.value))} className="w-full" />
+                  </div>
+                </div>
+
+                <div className="flex space-x-2">
+                  <button onClick={() => setIsPlaying(p => !p)}
+                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 rounded flex items-center justify-center text-white font-bold transition">
+                    {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                    <span className="ml-1.5">{isPlaying ? t('pause') : t('play')}</span>
+                  </button>
+                  <button onClick={advancePlayback} disabled={isPlaying}
+                    className="px-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 rounded flex items-center justify-center text-white transition"
+                    title="Step forward (→)">
+                    <StepIcon />
+                  </button>
+                  <button onClick={handleFlatten}
+                    className="px-3 bg-[#ef5350]/20 text-[#ef5350] hover:bg-[#ef5350]/30 rounded font-bold transition"
+                    title="Flatten (F)">
+                    {t('flatten')}
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between bg-[#131722] p-2 rounded border border-[#2B2B43]">
+                  <span className="text-[11px] text-gray-400">{t('speed')}</span>
+                  <div className="flex space-x-1">
+                    {[1, 3, 10, 30].map(s => (
+                      <button key={s} onClick={() => setSpeed(s)}
+                        className={`px-2 py-0.5 rounded text-[11px] font-mono ${
+                          speed === s ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
+                        }`}>{s}x</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-gray-500 font-mono flex justify-between">
+                  <span>{t('bar')} {playbackIdx}/{puzzleData.future.length}</span>
+                  <span>{t('spacePlayHint')}</span>
+                </div>
+              </div>
+            )}
+
+            {phase === 'RESULT' && aiData && (
+              <div className="space-y-4 mb-4">
+                <div className={`p-3 rounded-lg border ${
+                  tradeResult === 'WIN' ? 'bg-[#26a69a]/10 border-[#26a69a]/50 text-[#26a69a]' :
+                  tradeResult === 'LOSS' ? 'bg-[#ef5350]/10 border-[#ef5350]/50 text-[#ef5350]' :
+                  tradeResult === 'SKIP' && userDecision === aiData.decision ? 'bg-blue-500/10 border-blue-500/50 text-blue-400' :
+                  'bg-gray-800/50 border-gray-700 text-gray-300'
+                }`}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-sm">{resultTitle}</span>
+                    <span className="text-xs font-mono font-bold uppercase">{userDecision}</span>
+                  </div>
+                  <p className="text-xs text-gray-300">
+                    <span className="text-gray-400">{t('correctMove')}:</span>{' '}
+                    <strong className="text-white">{aiData.decision}</strong>
+                  </p>
+                  <p className="text-xs mt-1">
+                    <span className="text-gray-400">{t('eloDelta')}:</span>{' '}
+                    <strong className={eloDelta >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}>
+                      {eloDelta >= 0 ? `+${eloDelta}` : eloDelta}
+                    </strong>
+                  </p>
+                </div>
+
+                <CounterfactualPanel
+                  outcomes={aiData.outcomes}
+                  userDecision={userDecision}
+                  tradeResult={tradeResult}
+                  userR={rMultiple}
+                />
+
+                <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
+                  <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-1">
+                    {t('debrief')}
+                  </h3>
+                  <p className="text-xs text-gray-300 leading-relaxed mb-2">
+                    {t(`expl_${aiData.decision}`)}
+                  </p>
+                  <div className="text-[10px] text-gray-500 font-mono border-t border-[#2B2B43] pt-2">
+                    {t('playbook')}: <span className="text-gray-300">{setupLabel}</span>
+                  </div>
+                </div>
+
+                <button onClick={() => loadNewPuzzle()}
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition flex justify-center items-center">
+                  {t('nextPuzzle')}
+                  <svg className="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                <p className="text-[10px] text-gray-500 text-center font-mono">{t('nextHint')}</p>
+              </div>
+            )}
+
+            <div className="mt-auto bg-[#131722] p-3 rounded-lg border border-[#2B2B43] space-y-2 text-xs font-mono">
+              <div className="text-[11px] text-gray-400 uppercase font-bold tracking-wider mb-2 border-b border-[#2B2B43] pb-1">
+                {t('contextAtDecision')}
+              </div>
+              {contextRows.length === 0 && <div className="text-gray-500 text-[11px]">{t('awaitingData')}</div>}
+              {contextRows.map((r, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-gray-400">{r.k}</span>
+                  <span className={r.c}>{r.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </I18nCtx.Provider>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
