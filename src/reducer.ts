@@ -1,4 +1,6 @@
 import type { Action, AppState, Decision, JournalEntry, Stats } from './types';
+import type { GeneratorDifficulty } from './data';
+import { DIFFICULTY_RATING, eloDelta } from './rating';
 import { FREEZE_WINDOW_MS, cloneBreakdown, recordBucket } from './storage';
 
 const clampJournal = (entries: JournalEntry[]) => entries.slice(-200);
@@ -7,9 +9,10 @@ export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'SET_LANG': return { ...state, lang: action.lang };
     case 'SET_SOUND': return { ...state, soundEnabled: action.enabled };
+    case 'SET_CONTEXT_MODE': return { ...state, contextMode: action.contextMode };
+    case 'SET_DAILY_CONTEXT': return { ...state, dailyChallenge: action.active, dailyChallengeDate: action.date };
     case 'CLOCK_TICK': return { ...state, clockNow: action.now };
     case 'SET_MODE': return { ...state, mode: action.mode };
-    case 'SET_CONTEXT_MODE': return { ...state, contextMode: action.contextMode };
     case 'SET_TIMEFRAME': return { ...state, timeframe: action.timeframe };
     case 'SET_INSTRUMENT': return { ...state, instrument: action.instrument };
     case 'TOGGLE_INDICATOR': return { ...state, [action.key]: !state[action.key] };
@@ -82,6 +85,8 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         mode: 'speed',
         phase: 'DECISION',
+        dailyChallenge: false,
+        dailyChallengeDate: null,
         speedRun: { active: true, round: 1, totalRounds: action.totalRounds, correct: 0, processMatch: 0, rSum: 0, startedAt: action.now, deadlineAt: action.now + 15 * 60 * 1000, lastDurationMs: null },
         clockNow: action.now,
       };
@@ -105,61 +110,70 @@ export function reducer(state: AppState, action: Action): AppState {
       };
     }
     case 'END_SPEED_RUN': return { ...state, mode: 'standard', phase: 'HOME', speedRun: { ...state.speedRun, active: false } };
-    case 'GO_HOME': return { ...state, phase: 'HOME', isPlaying: false, skipModalOpen: false, skipReasonDraft: '', speedRun: { ...state.speedRun, active: false } };
+    case 'GO_HOME': return { ...state, phase: 'HOME', isPlaying: false, skipModalOpen: false, skipReasonDraft: '', dailyChallenge: false, dailyChallengeDate: null, speedRun: { ...state.speedRun, active: false } };
     case 'CLEAR_JOURNAL': return { ...state, journal: [] };
     case 'RESET_STATS':
-      return { ...state, stats: { elo: 1236, solved: 0, correct: 0, processMatch: 0, streak: 0, bestStreak: 0, rSum: 0, breakdown: { bySetup: {}, byTimeframe: {}, byDirection: {}, byInstrument: {} }, freezeAvailable: 1, freezeUsedAt: 0 } };
+      return { ...state, stats: { elo: 1236, solved: 0, correct: 0, processMatch: 0, streak: 0, bestStreak: 0, rSum: 0, breakdown: { bySetup: {}, byTimeframe: {}, byDirection: {}, byInstrument: {} }, freezeAvailable: 1, freezeUsedAt: 0, collectedCards: [] } };
     default: return state;
   }
 }
 
-export function buildNextStats(current: Stats, decision: Decision, aiDecision: Decision, result: string, r: number, setup: { id: string; en: string; pt: string }, timeframe: string, instrument: string): { stats: Stats; delta: number; freezeUsed: boolean; freezeStreak: number } {
-  const processMatch = decision === aiDecision;
-  const correct = result === 'WIN' || (result === 'SKIP' && decision === 'SKIP' && aiDecision === 'SKIP') || (result === 'FLATTEN' && r > 0 && processMatch);
-  let delta = correct ? 18 : -15;
-  if (result === 'FLATTEN' && r > 0) delta = 8;
+export function buildNextStats(
+  current:Stats,
+  decision:Decision,
+  aiDecision:Decision,
+  result:string,
+  r:number,
+  setup:{id:string;en:string;pt:string},
+  timeframe:string,
+  instrument:string,
+  acceptedDecisions:Decision[]=[aiDecision],
+  difficulty:GeneratorDifficulty='normal'
+):{stats:Stats;delta:number;freezeUsed:boolean;freezeStreak:number}{
+  const processMatch=acceptedDecisions.includes(decision);
+  const correct=result==='WIN'||(result==='SKIP'&&decision==='SKIP'&&processMatch)||(result==='FLATTEN'&&r>0&&processMatch);
+  const score:0|0.5|1=result==='FLATTEN'&&r!==0?.5:(correct?1:0);
+  const delta=eloDelta(current.elo,DIFFICULTY_RATING[difficulty],score);
 
-  let streak = delta > 0 ? current.streak + 1 : 0;
-  let freezeAvailable = current.freezeAvailable ?? 1;
-  let freezeUsedAt = current.freezeUsedAt ?? 0;
-  let freezeUsed = false;
-  let freezeStreak = 0;
-  const expired = freezeAvailable === 0 && freezeUsedAt > 0 && Date.now() - freezeUsedAt > FREEZE_WINDOW_MS;
-  if (expired) {
-    freezeAvailable = 1;
-    freezeUsedAt = 0;
-  }
-  const freezeReady = freezeAvailable > 0;
-  if (delta < 0 && current.streak > 0 && freezeReady) {
-    streak = current.streak;
-    freezeAvailable = 0;
-    freezeUsedAt = Date.now();
-    freezeUsed = true;
-    freezeStreak = current.streak;
+  let streak=delta>0?current.streak+1:0;
+  let freezeAvailable=current.freezeAvailable??1;
+  let freezeUsedAt=current.freezeUsedAt??0;
+  let freezeUsed=false;
+  let freezeStreak=0;
+  const expired=freezeAvailable===0&&freezeUsedAt>0&&Date.now()-freezeUsedAt>FREEZE_WINDOW_MS;
+  if(expired){freezeAvailable=1;freezeUsedAt=0;}
+  const freezeReady=freezeAvailable>0;
+  if(delta<0&&current.streak>0&&freezeReady){
+    streak=current.streak;
+    freezeAvailable=0;
+    freezeUsedAt=Date.now();
+    freezeUsed=true;
+    freezeStreak=current.streak;
   }
 
-  const breakdown = cloneBreakdown(current.breakdown);
-  const patch = { correct, processMatch, r };
-  recordBucket(breakdown.bySetup, setup.id, patch, setup.en, setup.pt);
-  recordBucket(breakdown.byTimeframe, timeframe, patch, timeframe, timeframe);
-  recordBucket(breakdown.byDirection, decision, patch, decision, decision);
-  recordBucket(breakdown.byInstrument, instrument, patch, instrument, instrument);
-  return {
-    stats: {
+  const breakdown=cloneBreakdown(current.breakdown);
+  const patch={correct,processMatch,r};
+  recordBucket(breakdown.bySetup,setup.id,patch,setup.en,setup.pt);
+  recordBucket(breakdown.byTimeframe,timeframe,patch,timeframe,timeframe);
+  recordBucket(breakdown.byDirection,decision,patch,decision,decision);
+  recordBucket(breakdown.byInstrument,instrument,patch,instrument,instrument);
+  const collectedCards=Array.from(new Set([...(current.collectedCards??[]),setup.id]));
+
+  return{
+    stats:{
       ...current,
-      elo: Math.max(0, current.elo + delta),
-      solved: current.solved + 1,
-      correct: current.correct + (correct ? 1 : 0),
-      processMatch: current.processMatch + (processMatch ? 1 : 0),
+      elo:Math.max(0,current.elo+delta),
+      solved:current.solved+1,
+      correct:current.correct+(correct?1:0),
+      processMatch:current.processMatch+(processMatch?1:0),
       streak,
-      bestStreak: Math.max(current.bestStreak, streak),
-      rSum: +(current.rSum + r).toFixed(2),
+      bestStreak:Math.max(current.bestStreak,streak),
+      rSum:+(current.rSum+r).toFixed(2),
       breakdown,
       freezeAvailable,
       freezeUsedAt,
+      collectedCards
     },
-    delta,
-    freezeUsed,
-    freezeStreak,
+    delta,freezeUsed,freezeStreak
   };
 }
