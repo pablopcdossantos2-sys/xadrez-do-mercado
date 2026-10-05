@@ -17,7 +17,7 @@ import type { Action, AppState, Decision, Instrument, JournalEntry, Mode, Timefr
 import { exportJournalCsv, exportJournalJson, isFreezeReady, loadJournal, loadLanguage, loadSoundPreference, loadStats, saveJournal, saveLanguage, saveSoundPreference, saveStats } from './storage';
 import { translate, type TranslationKey } from './translations';
 import TapeChart from './TapeChart';
-import { loadHistoricalManifest, loadHistoricalSession, selectHistoricalSessions, selectHistoricalWindow, type HistoricalLibraryManifest } from './historicalLibrary';
+import { loadHistoricalManifest, loadHistoricalSession, selectHistoricalContractSessions, selectHistoricalWindow, type HistoricalLibraryManifest } from './historicalLibrary';
 import './styles.css';
 
 const SPEED_TOTAL_ROUNDS=10;
@@ -114,20 +114,39 @@ function App(){
   const historicalManifestRef=useRef<HistoricalLibraryManifest|null>(null);
   useEffect(()=>{let alive=true;loadHistoricalManifest().then(manifest=>{if(alive)historicalManifestRef.current=manifest;}).catch(()=>{});return()=>{alive=false;};},[]);
   const generatePuzzle=useCallback(async(seed:number,difficulty:GeneratorDifficulty='normal')=>{
-    const manifest=historicalManifestRef.current;
+    let manifest=historicalManifestRef.current;
+    if(!manifest){
+      try{
+        manifest=await loadHistoricalManifest();
+        historicalManifestRef.current=manifest;
+      }catch{}
+    }
     if(manifest){
-      const sessions=selectHistoricalSessions(manifest,state.instrument,state.timeframe);
+      const sessions=selectHistoricalContractSessions(manifest,state.instrument,state.timeframe);
       if(sessions.length){
-        const session=sessions[(seed>>>0)%sessions.length]!;
         try{
-          const bars=await loadHistoricalSession(session,state.timeframe);
+          const datasets=await Promise.all(sessions.map(session=>loadHistoricalSession(session,state.timeframe)));
+          const bars=datasets.flat().sort((left,right)=>left.time-right.time);
           const window=selectHistoricalWindow(bars,seed);
-          if(window)return{history:window.history,future:window.future,macroEvents:[],dataSource:'historical' as const,historicalSessionId:session.id,historicalTradeDate:session.tradeDate,historicalContract:session.contract};
+          if(window){
+            const first=sessions[0]!;
+            const last=sessions.at(-1)!;
+            return{
+              history:window.history,
+              future:window.future,
+              macroEvents:[],
+              dataSource:'historical' as const,
+              historicalSessionId:sessions.map(session=>session.id).join('|'),
+              historicalTradeDate:first.tradeDate===last.tradeDate?first.tradeDate:first.tradeDate+'..'+last.tradeDate,
+              historicalContract:first.contract
+            };
+          }
         }catch{}
       }
     }
     return{...generateMarketData(state.timeframe,state.instrument,seed,difficulty),dataSource:'synthetic' as const};
   },[state.instrument,state.timeframe]);
+
   const newPuzzle=useCallback(async(speedNow?:number)=>{
     const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,seed=Date.now()+id*101,data=await generatePuzzle(seed,difficulty);
     dispatch({type:'LOAD_PUZZLE',data,analysis:analyzePuzzle(data.history,data.future),trap:detectTrap(data.history),puzzleId:id,speedNow});
