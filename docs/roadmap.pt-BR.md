@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Roadmap de Melhorias
 
-> **Documento Estratégico** · v1.3
+> **Documento Estratégico** · v1.4
 >
 > 32 melhorias para transformar o Tape Puzzles de um jogo de adivinhação em uma ferramenta real de treino.
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 10 entregues · 22 pendentes
+**Resumo:** 32 itens · 4 tiers · 13 entregues · 19 pendentes
 
 ---
 
@@ -77,13 +77,13 @@ Painel objetivo com quatro eixos clássicos — estrutura, volume, localização
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Cada decisão é anexada a um diário local (últimas 200). Export em JSON ou CSV. Agora também armazena motivo do skip e trap detectada.
+Cada decisão é anexada a um diário local (últimas 200). Export em JSON ou CSV. Armazena motivo do skip, trap detectada e uso do freeze.
 
 ### 9. Skip justificado (com motivo)
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Ao Skip, um modal pergunta "Por quê?" com cinco razões canônicas (setup ruim, longe do VWAP, contra tendência, sem confluência, não sei). A escolha é comparada com a razão do analista e salva no journal. Comparação aparece no debrief.
+Ao Skip, um modal pergunta "Por quê?" com cinco razões canônicas (setup ruim, longe do VWAP, contra tendência, sem confluência, não sei). A escolha é comparada com a razão do analista e salva no journal.
 
 ### 10. Dificuldade adaptativa
 
@@ -95,7 +95,7 @@ Manter o usuário na zona de fluxo (60–75% de precisão) ajustando o ruído do
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-`detectTrap()` analisa o histórico visível e sinaliza padrões enganosos: corpo de barra gigante (>1.5× ATR), rejeição por pavio dominante, whipsaw no VWAP (≥4 cruzamentos em 8 barras), empurrão de 3 barras com volume decrescente, e rompimentos falhos nas últimas 4 barras. Um banner aparece na sidebar durante a fase de decisão, sem entregar a resposta.
+`detectTrap()` analisa o histórico visível e sinaliza padrões enganosos: corpo de barra gigante, rejeição por pavio dominante, whipsaw no VWAP, empurrão de 3 barras com volume decrescente, e rompimentos falhos nas últimas 4 barras. Banner aparece na sidebar durante a fase de decisão.
 
 ---
 
@@ -177,9 +177,9 @@ Novato · Em Desenvolvimento · Consistente · Afiado · Institucional.
 
 ### 23. Streak com "freeze"
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-1 freeze/dia para não zerar a sequência.
+Um freeze por dia. Se o usuário perde com streak > 0 e freeze disponível, a sequência é **preservada** e o freeze consumido. Reinicia automaticamente após 24h. Indicador na barra superior durante o jogo, e banner dedicado na fase de Resultado quando consumido. Som de duas notas toca no consumo.
 
 ### 24. Onboarding em 30 segundos
 
@@ -189,9 +189,9 @@ Overlay de 3 passos na primeira visita. A home explica como o jogo funciona.
 
 ### 25. Responsividade mobile
 
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Layout vertical, botões touch, gestos.
+Layout empilha verticalmente abaixo de `md`: gráfico ocupa os 40vh do topo, sidebar fica com o restante e rola sozinha. Barra superior envolve graciosamente; toggles de indicadores ocultos em telas pequenas; tabela do journal revela colunas progressivamente (`hidden sm:table-cell`, `hidden md:table-cell`, `hidden lg:table-cell`). Botões ganham `min-height: 40px` em toque. Pan/zoom de toque habilitado no gráfico. Atalhos de teclado desenfatizados em touch.
 
 ### 26. Desafios diários com seed determinística
 
@@ -207,9 +207,9 @@ Cada setup dominado vira uma "carta".
 
 ### 28. Som sutil
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Chime ao bater TP, thud ao stopar. Desligável.
+Hook `useSound` construído na **Web Audio API** — sem arquivos externos. Tones distintos para clique (decisão), chime (WIN), thud (LOSS), tique (SKIP) e um shimmer de duas notas (freeze consumido). Botão de toggle na barra superior; preferência persistida em `localStorage`. O contexto é criado preguiçosamente no primeiro gesto do usuário, então o navegador nunca bloqueia.
 
 ### 29. Migrar para Vite + React + TypeScript
 
@@ -221,7 +221,7 @@ Quando o single-file passar de ~2.000 LOC. Estrutura em módulos.
 
 **Esforço:** Baixo · **Status:** Pendente
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady.
 
 ### 31. Modo offline (service worker)
 
@@ -249,6 +249,11 @@ Substituir os 12+ useState interdependentes.
 | 8 | Journal por decisão com export | T2 | Baixo | Alto | ✅ ENTREGUE |
 | 9 | Skip justificado (com motivo) | T2 | Baixo | Alto | ✅ ENTREGUE |
 | 11 | Aviso de "armadilha do dia" | T2 | Médio | Alto | ✅ ENTREGUE |
+| 22 | Patentes / níveis | T4 | Baixo | Médio | ✅ ENTREGUE |
+| 23 | Streak com freeze | T4 | Baixo | Médio | ✅ ENTREGUE |
+| 24 | Onboarding em 30 segundos | T4 | Baixo | Médio | ✅ ENTREGUE |
+| 25 | Responsividade mobile | T4 | Médio | Médio | ✅ ENTREGUE |
+| 28 | Som sutil | T4 | Baixo | Médio | ✅ ENTREGUE |
 | 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Parcial |
 | 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | Pendente |
 | 10 | Dificuldade adaptativa | T2 | Médio | Alto | Pendente |
@@ -266,7 +271,10 @@ Substituir os 12+ useState interdependentes.
 - ✅ Skip justificado com motivo (#9)
 - ✅ Aviso de "armadilha do dia" (#11)
 - ✅ Patentes / níveis (#22)
+- ✅ Streak com freeze (#23)
 - ✅ Onboarding em 30 segundos (#24)
+- ✅ Responsividade mobile (#25)
+- ✅ Som sutil (#28)
 - → Dificuldade adaptativa (#10)
 
 ### Investimentos estruturais
@@ -282,10 +290,10 @@ Substituir os 12+ useState interdependentes.
 
 Hoje, o Tape Puzzles é um *jogo bonito de adivinhar direção*. Para virar uma **ferramenta de treino real**, o pulo do gato está em três itens do Tier 1: **debrief contrafactual**, **rotulagem de setups** e **realismo dos dados**.
 
-A adição do **score de processo**, do **heatmap de fraquezas**, do **debrief expandido em quatro eixos**, do **journal por decisão**, do **skip justificado** e do **aviso de armadilha** (Tier 2, #5, #6, #7, #8, #9, #11) fecha o ciclo: o app agora separa boas decisões de bons resultados, diz exatamente onde a edge do usuário está faltando, explica *por que* o outro lado perdeu, mantém um registro persistente e exportável de cada decisão, pede que o usuário justifique os skips, e avisa em tempo real sobre as armadilhas mais comuns.
+A adição do **score de processo**, do **heatmap de fraquezas**, do **debrief expandido em quatro eixos**, do **journal por decisão**, do **skip justificado**, do **aviso de armadilha**, e do pacote de polish (**streak com freeze + som + mobile**) fecha o ciclo: o app agora separa boas decisões de bons resultados, diz exatamente onde a edge do usuário está faltando, explica *por que* o outro lado perdeu, mantém um registro persistente e exportável de cada decisão, pede que o usuário justifique os skips, avisa em tempo real sobre as armadilhas mais comuns, e finalmente funciona no celular.
 
-A próxima fronteira é o **realismo do gerador** (#4) — enquanto os dados não forem realistas, o resto é rodinha de bicicleta em pista sintética.
+A próxima fronteira continua sendo o **realismo do gerador** (#4) — enquanto os dados não forem realistas, o resto é rodinha de bicicleta em pista sintética.
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.3 · 32 itens · 4 tiers · 10 entregues · 22 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.4 · 32 itens · 4 tiers · 13 entregues · 19 pendentes*
