@@ -3,6 +3,8 @@ import { analyzePuzzle, computeATR, computeEMA, computeMicrostructure, computeSe
 import { generateMarketData, getDailyChallengeSeed } from '../src/data';
 import { eloDelta } from '../src/rating';
 import { getAdaptiveDifficulty } from '../src/difficulty';
+import { parseOhlcvCsv, parseOhlcvJson, splitDataset } from '../src/realData';
+import { ACTIVE_ASSETS } from '../src/assets';
 import type { Bar, JournalEntry } from '../src/types';
 
 function bar(close:number,open=close,high=Math.max(open,close),low=Math.min(open,close),time=0):Bar{
@@ -60,6 +62,28 @@ describe('analytics pure functions',()=>{
     expect(levels.rthLow).toBe(8);
     expect(levels.ethHigh).toBe(13);
     expect(levels.ethLow).toBe(9);
+  });
+});
+
+describe('real market data foundation',()=>{
+  it('parses standard and semicolon OHLCV CSV',()=>{
+    const comma=parseOhlcvCsv('time,open,high,low,close,volume\\n2026-01-02T10:00:00Z,10,12,9,11,1500');
+    const semicolon=parseOhlcvCsv('time;open;high;low;close;volume\\n2026-01-02T10:00:00Z;10,5;12,5;9,5;11,5;1500');
+    expect(comma[0]?.close).toBe(11);
+    expect(semicolon[0]?.close).toBe(11.5);
+  });
+
+  it('parses JSON OHLCV and keeps bars ordered',()=>{
+    const bars=parseOhlcvJson([{time:2,open:11,high:12,low:10,close:11.5,volume:200},{time:1,open:10,high:11,low:9,close:10.5,volume:100}]);
+    expect(bars.map(x=>x.time)).toEqual([1,2]);
+    expect(splitDataset(bars,1).history).toHaveLength(1);
+  });
+
+  it('includes the requested Brazilian futures',()=>{
+    expect(ACTIVE_ASSETS.map(x=>x.id)).toEqual(['MES','MNQ','WINFUT','WDOFUT','BIT']);
+    expect(ACTIVE_ASSETS.find(x=>x.id==='WINFUT')?.b3Code).toBe('WIN');
+    expect(ACTIVE_ASSETS.find(x=>x.id==='WDOFUT')?.b3Code).toBe('WDO');
+    expect(ACTIVE_ASSETS.find(x=>x.id==='BIT')?.b3Code).toBe('BIT');
   });
 });
 
