@@ -75,7 +75,7 @@ export function classifySetup({history,atr,vwap,ema}:{history:Bar[];atr:number;v
   return{id:'consolidation',en:'Consolidation',pt:'Consolidação',bias:'skip'};
 }
 
-function historyOnlyDecision(history:Bar[],setup:Setup,atr:number,vwap:number,ema:number):{decision:TradeOutcome['result'] extends never?never: 'LONG'|'SHORT'|'SKIP';acceptedDecisions:('LONG'|'SHORT'|'SKIP')[];signalConfidence:number}{
+function historyOnlyDecision(history:Bar[],setup:Setup,atr:number,vwap:number,ema:number):{decision:'LONG'|'SHORT'|'SKIP';acceptedDecisions:('LONG'|'SHORT'|'SKIP')[];signalConfidence:number}{
   const last=history.at(-1)!,recent=history.slice(-6),momentum=last.close-(recent[0]?.open??last.open);
   let score=0;
   score+=setup.bias==='long'?3:setup.bias==='short'?-3:0;
