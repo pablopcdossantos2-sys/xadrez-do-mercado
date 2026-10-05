@@ -51,3 +51,20 @@ After a scored result, the user can start an isolated exploration of the same pu
 Long/Short use the same SL/TP bracket controls and replay engine, including Play, Pause, Step, four playback speeds, and Flatten. Skip replays the future sequence without opening a position. A blue “Exploration — not counted” banner identifies the mode.
 
 Exploration has its own replay/result state and never writes to statistics or journal. “Back to result” restores the original scored result without changing ELO, streak, process accuracy, or history used by adaptive difficulty.
+
+## 16. Only structure vs Full context — shipped
+
+Added a persistent context selector with two tracks: **Full context** keeps the market-context panel visible, while **Only structure** hides that panel during the decision and leaves the chart itself available. The context panel returns after the decision, and Blind tape keeps its stricter concealment rules.
+
+## 18. Visual session clock — shipped
+
+Added a compact market-session clock to the game header. It follows the timestamp of the latest visible bar, so it advances with replay instead of showing wall-clock time. Blind tape hides the session clock during the decision phase to preserve the mode's information constraints.
+
+## 20. Revenge trade warning — shipped
+
+When a new Standard or Blind decision starts immediately after a losing scored trade, the sidebar shows a localized behavioral warning to slow down, reread the structure, and avoid trading to recover the previous loss. Speed Run is excluded because its rapid-session design intentionally avoids extra decision friction.
+
+## 30. Tests for pure functions — shipped
+
+Added a Vitest suite covering pure analytics and adaptive-difficulty behavior: EMA, ATR, bracket outcome ordering, warm-up behavior, and easy/normal/hard threshold mapping. The repository now exposes `npm run test` for the suite.
+
