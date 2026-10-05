@@ -85,7 +85,7 @@ function historyOnlyDecision(history:Bar[],setup:Setup,atr:number,vwap:number,em
   score+=last.close>=last.open?1:-1;
   const magnitude=Math.abs(score),decision=magnitude>=2?(score>0?'LONG':'SHORT'):'SKIP';
   const confidence=clamp(.5+magnitude*.09,.5,.95);
-  const acceptedDecisions=decision==='SKIP'?['SKIP',score>=0?'LONG':'SHORT']:(magnitude>=4?[decision]:[decision,'SKIP']);
+  const acceptedDecisions:('LONG'|'SHORT'|'SKIP')[]=decision==='SKIP'?['SKIP',score>=0?'LONG':'SHORT']:(magnitude>=4?[decision]:[decision,'SKIP']);
   return{decision,acceptedDecisions,signalConfidence:Number(confidence.toFixed(2))};
 }
 
