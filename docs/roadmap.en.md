@@ -258,6 +258,8 @@ Interactive application state is centralized in a typed React `useReducer`, with
 | 8 | Per-decision journal with export | T2 | Low | High | ✅ SHIPPED |
 | 9 | Justified skip (with reason) | T2 | Low | High | ✅ SHIPPED |
 | 11 | "Trap of the day" warning | T2 | Medium | High | ✅ SHIPPED |
+| 15 | "Blind tape" mode | T3 | Low | Medium-high | ✅ SHIPPED |
+| 19 | "Speed run" mode | T3 | Low | Medium-high | ✅ SHIPPED |
 | 22 | Ranks / tiers | T4 | Low | Medium | ✅ SHIPPED |
 | 23 | Streak with freeze | T4 | Low | Medium | ✅ SHIPPED |
 | 24 | 30-second onboarding | T4 | Low | Medium | ✅ SHIPPED |
@@ -266,6 +268,7 @@ Interactive application state is centralized in a typed React `useReducer`, with
 | 10 | Adaptive difficulty | T2 | Medium | High | Pending |
 | 21 | Real ELO (Glicko) | T4 | Medium | Medium-high | Pending |
 | 29 | Migration to Vite + TS | T4 | High | Enabler | ✅ SHIPPED |
+| 32 | State via useReducer | T4 | Low | Enabler | ✅ SHIPPED |
 
 ### Quick wins — do first
 
