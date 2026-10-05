@@ -206,7 +206,7 @@ The roadmap is complete; future work should be tracked as new issues.
 
 ## Executive summary
 
-**All thirty-two roadmap items are now shipped.** Tier 2 is complete, while Tier 1 items 3 and 4 remain pending because their previously documented capabilities are not yet fully present in the audited codebase.
+**All thirty-two roadmap items are now shipped.** Tier 2 is complete, and the remaining Tier 1 capabilities are now implemented in the audited codebase.
 
 All remaining roadmap capabilities are now implemented, including hindsight-safe analyst validation, richer synthetic market dynamics, RTH/ETH references, synthetic tape microstructure, macro-event shocks, dynamic Elo, daily challenges, collectible pattern cards, and offline caching:
 
