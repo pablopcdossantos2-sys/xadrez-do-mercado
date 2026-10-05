@@ -1,4 +1,4 @@
-# Market Chess
+# Xadrez do Mercado
 
 *Leia isto em outros idiomas: [Português](README.md)*
 
@@ -25,6 +25,8 @@ npm run build
 
 Each puzzle presents 82 historical bars and asks for one decision. In Standard mode, the 38 future bars can be replayed bar by bar with an adjustable bracket and Flatten. The result includes rule-based grading, ELO, R outcome, debrief, and counterfactuals.
 
+Windows can come from real historical market data or the synthetic generator. **The product does not depend on real-time market data.**
+
 ## Training modes
 
 - **Standard:** decision + adjustable bracket + manual/automatic replay.
@@ -33,7 +35,7 @@ Each puzzle presents 82 historical bars and asks for one decision. In Standard m
 
 ## Features
 
-- Procedural generation of synthetic OHLCV series.
+- Replay of real historical windows and procedural synthetic generation.
 - MES, MNQ, WINFUT, WDOFUT, and BIT across 1m, 5m, 15m, and 1h timeframes.
 - Candles, volume, VWAP, EMA 20, DEMA, and session levels.
 - Setup classifier covering Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push, and Consolidation.
@@ -43,14 +45,13 @@ Each puzzle presents 82 historical bars and asks for one decision. In Standard m
 - Local journal with up to 200 decisions and JSON/CSV export.
 - Bilingual EN/PT-BR interface, optional sound, and keyboard shortcuts.
 - Adaptive difficulty, Only structure vs Full context mode, a visual session clock, and a revenge-trade warning.
-- Pure-function tests with Vitest.
 - Hindsight-safe analyst validation, signal confidence, and accepted answers.
 - RTH/ETH references, synthetic microstructure, and simulated macro events in replay.
 - Dynamic Elo, deterministic daily challenge, pattern cards, and offline PWA support.
 
 ## Architecture
 
-The project was migrated from a monolithic browser implementation to **Vite + React + TypeScript**. UI orchestration is in `src/App.tsx`; analytics in `src/analytics.ts`; data generation in `src/data.ts`; persistence in `src/storage.ts`; translations in `src/translations.ts`; state in `src/reducer.ts`; types in `src/types.ts`; and the React entry point in `src/main.tsx`; asset metadata is in `src/assets.ts`, and the real OHLCV parser is in `src/realData.ts`.
+The project was migrated from a monolithic browser implementation to **Vite + React + TypeScript**. UI orchestration is in `src/App.tsx`; analytics in `src/analytics.ts`; data generation in `src/data.ts`; persistence in `src/storage.ts`; translations in `src/translations.ts`; state in `src/reducer.ts`; types in `src/types.ts`; the React entry point is in `src/main.tsx`; asset metadata is in `src/assets.ts`; and the real OHLCV parser is in `src/realData.ts`.
 
 Interactive state is centralized in `useReducer`, replacing a collection of interdependent local state hooks.
 
@@ -59,12 +60,16 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 - `npm run typecheck` — TypeScript checking.
 - `npm run build` — type checking and Vite production build.
 - `npm run audit` — structural audit of the migration, modes, runtime, and translations.
+- `npm run test` — pure-function tests.
 
 ## Scope and limitations
 
-- Synthetic generation remains available as a fallback. Real-data integration is prepared to consume licensed intraday datasets without exposing credentials in the browser.
+- Synthetic generation remains available as a fallback.
+- Real-data integration is being designed around **historical datasets**, not real-time streaming.
+- The historical priority is WINFUT, WDOFUT, and BIT.
+- Raw historical market files may have their own usage/redistribution terms; the project should keep application code and market files separate when necessary.
 - WINFUT, WDOFUT, and BIT use the B3 product codes WIN, WDO, and BIT respectively.
-- Analyst grading uses rules and the simulated future window. This does not validate a trading strategy or demonstrate predictive capability.
+- Analyst grading uses only information available up to the decision point. This does not validate a trading strategy or demonstrate predictive capability.
 - The project is a training tool and does not place market orders.
 
 ## Documentation
@@ -72,13 +77,13 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 - [Roadmap in Portuguese](docs/roadmap.pt-BR.md)
 - [Roadmap in English](docs/roadmap.en.md)
 - [Implementation notes](docs/roadmap-implementation.md)
-- [Real market data plan](docs/real-market-data-plan.en.md)
+- [Real historical data plan](docs/real-market-data-plan.en.md)
 - [Puzzle creation tutorial — Portuguese](docs/tutorial-create-puzzles.pt-BR.md)
 - [Puzzle creation tutorial — English](docs/tutorial-create-puzzles.md)
 
-## 👤 Authorship and development
+## Authorship and development
 
-Market Chess is a browser-based training tool independently developed by Pablo Phillipe Cândido dos Santos for futures day-trading decision practice through price-action puzzles, trade replay, and counterfactual debriefing.
+Xadrez do Mercado is a browser-based training tool independently developed by Pablo Phillipe Cândido dos Santos for futures day-trading decision practice through price-action puzzles, trade replay, and counterfactual debriefing.
 
 Development used generative artificial intelligence tools as an auxiliary resource, while the author remained responsible for the project's conception, implementation, integration, and verification.
 
