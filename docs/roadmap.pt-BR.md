@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Roadmap de Melhorias
 
-> **Documento Estratégico** · v1.1
+> **Documento Estratégico** · v1.2
 >
 > 32 melhorias para transformar o Tape Puzzles de um jogo de adivinhação em uma ferramenta real de treino.
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 6 entregues · 26 pendentes
+**Resumo:** 32 itens · 4 tiers · 8 entregues · 24 pendentes
 
 ---
 
@@ -71,19 +71,19 @@ Um segundo score que premia decisões boas mesmo quando o mercado não coopera. 
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Estatísticas agregadas por setup, timeframe, horário, direção e instrumento. O usuário descobre onde é fraco. Buckets com menos de 2 amostras são ocultados.
+Estatísticas agregadas por setup, timeframe, direção e instrumento. O usuário descobre onde é fraco. Buckets com menos de 2 amostras são ocultados.
 
-### 7. Debrief expandido "Why not the other side?"
+### 7. Debrief expandido "Por que não o outro lado?"
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Após uma perda, bullets objetivos: estrutura, volume, localização, confluência.
+Após cada decisão, um painel objetivo lista **quatro eixos clássicos** — estrutura, volume, localização e confluência — cada um com um ponto colorido indicando se o eixo *suporta* ou *contradiz* a jogada do analista. Todos os eixos são calculados a partir do histórico visível (contagem HH/LL, divisão de volume alta/baixa, distância ao nível mais próximo, e concordância entre VWAP, EMA, estrutura e volume).
 
 ### 8. Journal por decisão com export
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Snapshot do gráfico, contexto, decisões, R final. Export em JSON/CSV.
+Cada decisão é anexada a um diário local (`localStorage`, mantidas as últimas 200). A home exibe as últimas 20 entradas em tabela compacta com botões **Exportar JSON**, **Exportar CSV** e **Limpar diário**. Ideal para estudo offline e para alimentar ferramentas externas de análise.
 
 ### 9. Skip justificado (com motivo)
 
@@ -227,7 +227,7 @@ Quando o single-file passar de ~2.000 LOC. Estrutura em módulos.
 
 **Esforço:** Baixo · **Status:** Pendente
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief.
 
 ### 31. Modo offline (service worker)
 
@@ -253,28 +253,31 @@ Visão compacta para decidir a ordem de implementação. **Comece pelo quadrante
 | 2 | Playbook com setups rotulados | T1 | Médio | Altíssimo | ✅ ENTREGUE |
 | 5 | Score de processo vs. resultado | T2 | Médio | Alto | ✅ ENTREGUE |
 | 6 | Heatmap "onde você erra" | T2 | Médio | Alto | ✅ ENTREGUE |
-| 8 | Journal por decisão com export | T2 | Baixo | Alto | Pendente |
+| 7 | Debrief expandido "Por que não o outro lado?" | T2 | Baixo | Alto | ✅ ENTREGUE |
+| 8 | Journal por decisão com export | T2 | Baixo | Alto | ✅ ENTREGUE |
 | 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Parcial |
 | 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | Pendente |
+| 9 | Skip justificado (com motivo) | T2 | Baixo | Alto | Pendente |
 | 10 | Dificuldade adaptativa | T2 | Médio | Alto | Pendente |
 | 21 | ELO real (Glicko) | T4 | Médio | Médio-alto | Pendente |
 | 29 | Migração para Vite + TS | T4 | Alto | Habilitador | Recomendado |
 
 ### Quick wins — faça primeiro
 
-- ✅ Debrief contrafactual
-- ✅ Playbook com setups rotulados
-- ✅ Score de processo vs. resultado
-- ✅ Heatmap "onde você erra"
-- ✅ Patentes / níveis
-- ✅ Onboarding em 30 segundos
-- → Skip justificado (#9)
-- → Debrief expandido (#7)
-- → Journal exportável (#8)
+- ✅ Debrief contrafactual (#1)
+- ✅ Playbook com setups rotulados (#2)
+- ✅ Score de processo vs. resultado (#5)
+- ✅ Heatmap "onde você erra" (#6)
+- ✅ Debrief expandido "Por que não o outro lado?" (#7)
+- ✅ Journal por decisão com export (#8)
+- ✅ Patentes / níveis (#22)
+- ✅ Onboarding em 30 segundos (#24)
+- → Skip justificado com motivo (#9)
+- → Aviso de armadilha do dia (#11)
 
 ### Investimentos estruturais
 
-- → Validação da IA (#3)
+- → Validação da IA (hindsight bias) (#3)
 - → Realismo do gerador (#4)
 - → Dificuldade adaptativa (#10)
 - → Migração para Vite + TS (#29)
@@ -287,8 +290,8 @@ Hoje, o Tape Puzzles é um *jogo bonito de adivinhar direção*. Para virar uma 
 
 Com esses três, o usuário sai de cada puzzle sabendo *o quê* errou, *por quê*, e *o que o mercado teria feito* em qualquer direção — que é exatamente o que *"xadrez para traders"* deveria entregar.
 
-A adição do **score de processo** e do **heatmap de fraquezas** (Tier 2, #5 e #6) fecha o ciclo: o app agora separa boas decisões de bons resultados, e diz ao usuário exatamente onde a edge dele está faltando.
+A adição do **score de processo**, do **heatmap de fraquezas**, do **debrief expandido em quatro eixos** e do **journal por decisão** (Tier 2, #5, #6, #7, #8) fecha o ciclo: o app agora separa boas decisões de bons resultados, diz ao usuário exatamente onde a edge dele está faltando, explica *por que* o outro lado perdeu, e mantém um registro persistente e exportável de cada decisão.
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.1 · 32 itens · 4 tiers · 6 entregues · 26 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.2 · 32 itens · 4 tiers · 8 entregues · 24 pendentes*
