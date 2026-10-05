@@ -6,7 +6,7 @@
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 19 shipped · 13 pending
+**Summary:** 32 items · 4 tiers · 23 shipped · 9 pending
 
 ---
 
@@ -95,7 +95,7 @@ The current level is shown in a small badge in the game top bar, so the user alw
 **Effort:** Low · **Status:** ✅ SHIPPED (in repo)
 
 ### 16. "Only structure" vs "Full context" mode
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
 ### 17. Reverse replay after result
 **Effort:** Medium · **Status:** ✅ SHIPPED
@@ -105,13 +105,13 @@ After the result, the user can click **"Explore another side"** to replay the sa
 This is the purest form of counterfactual training: not "what would have happened" as a static R number, but "here is what the market did, and here is how it would have felt if you had been on the other side."
 
 ### 18. Visual session clock
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
 ### 19. "Speed run" mode
 **Effort:** Low · **Status:** ✅ SHIPPED (in repo)
 
 ### 20. Revenge trade warning
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
 ---
 
@@ -147,7 +147,7 @@ This is the purest form of counterfactual training: not "what would have happene
 **Effort:** High · **Status:** ✅ SHIPPED (in repo)
 
 ### 30. Tests for pure functions
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
 ### 31. Offline mode (service worker)
 **Effort:** Medium · **Status:** Pending
@@ -164,7 +164,7 @@ This is the purest form of counterfactual training: not "what would have happene
 | 1 | Counterfactual debrief | T1 | Low | Very high | ✅ |
 | 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ |
 | 3 | AI validation (hindsight bias) | T1 | High | Very high | Pending |
-| 4 | Realism of procedural generator | T1 | High | Very high (long term) | ✅ |
+| 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
 | 5 | Process score vs. outcome score | T2 | Medium | High | ✅ |
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ |
 | 7 | Expanded debrief | T2 | Low | High | ✅ |
@@ -185,13 +185,13 @@ This is the purest form of counterfactual training: not "what would have happene
 | 12 | Real levels (RTH/ETH) | T3 | Medium | Medium | Pending |
 | 13 | Synthetic tape microstructure | T3 | High | Medium-high | Pending |
 | 14 | Macro events mid-puzzle | T3 | Medium | Medium | Pending |
-| 16 | Only structure vs Full context | T3 | Low | Medium | Pending |
-| 18 | Visual session clock | T3 | Low | Medium | Pending |
-| 20 | Revenge trade warning | T3 | Low | Medium | Pending |
+| 16 | Only structure vs Full context | T3 | Low | Medium | ✅ |
+| 18 | Visual session clock | T3 | Low | Medium | ✅ |
+| 20 | Revenge trade warning | T3 | Low | Medium | ✅ |
 | 21 | Real ELO curve (Glicko) | T4 | Medium | Medium-high | Pending |
 | 26 | Daily challenges | T4 | Medium | Medium | Pending |
 | 27 | Collectible cards | T4 | Medium | Low | Pending |
-| 30 | Tests for pure functions | T4 | Low | Engineering | Pending |
+| 30 | Tests for pure functions | T4 | Low | Engineering | ✅ |
 | 31 | Offline mode (PWA) | T4 | Medium | Low | Pending |
 
 ### Quick wins — do first
@@ -210,15 +210,19 @@ This is the purest form of counterfactual training: not "what would have happene
 
 ## Executive summary
 
-**Nineteen of thirty-two items are now shipped.** Tier 2 is complete, while Tier 1 items 3 and 4 remain pending because their previously documented capabilities are not yet fully present in the audited codebase.
+**Twenty-three of thirty-two items are now shipped.** Tier 2 is complete, while Tier 1 items 3 and 4 remain pending because their previously documented capabilities are not yet fully present in the audited codebase.
 
-The two newly verified learning-loop items are **adaptive difficulty** and **reverse replay**:
+The latest quick wins now include **structure-only context**, a **visual session clock**, and a **revenge-trade warning**, alongside the earlier **adaptive difficulty** and **reverse replay** learning-loop improvements. A pure-function test suite is also shipped:
 
-- **Adaptive difficulty** keeps the user in a target process-accuracy zone using a rolling 20-decision window, with difficulty changes driven by decision quality rather than lucky trade outcomes.
-- **Reverse replay** turns the existing counterfactual numbers into an interactive, non-scoring exploration of the same future sequence.
+- **Structure-only context** lets the user suppress market-context information during the decision while retaining the chart itself.
+- **Visual session clock** follows the timestamp of the latest visible replay bar.
+- **Revenge-trade warning** adds a behavioral pause after a loss before the next Standard/Blind decision.
+- **Pure-function tests** cover core analytics and adaptive-difficulty thresholds with Vitest.
+- **Adaptive difficulty** keeps the user in a target process-accuracy zone using a rolling 20-decision window, with difficulty driven by decision quality rather than lucky outcomes.
+- **Reverse replay** turns counterfactual numbers into an interactive, non-scoring exploration of the same future sequence.
 
-The remaining work is mostly **depth** (real levels, microstructure, macro events), **meta-progression** (Glicko ELO, daily challenges, cards), and **engineering** (tests, offline PWA). 
+The remaining work is mostly **depth** (real levels, microstructure, macro events), **meta-progression** (Glicko ELO, daily challenges, cards), and **engineering** (offline PWA). 
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.7 · 32 items · 4 tiers · 19 shipped · 13 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.8 · 32 items · 4 tiers · 23 shipped · 9 pending*
