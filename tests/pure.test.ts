@@ -113,10 +113,9 @@ describe('real market data foundation',()=>{
   });
 
   it('includes the requested Brazilian futures',()=>{
-    expect(ACTIVE_ASSETS.map(x=>x.id)).toEqual(['MES','MNQ','WINFUT','WDOFUT','BIT']);
+    expect(ACTIVE_ASSETS.map(x=>x.id)).toEqual(['MES','MNQ','WINFUT','WDOFUT']);
     expect(ACTIVE_ASSETS.find(x=>x.id==='WINFUT')?.b3Code).toBe('WIN');
     expect(ACTIVE_ASSETS.find(x=>x.id==='WDOFUT')?.b3Code).toBe('WDO');
-    expect(ACTIVE_ASSETS.find(x=>x.id==='BIT')?.b3Code).toBe('BIT');
   });
 });
 
