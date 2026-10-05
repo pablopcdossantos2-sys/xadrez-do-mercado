@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import type { ChangeEvent, ReactNode } from 'react';
-import { analyzeDebrief, analyzePuzzle, detectTrap, REF_SL, REF_TP, simulateSide } from './analytics';
+import { analyzeDebrief, analyzePuzzle, computeMicrostructure, detectTrap, REF_SL, REF_TP, simulateSide } from './analytics';
 import { generateMarketData, getDailyChallengeSeed, type GeneratorDifficulty } from './data';
 import { PATTERN_CARDS } from './cards';
 import { getAdaptiveDifficulty } from './difficulty';
@@ -184,7 +184,7 @@ function App(){
   const sessionClock=visibleBar?fmtSessionTime(visibleBar.time):'—';
   const activeMacro=state.puzzleData.macroEvents.filter(e=>bars.length>=state.puzzleData.history.length+e.index).at(-1);
   const levels=state.aiData?.levels;
-  const micro=state.aiData?.microstructure;
+  const micro=computeMicrostructure(bars);
   const setupLabel=state.aiData?(state.lang==='pt'?state.aiData.setup.pt:state.aiData.setup.en):'—';
   return <div className="app-shell"><header className="app-bar"><button className="home-link" onClick={()=>dispatch({type:'GO_HOME'})}>← {t('trainingModes')}</button><div className="app-center"><strong>{t('appName')}</strong><span>{state.instrument} · {state.timeframe} · {state.mode==='blind'?t('blind'):state.mode==='speed'?t('speedRun'):t('standard')}</span></div><div className="difficulty-badge" title={t('difficultyProcessHint')}>{t('difficulty')}: {t(('difficulty'+adaptiveDifficulty.charAt(0).toUpperCase()+adaptiveDifficulty.slice(1)) as TranslationKey)}</div>{!blind&&<div className="session-clock" title={t('sessionClockHint')}><span>{t('sessionClock')}</span><strong>{sessionClock}</strong></div>}<div className="app-actions"><button onClick={()=>dispatch({type:'SET_LANG',lang:state.lang==='en'?'pt':'en'})}>{state.lang==='en'?'PT':'EN'}</button><button onClick={()=>dispatch({type:'SET_SOUND',enabled:!state.soundEnabled})}>{state.soundEnabled?'🔊':'🔇'}</button></div></header>
   {state.mode==='speed'&&state.phase!=='SPEED_SUMMARY'&&<div className="speed-strip"><span>{t('round')} {Math.min(state.speedRun.round,state.speedRun.totalRounds)} {t('of')} {state.speedRun.totalRounds}</span><strong className={'timer '+(remaining<=60000?'danger':'')}>{timeLabel}</strong><div className="timer-bar"><div style={{width:Math.max(0,Math.min(100,remaining/SPEED_SESSION_MS*100))}}/></div></div>}
