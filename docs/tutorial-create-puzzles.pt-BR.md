@@ -1,25 +1,24 @@
 # Como Criar Puzzles
 
-Um puzzle e { history: [...82 barras], future: [...38 barras] }.
+Um puzzle é `{ history: [...82 barras], future: [...38 barras] }`, gerado por `src/data.ts`.
 
-Cada barra: { time, open, high, low, close, volume }.
+Cada barra tem o formato `{ time, open, high, low, close, volume }`.
 
 ## Pipeline
 
-generateMarketData() -> classifySetup() -> analyzePuzzle() -> App()
+`src/data.ts` (`generateMarketData`) -> `src/analytics.ts` (`classifySetup` / `analyzePuzzle`) -> `src/App.tsx`
 
 ## Setups
 
-liq_sweep_long, liq_sweep_short, vwap_reclaim, vwap_reject,
-orb_long, orb_short, failed_breakdown, failed_breakout,
-pullback_long, pullback_short, range_fade_long, range_fade_short,
-momentum_long, momentum_short, consolidation.
+`liq_sweep_long`, `liq_sweep_short`, `vwap_reclaim`, `vwap_reject`,
+`orb_long`, `orb_short`, `failed_breakdown`, `failed_breakout`,
+`pullback_long`, `pullback_short`, `range_fade_long`, `range_fade_short`,
+`momentum_long`, `momentum_short`, `consolidation`.
 
 ## Adicionando um novo setup
 
-Insira um novo if-block antes do fallback de momentum em classifySetup().
+Insira uma nova condição em `classifySetup()` antes do fallback de momentum. Retorne o id do setup, os rótulos em inglês/português e o viés direcional.
 
-## Dados historicos reais
+## Dados históricos reais
 
-Carregue CSV, depois amostre janelas de 82 + 38 barras.
-Fontes: Databento, Polygon.io, FirstRate Data, Kaggle.
+A aplicação atual gera deliberadamente dados sintéticos de forma procedural. Um futuro adaptador de dados históricos deverá preservar o contrato de 82 barras de histórico / 38 barras futuras antes de enviar as amostras para o mesmo pipeline de análise.
