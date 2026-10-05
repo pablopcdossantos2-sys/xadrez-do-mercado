@@ -17,6 +17,7 @@ import type { Action, AppState, Decision, Instrument, JournalEntry, Mode, Timefr
 import { exportJournalCsv, exportJournalJson, isFreezeReady, loadJournal, loadLanguage, loadSoundPreference, loadStats, saveJournal, saveLanguage, saveSoundPreference, saveStats } from './storage';
 import { translate, type TranslationKey } from './translations';
 import TapeChart from './TapeChart';
+import { loadHistoricalManifest, loadHistoricalSession, selectHistoricalSessions, selectHistoricalWindow, type HistoricalLibraryManifest } from './historicalLibrary';
 import './styles.css';
 
 const SPEED_TOTAL_ROUNDS=10;
@@ -110,23 +111,39 @@ function App(){
   useEffect(()=>{if(state.mode!=='speed'||state.phase!=='DECISION')return;const id=window.setInterval(()=>dispatch({type:'CLOCK_TICK',now:Date.now()}),250);return()=>window.clearInterval(id);},[state.mode,state.phase,state.speedRun.deadlineAt]);
   const adaptiveProfile=getAdaptiveDifficulty(state.journal);
   const adaptiveDifficulty=adaptiveProfile.key;
-  const generatePuzzle=useCallback((seed:number,difficulty:GeneratorDifficulty='normal')=>generateMarketData(state.timeframe,state.instrument,seed,difficulty),[state.instrument,state.timeframe]);
-  const newPuzzle=useCallback((speedNow?:number)=>{
-    const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,seed=Date.now()+id*101,data=generatePuzzle(seed,difficulty);
+  const historicalManifestRef=useRef<HistoricalLibraryManifest|null>(null);
+  useEffect(()=>{let alive=true;loadHistoricalManifest().then(manifest=>{if(alive)historicalManifestRef.current=manifest;}).catch(()=>{});return()=>{alive=false;};},[]);
+  const generatePuzzle=useCallback(async(seed:number,difficulty:GeneratorDifficulty='normal')=>{
+    const manifest=historicalManifestRef.current;
+    if(manifest){
+      const sessions=selectHistoricalSessions(manifest,state.instrument,state.timeframe);
+      if(sessions.length){
+        const session=sessions[(seed>>>0)%sessions.length]!;
+        try{
+          const bars=await loadHistoricalSession(session,state.timeframe);
+          const window=selectHistoricalWindow(bars,seed);
+          if(window)return{history:window.history,future:window.future,macroEvents:[]};
+        }catch{}
+      }
+    }
+    return generateMarketData(state.timeframe,state.instrument,seed,difficulty);
+  },[state.instrument,state.timeframe]);
+  const newPuzzle=useCallback(async(speedNow?:number)=>{
+    const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,seed=Date.now()+id*101,data=await generatePuzzle(seed,difficulty);
     dispatch({type:'LOAD_PUZZLE',data,analysis:analyzePuzzle(data.history,data.future),trap:detectTrap(data.history),puzzleId:id,speedNow});
     speedLock.current=false;
   },[generatePuzzle,state.journal,state.puzzleId]);
-  const start=useCallback((mode:Mode)=>{
+  const start=useCallback(async(mode:Mode)=>{
     const now=Date.now();sound.click();
     if(mode==='speed')dispatch({type:'START_SPEED_RUN',totalRounds:SPEED_TOTAL_ROUNDS,now});
     dispatch({type:'SET_DAILY_CONTEXT',active:false,date:null});
     dispatch({type:'SET_MODE',mode});
-    const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,data=generatePuzzle(now+id*101,difficulty);
+    const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,data=await generatePuzzle(now+id*101,difficulty);
     dispatch({type:'LOAD_PUZZLE',data,analysis:analyzePuzzle(data.history,data.future),trap:detectTrap(data.history),puzzleId:id,speedNow:mode==='speed'?now:undefined});
     speedLock.current=false;
   },[generatePuzzle,sound,state.journal,state.puzzleId]);
-  const startDaily=useCallback(()=>{
-    const date=localDateKey(),seed=getDailyChallengeSeed(new Date()),id=state.puzzleId+1,data=generatePuzzle(seed,'normal');
+  const startDaily=useCallback(async()=>{
+    const date=localDateKey(),seed=getDailyChallengeSeed(new Date()),id=state.puzzleId+1,data=await generatePuzzle(seed,'normal');
     sound.click();
     dispatch({type:'SET_DAILY_CONTEXT',active:true,date});
     dispatch({type:'SET_MODE',mode:'standard'});
@@ -141,7 +158,7 @@ function App(){
     dispatch({type:'EVALUATE',result,rMultiple:r,eloDelta:built.delta,journalEntry:entry,debriefAxes:analyzeDebrief(state.puzzleData.history,state.aiData.decision),freezeUsed:built.freezeUsed,freezeStreakValue:built.freezeStreak,nextStats:built.stats,nextJournal:[...state.journal,entry].slice(-200)});
     if(result==='WIN')sound.win();else if(result==='LOSS')sound.loss();else if(result==='SKIP')sound.skip();if(built.freezeUsed)sound.freeze();
   },[adaptiveDifficulty,sound,state]);
-  const settleSpeed=useCallback((decision:Decision,durationMs:number)=>{if(speedLock.current||!state.aiData)return;speedLock.current=true;const outcome:TradeOutcome=decision==='SKIP'?{result:'SKIP',r:0,bars:0,exit:state.aiData.entryPrice}:simulateSide(state.puzzleData.future,state.aiData.entryPrice,decision,REF_SL,REF_TP);const finished=state.speedRun.round>=state.speedRun.totalRounds||Date.now()>=state.speedRun.deadlineAt;const built=buildNextStats(state.stats,decision,state.aiData.decision,outcome.result,outcome.r,state.aiData.setup,state.timeframe,state.instrument,state.aiData.acceptedDecisions,adaptiveDifficulty);const entry:JournalEntry={ts:Date.now(),puzzleId:state.puzzleId,instrument:state.instrument,timeframe:state.timeframe,mode:'speed',setup:{id:state.aiData.setup.id,en:state.aiData.setup.en,pt:state.aiData.setup.pt},decision,aiDecision:state.aiData.decision,processMatch:state.aiData.acceptedDecisions.includes(decision),outcome:outcome.result,r:Number(outcome.r.toFixed(2)),entry:state.aiData.entryPrice,slOffset:REF_SL,tpOffset:REF_TP,skipReason:null,skipReasonMatch:null,trap:state.trap?.key??null,freezeUsed:built.freezeUsed,speedRunRound:state.speedRun.round,speedRunDurationMs:durationMs,dailyChallenge:false};dispatch({type:'EVALUATE',result:outcome.result,rMultiple:outcome.r,eloDelta:built.delta,journalEntry:entry,debriefAxes:[],freezeUsed:built.freezeUsed,freezeStreakValue:built.freezeStreak,nextStats:built.stats,nextJournal:[...state.journal,entry].slice(-200)});dispatch({type:'SPEED_ROUND_RESULT',correct:decision===state.aiData.decision,processMatch:state.aiData.acceptedDecisions.includes(decision),r:outcome.r,durationMs,finished,now:Date.now()});if(outcome.result==='WIN')sound.win();else if(outcome.result==='LOSS')sound.loss();else sound.skip();if(built.freezeUsed)sound.freeze();if(!finished)window.setTimeout(()=>newPuzzle(Date.now()),250);},[newPuzzle,sound,state]);
+  const settleSpeed=useCallback((decision:Decision,durationMs:number)=>{if(speedLock.current||!state.aiData)return;speedLock.current=true;const outcome:TradeOutcome=decision==='SKIP'?{result:'SKIP',r:0,bars:0,exit:state.aiData.entryPrice}:simulateSide(state.puzzleData.future,state.aiData.entryPrice,decision,REF_SL,REF_TP);const finished=state.speedRun.round>=state.speedRun.totalRounds||Date.now()>=state.speedRun.deadlineAt;const built=buildNextStats(state.stats,decision,state.aiData.decision,outcome.result,outcome.r,state.aiData.setup,state.timeframe,state.instrument,state.aiData.acceptedDecisions,adaptiveDifficulty);const entry:JournalEntry={ts:Date.now(),puzzleId:state.puzzleId,instrument:state.instrument,timeframe:state.timeframe,mode:'speed',setup:{id:state.aiData.setup.id,en:state.aiData.setup.en,pt:state.aiData.setup.pt},decision,aiDecision:state.aiData.decision,processMatch:state.aiData.acceptedDecisions.includes(decision),outcome:outcome.result,r:Number(outcome.r.toFixed(2)),entry:state.aiData.entryPrice,slOffset:REF_SL,tpOffset:REF_TP,skipReason:null,skipReasonMatch:null,trap:state.trap?.key??null,freezeUsed:built.freezeUsed,speedRunRound:state.speedRun.round,speedRunDurationMs:durationMs,dailyChallenge:false};dispatch({type:'EVALUATE',result:outcome.result,rMultiple:outcome.r,eloDelta:built.delta,journalEntry:entry,debriefAxes:[],freezeUsed:built.freezeUsed,freezeStreakValue:built.freezeStreak,nextStats:built.stats,nextJournal:[...state.journal,entry].slice(-200)});dispatch({type:'SPEED_ROUND_RESULT',correct:decision===state.aiData.decision,processMatch:state.aiData.acceptedDecisions.includes(decision),r:outcome.r,durationMs,finished,now:Date.now()});if(outcome.result==='WIN')sound.win();else if(outcome.result==='LOSS')sound.loss();else sound.skip();if(built.freezeUsed)sound.freeze();if(!finished)window.setTimeout(()=>{void newPuzzle(Date.now());},250);},[newPuzzle,sound,state]);
   const handleDecision=useCallback((decision:Decision)=>{if(state.phase!=='DECISION'||!state.aiData)return;sound.click();if(state.mode==='speed'){settleSpeed(decision,Math.max(0,Math.min(SPEED_SESSION_MS,Date.now()-state.speedRun.startedAt)));return;}dispatch({type:'SET_DECISION',decision,entryPrice:state.aiData.entryPrice});if(decision==='SKIP')dispatch({type:'OPEN_SKIP'});else dispatch({type:'TICK_REPLAY',idx:0,data:[]});},[settleSpeed,sound,state.aiData,state.mode,state.phase,state.speedRun.startedAt]);
   const startReverse=useCallback((decision:Decision)=>{dispatch({type:'REVERSE_START',decision});},[]);
   const finishReverseWithFlatten=useCallback(()=>{if(state.phase!=='REVERSE_REPLAY'||!state.reverseDecision||state.reverseDecision==='SKIP'||state.reverseResult||state.reverseEntryPrice===null)return;const b=state.reverseReplayData.at(-1)??state.puzzleData.future[0];if(!b)return;const diff=state.reverseDecision==='LONG'?b.close-state.reverseEntryPrice:state.reverseEntryPrice-b.close;void diff;dispatch({type:'REVERSE_FINISH',result:'FLATTEN'});},[state]);
