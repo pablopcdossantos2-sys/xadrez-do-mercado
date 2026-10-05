@@ -6,7 +6,7 @@
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 19 entregues · 13 pendentes
+**Resumo:** 32 itens · 4 tiers · 17 entregues · 15 pendentes
 
 ---
 
@@ -39,22 +39,15 @@ Marca cada puzzle com seu tipo de setup e mostra o rótulo na sidebar.
 
 ### 3. Validação da IA contra hindsight bias
 
-**Esforço:** Alto · **Status:** ✅ ENTREGUE
+**Esforço:** Alto · **Status:** Pendente
 
-O analista agora calcula uma **confiança baseada em sinais** para cada lado (estrutura, distância do VWAP, distância da EMA, viés do setup) *antes* de ver o futuro, e a expõe num `ConfidencePanel` com uma barra por opção. Um conjunto de **respostas aceitas** substitui a comparação exata: qualquer alternativa com confiança ≥ 0,30 que não perdeu feio é um resultado de processo válido. O skip passa a ser corretamente recompensado quando o setup era genuinamente ambíguo — em vez de ser silenciosamente punido pelo R avaliado com hindsight.
+O analista atual ainda determina a decisão principalmente a partir dos resultados da janela futura simulada. O painel de confiança baseada em sinais e as regras de múltiplas respostas aceitas descritos aqui não estão implementados na aplicação atual.
 
 ### 4. Realismo do gerador procedural
 
-**Esforço:** Alto · **Status:** ✅ ENTREGUE
+**Esforço:** Alto · **Status:** Pendente
 
-`generateMarketData` foi reescrita em torno de quatro fatos estilizados do mercado real:
-
-- **Regimes de sessão** — cada puzzle abre em um de *trend_up*, *trend_down*, *range*, *reversal* ou *chop*, que conduz o drift. O regime `reversal` inverte no meio da sessão.
-- **Agrupamento de volatilidade** — GARCH(1,1) com α = 0,12, β = 0,78. Barras de alta vol se agrupam, barras quietas ficam quietas, choques se propagam.
-- **Gap de abertura** — ±0,15% no começo da sessão.
-- **Forma do volume** — perfil intradiário em U, mais volume correlacionado com |retorno|. Movimentos grandes imprimem em volume grande, exatamente como no tape.
-
-O classificador agora vê setups de tendência, range e reversão com frequência realista, em vez de um emaranhado de random walk.
+O gerador atual produz séries OHLCV procedurais, mas o modelo de regimes de sessão, agrupamento de volatilidade, gap de abertura e perfil de volume em U descrito aqui não está totalmente implementado.
 
 ---
 
@@ -250,8 +243,8 @@ O estado interativo da aplicação foi centralizado em um React `useReducer` tip
 |---|------|------|---------|---------|--------|
 | 1 | Debrief contrafactual | T1 | Baixo | Altíssimo | ✅ ENTREGUE |
 | 2 | Playbook com setups rotulados | T1 | Médio | Altíssimo | ✅ ENTREGUE |
-| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | ✅ ENTREGUE |
-| 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | ✅ ENTREGUE |
+| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Pendente |
+| 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | Pendente |
 | 5 | Score de processo vs. resultado | T2 | Médio | Alto | ✅ ENTREGUE |
 | 6 | Heatmap "onde você erra" | T2 | Médio | Alto | ✅ ENTREGUE |
 | 7 | Debrief expandido "Por que não o outro lado?" | T2 | Baixo | Alto | ✅ ENTREGUE |
@@ -272,7 +265,7 @@ O estado interativo da aplicação foi centralizado em um React `useReducer` tip
 
 ### Quick wins — faça primeiro
 
-- ✅ Todos os 19 itens entregues
+- ✅ Todos os 17 itens atualmente entregues
 - → Dificuldade adaptativa (#10)
 - → Curva de ELO real (#21)
 
@@ -292,4 +285,4 @@ Com 19 de 32 itens entregues — incluindo todo o Tier 1, a maior parte do Tier 
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.5 · 32 itens · 4 tiers · 19 entregues · 13 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.5 · 32 itens · 4 tiers · 17 entregues · 15 pendentes*
