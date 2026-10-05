@@ -42,6 +42,8 @@ Cada puzzle apresenta 82 barras de histórico e solicita uma decisão. No modo P
 - ELO, precisão, score de processo, streak e breakdown por setup, direção, timeframe e instrumento.
 - Journal local com até 200 decisões e exportação em JSON/CSV.
 - Interface bilíngue EN/PT-BR, som opcional e atalhos de teclado.
+- Dificuldade adaptativa, modo Only structure vs Full context, relógio visual de sessão e alerta de revenge trade.
+- Testes de funções puras com Vitest.
 
 ## Arquitetura
 
@@ -63,7 +65,7 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 ## Roadmap executado nesta versão
 
-Foram implementadas as pendências **10. Dificuldade adaptativa**, **15. Blind tape**, **17. Replay reverso pós-resultado**, **19. Speed run**, **29. Migrar para Vite + React + TypeScript** e **32. Estado com useReducer**. Detalhes: [notas de implementação](docs/roadmap-implementation.md).
+Foram implementadas as pendências **10. Dificuldade adaptativa**, **15. Blind tape**, **16. Only structure vs Full context**, **17. Replay reverso pós-resultado**, **18. Session clock visual**, **19. Speed run**, **20. Revenge trade warning**, **29. Migrar para Vite + React + TypeScript**, **30. Testes para funções puras** e **32. Estado com useReducer**. Detalhes: [notas de implementação](docs/roadmap-implementation.md).
 
 ## Documentação
 
