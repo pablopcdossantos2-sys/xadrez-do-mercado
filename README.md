@@ -44,6 +44,9 @@ Cada puzzle apresenta 82 barras de histórico e solicita uma decisão. No modo P
 - Interface bilíngue EN/PT-BR, som opcional e atalhos de teclado.
 - Dificuldade adaptativa, modo Only structure vs Full context, relógio visual de sessão e alerta de revenge trade.
 - Testes de funções puras com Vitest.
+- Validação do analista sem hindsight, confiança do sinal e respostas aceitas.
+- Referências RTH/ETH, microestrutura sintética e eventos macro simulados no replay.
+- ELO dinâmico, desafio diário determinístico, cartas de padrão e suporte offline via PWA.
 
 ## Arquitetura
 
