@@ -9,6 +9,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'SET_SOUND': return { ...state, soundEnabled: action.enabled };
     case 'CLOCK_TICK': return { ...state, clockNow: action.now };
     case 'SET_MODE': return { ...state, mode: action.mode };
+    case 'SET_CONTEXT_MODE': return { ...state, contextMode: action.contextMode };
     case 'SET_TIMEFRAME': return { ...state, timeframe: action.timeframe };
     case 'SET_INSTRUMENT': return { ...state, instrument: action.instrument };
     case 'TOGGLE_INDICATOR': return { ...state, [action.key]: !state[action.key] };
