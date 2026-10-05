@@ -32,10 +32,14 @@ Cada item é classificado por **impacto no aprendizado do usuário**, consideran
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 3. Validação da IA contra hindsight bias
-**Esforço:** Alto · **Status:** ✅ ENTREGUE
+**Esforço:** Alto · **Status:** Pendente
+
+A implementação auditada atual não contém o painel de confiança baseada em sinais nem o modelo de múltiplas respostas aceitas descritos neste item.
 
 ### 4. Realismo do gerador procedural
-**Esforço:** Alto · **Status:** ✅ ENTREGUE
+**Esforço:** Alto · **Status:** Pendente
+
+O gerador é procedural e sintético, mas ainda não implementa integralmente o modelo de regimes de sessão, agrupamento de volatilidade, gap de abertura e perfil de volume em U descrito neste item.
 
 ---
 
@@ -163,8 +167,8 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 |---|------|------|---------|---------|--------|
 | 1 | Debrief contrafactual | T1 | Baixo | Altíssimo | ✅ |
 | 2 | Playbook com setups rotulados | T1 | Médio | Altíssimo | ✅ |
-| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | ✅ |
-| 4 | Realismo do gerador | T1 | Alto | Altíssimo (longo prazo) | ✅ |
+| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Pendente |
+| 4 | Realismo do gerador | T1 | Alto | Altíssimo (longo prazo) | Pendente |
 | 5 | Score de processo vs. resultado | T2 | Médio | Alto | ✅ |
 | 6 | Heatmap "onde você erra" | T2 | Médio | Alto | ✅ |
 | 7 | Debrief expandido | T2 | Baixo | Alto | ✅ |
