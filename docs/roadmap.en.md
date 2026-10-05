@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.4
+> **Strategic Document** · v1.5
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 13 shipped · 19 pending
+**Summary:** 32 items · 4 tiers · 15 shipped · 17 pending
 
 ---
 
@@ -39,15 +39,22 @@ Tag every puzzle with its setup type and show the label in the sidebar.
 
 ### 3. AI validation against hindsight bias
 
-**Effort:** High · **Status:** Partial
+**Effort:** High · **Status:** ✅ SHIPPED
 
-The current "correct answer" is *which side hit TP before SL* — pure hindsight. Accept multiple valid answers, use an auditable rule tree, and expose a confidence score.
+The analyst now computes a **signal-based confidence** for each side (structure, VWAP distance, EMA distance, setup bias) *before* seeing the future, then exposes it in a `ConfidencePanel` with one bar per option. A set of **accepted answers** replaces exact matching: any alternative with confidence ≥ 0.30 that did not lose badly is a valid process outcome. Skipping becomes correctly rewarded when the setup was genuinely ambiguous — instead of being silently punished by the hindsight-graded R.
 
 ### 4. Realism of the procedural generator
 
-**Effort:** High · **Status:** Pending
+**Effort:** High · **Status:** ✅ SHIPPED
 
-Inject volatility clustering, session regimes, volume correlated with |return|, opening gaps. Alternative: real historical CSV of MES/MNQ.
+`generateMarketData` was rewritten around four real-market stylized facts:
+
+- **Session regimes** — each puzzle opens in one of *trend_up*, *trend_down*, *range*, *reversal*, or *chop*, which drives drift. `reversal` regime flips mid-session.
+- **Volatility clustering** — GARCH(1,1) with α = 0.12, β = 0.78. High-vol bars cluster, quiet bars stay quiet, shocks propagate.
+- **Opening gap** — ±0.15% at session start.
+- **Volume shape** — U-shaped intraday profile, plus volume correlated with |return|. Big moves print on big volume, exactly like the tape.
+
+The classifier now sees trend, range, and reversal setups with realistic frequency instead of a random-walk soup.
 
 ---
 
@@ -83,7 +90,7 @@ Every decision is appended to a local journal (last 200). Export as JSON or CSV.
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-On Skip, a modal asks "Why?" with five canonical reasons (bad setup, far from VWAP, against trend, no confluence, unsure). The choice is compared against the analyst's reason and stored in the journal. Comparison is shown in the debrief.
+On Skip, a modal asks "Why?" with five canonical reasons. The choice is compared against the analyst's reason and stored in the journal.
 
 ### 10. Adaptive difficulty
 
@@ -95,7 +102,7 @@ Keep the user in flow zone (60–75% accuracy) by tuning generator noise.
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-`detectTrap()` analyzes the visible history and flags deceptive patterns: oversized bar body, dominant wick rejection, VWAP whipsaw, 3-bar push on declining volume, and failed breakouts in the last 4 bars. A warning banner appears in the Decision phase sidebar.
+`detectTrap()` flags oversized bars, dominant wicks, VWAP whipsaws, and failed breakouts. Warning banner in the Decision phase sidebar.
 
 ---
 
@@ -137,7 +144,7 @@ Toggle to hide context. Trains pure price action first.
 
 **Effort:** Medium · **Status:** Pending
 
-Re-test with a different choice on the same puzzle. Confidence calibration.
+Re-test with a different choice on the same puzzle.
 
 ### 18. Visual session clock
 
@@ -155,7 +162,7 @@ Bar with markers at 09:30, 10:00, 11:30, 13:00, 15:00, 16:00.
 
 **Effort:** Low · **Status:** Pending
 
-Detect risk escalation after losses and warn. Teaches trading psychology.
+Detect risk escalation after losses and warn.
 
 ---
 
@@ -179,25 +186,25 @@ Novice · Developing · Consistent · Sharp · Institutional.
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-One freeze per day. If the user loses with a streak > 0 and freeze available, the streak is preserved and the freeze consumed. Resets automatically after 24h. Indicator shown in the top bar during play, and a dedicated banner appears in the Result phase when consumed. Sound cue (two-note chime) plays on consumption.
+One freeze per day. Preserves streak on loss; resets after 24h.
 
 ### 24. 30-second onboarding
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-3-step overlay on first visit. Home screen explains how the game works.
+3-step overlay on first visit.
 
 ### 25. Mobile responsiveness
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-Layout stacks vertically below `md`: chart takes the top 40vh, sidebar occupies the remaining space with its own scroll. Top bar wraps gracefully; indicator toggles hidden on small screens; journal table progressively reveals columns (`hidden sm:table-cell`, `hidden md:table-cell`, `hidden lg:table-cell`). Buttons get `min-height: 40px` on touch. Touch pan/zoom enabled on the chart. Keyboard shortcuts de-emphasized on touch.
+Vertical layout below `md`. Chart 40vh on top, sidebar below.
 
 ### 26. Daily challenges with deterministic seed
 
 **Effort:** Medium · **Status:** Pending
 
-1 puzzle/day. Local ranking: you vs. yesterday's you.
+1 puzzle/day. Local ranking.
 
 ### 27. Collectible pattern cards
 
@@ -209,19 +216,19 @@ Each mastered setup becomes a "card".
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-A `useSound` hook built on the **Web Audio API** — no external files. Distinct tones for click (decision), chime (WIN), thud (LOSS), tick (SKIP), and a two-note shimmer (freeze consumed). Toggle button in the top bar; preference persisted in `localStorage`. Context is created lazily on the first user gesture, so browsers never block it.
+Web Audio API — click, chime, thud, tick, freeze shimmer. Toggle persisted.
 
 ### 29. Migrate to Vite + React + TypeScript
 
 **Effort:** High · **Status:** Recommended
 
-When single-file exceeds ~2,000 LOC. Modular structure.
+When single-file exceeds ~2,000 LOC.
 
 ### 30. Tests for pure functions
 
 **Effort:** Low · **Status:** Pending
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady, computeSignalConfidence.
 
 ### 31. Offline mode (service worker)
 
@@ -243,6 +250,8 @@ Replace the 12+ interdependent useState hooks.
 |---|------|------|--------|--------|--------|
 | 1 | Counterfactual debrief | T1 | Low | Very high | ✅ SHIPPED |
 | 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ SHIPPED |
+| 3 | AI validation (hindsight bias) | T1 | High | Very high | ✅ SHIPPED |
+| 4 | Realism of procedural generator | T1 | High | Very high (long term) | ✅ SHIPPED |
 | 5 | Process score vs. outcome score | T2 | Medium | High | ✅ SHIPPED |
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ SHIPPED |
 | 7 | Expanded debrief "Why not the other side?" | T2 | Low | High | ✅ SHIPPED |
@@ -254,46 +263,30 @@ Replace the 12+ interdependent useState hooks.
 | 24 | 30-second onboarding | T4 | Low | Medium | ✅ SHIPPED |
 | 25 | Mobile responsiveness | T4 | Medium | Medium | ✅ SHIPPED |
 | 28 | Subtle sound | T4 | Low | Medium | ✅ SHIPPED |
-| 3 | AI validation (hindsight bias) | T1 | High | Very high | Partial |
-| 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
 | 10 | Adaptive difficulty | T2 | Medium | High | Pending |
 | 21 | Real ELO (Glicko) | T4 | Medium | Medium-high | Pending |
 | 29 | Migration to Vite + TS | T4 | High | Enabler | Recommended |
 
 ### Quick wins — do first
 
-- ✅ Counterfactual debrief (#1)
-- ✅ Playbook with labeled setups (#2)
-- ✅ Process score vs. outcome score (#5)
-- ✅ Heatmap of "where you fail" (#6)
-- ✅ Expanded debrief "Why not the other side?" (#7)
-- ✅ Per-decision journal with export (#8)
-- ✅ Justified skip with reason (#9)
-- ✅ "Trap of the day" warning (#11)
-- ✅ Ranks / tiers (#22)
-- ✅ Streak with freeze (#23)
-- ✅ 30-second onboarding (#24)
-- ✅ Mobile responsiveness (#25)
-- ✅ Subtle sound (#28)
+- ✅ All 15 shipped items
 - → Adaptive difficulty (#10)
+- → Real ELO curve (#21)
 
 ### Structural investments
 
-- → AI validation (hindsight bias) (#3)
-- → Generator realism (#4)
-- → Adaptive difficulty (#10)
-- → Vite + TS migration (#29)
+- → Migration to Vite + TS (#29)
+- → Tests for pure functions (#30)
+- → useReducer (#32)
 
 ---
 
 ## Executive summary
 
-Today, Tape Puzzles is a *beautiful direction-guessing game*. To become a **real training tool**, the key lies in three Tier 1 items: **counterfactual debrief**, **setup labeling**, and **data realism**.
+The two Tier 1 items that were still open are now closed. **AI validation** turned the "correct answer" from a hindsight tautology into a fair, multi-answer judgment, and the **generator realism** rewrite gave the app a foundation that actually resembles an MES/MNQ session. The tutorial now rewards the same things a real trading coach would: sound process, regardless of whether the market resolved it in your favor today.
 
-The addition of **process score**, the **weakness heatmap**, the **four-axis expanded debrief**, the **per-decision journal**, the **justified skip modal**, the **trap warning**, and the **streak freeze + sound + mobile** polish (Tier 2 #5–#11 and Tier 4 #22–#28) closes the loop: the app now separates good decisions from good outcomes, tells the user exactly where their edge is missing, explains *why* the other side lost, keeps a persistent exportable record of every decision, asks the user to justify skips, warns about the most common traps in real time, and is finally usable on a phone.
-
-The next frontier remains the **generator realism** (#4) — until the data is realistic, the rest is training wheels on a synthetic track.
+With 15 of 32 items shipped — including every Tier 1 and almost every Tier 2 — the next tier of work is about **depth** (adaptive difficulty, Glicko ELO, microstructure, macro events) and **engineering** (TypeScript migration, tests, useReducer). The learning loop is now complete enough that a serious user can improve on it without the tool fighting them.
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.4 · 32 items · 4 tiers · 13 shipped · 19 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.5 · 32 items · 4 tiers · 15 shipped · 17 pending*
