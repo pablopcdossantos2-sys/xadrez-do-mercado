@@ -154,6 +154,12 @@ Gera uma sequência procedural para completar casos raros, testes e treinamento 
 
 A experiência do usuário permanece a mesma. A diferença fica na origem dos dados.
 
+## Etapa 8 — Futuros estrangeiros
+
+A próxima frente é montar a biblioteca real de **MES e MNQ** em fonte autorizada, mantendo o mesmo contrato de dados já usado no histórico brasileiro. A biblioteca estrangeira deverá preservar sessão regular, horário de negociação, contrato, volume e regras de rollover, sem misturar dados de vencimentos diferentes.
+
+Neste momento, MES e MNQ permanecem com o gerador sintético e não fazem parte da biblioteca histórica real publicada.
+
 ## Critério de conclusão
 
 Consideraremos a migração histórica bem-sucedida quando houver:
