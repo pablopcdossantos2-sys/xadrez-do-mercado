@@ -1,4 +1,4 @@
-# Roadmap implementation notes
+# Xadrez do Mercado — Roadmap implementation notes
 
 ## 15. Blind tape — shipped
 
@@ -104,3 +104,8 @@ Added a persistent collection of setup cards. Each solved puzzle exposes its set
 
 Added a minimal PWA shell with a web manifest, SVG app icon, service-worker registration, shell precaching, and runtime same-origin caching. After an online load, the application assets can be served from cache when the network is unavailable.
 
+
+
+## Advanced phase — real market data
+
+The 32-item roadmap is complete. The next phase is tracked separately in the [real market data plan](real-market-data-plan.pt-BR.md), covering licensed historical data, runtime feed integration, professional replay, and real microstructure.
