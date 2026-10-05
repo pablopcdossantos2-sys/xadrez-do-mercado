@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Roadmap de Melhorias
 
-> **Documento Estratégico** · v1.2
+> **Documento Estratégico** · v1.3
 >
 > 32 melhorias para transformar o Tape Puzzles de um jogo de adivinhação em uma ferramenta real de treino.
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 8 entregues · 24 pendentes
+**Resumo:** 32 itens · 4 tiers · 10 entregues · 22 pendentes
 
 ---
 
@@ -25,27 +25,23 @@ Cada item é classificado por **impacto no aprendizado do usuário**, consideran
 
 *Fundação — sem isso, o app não ensina.*
 
-Estes são os itens que separam um *quiz de direção* de uma *ferramenta de treino deliberado*. Todos os outros tiers dependem destes para fazer sentido pedagógico.
-
 ### 1. Debrief contrafactual
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Após o resultado, mostrar o que teria acontecido com **cada alternativa** (Long, Short, Skip) contra as mesmas barras futuras.
-
-> *Por que é o #1:* o aprendizado não acontece no acerto — acontece no *contraste*.
+Mostra o que cada alternativa (Long, Short, Skip) teria produzido.
 
 ### 2. Playbook com setups rotulados
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Marcar cada puzzle com um tipo de setup (Reclaim de VWAP, ORB, Rompimento Falho, Varredura de Liquidez, Pullback de Tendência, Fade de Range, Impulso, Consolidação) e mostrar o rótulo na sidebar.
+Marca cada puzzle com seu tipo de setup e mostra o rótulo na sidebar.
 
 ### 3. Validação da IA contra hindsight bias
 
 **Esforço:** Alto · **Status:** Parcial
 
-A "resposta correta" atual é *qual lado bateu TP antes do SL* — isso é hindsight puro. Aceitar múltiplas respostas válidas, usar uma árvore de regras auditável e expor um score de confiança.
+A "resposta correta" atual é *qual lado bateu TP antes do SL* — hindsight puro. Aceitar múltiplas respostas válidas, usar árvore de regras auditável e expor score de confiança.
 
 ### 4. Realismo do gerador procedural
 
@@ -59,37 +55,35 @@ Injetar agrupamento de volatilidade, regimes de sessão, volume correlacionado c
 
 *Multiplicadores de aprendizado.*
 
-Combatemos o vício mais comum de trader: *processo ruim com resultado bom*.
-
 ### 5. Score de processo vs. score de resultado
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Um segundo score que premia decisões boas mesmo quando o mercado não coopera. Combate o result bias. A home mostra um insight comparando precisão de processo vs. precisão de resultado.
+Um segundo score que premia decisões boas mesmo quando o mercado não coopera.
 
 ### 6. Heatmap "onde você erra"
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Estatísticas agregadas por setup, timeframe, direção e instrumento. O usuário descobre onde é fraco. Buckets com menos de 2 amostras são ocultados.
+Estatísticas agregadas por setup, timeframe, direção e instrumento. Piores buckets primeiro.
 
 ### 7. Debrief expandido "Por que não o outro lado?"
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Após cada decisão, um painel objetivo lista **quatro eixos clássicos** — estrutura, volume, localização e confluência — cada um com um ponto colorido indicando se o eixo *suporta* ou *contradiz* a jogada do analista. Todos os eixos são calculados a partir do histórico visível (contagem HH/LL, divisão de volume alta/baixa, distância ao nível mais próximo, e concordância entre VWAP, EMA, estrutura e volume).
+Painel objetivo com quatro eixos clássicos — estrutura, volume, localização, confluência — cada um com um ponto colorido indicando suporte/contradição à jogada do analista.
 
 ### 8. Journal por decisão com export
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Cada decisão é anexada a um diário local (`localStorage`, mantidas as últimas 200). A home exibe as últimas 20 entradas em tabela compacta com botões **Exportar JSON**, **Exportar CSV** e **Limpar diário**. Ideal para estudo offline e para alimentar ferramentas externas de análise.
+Cada decisão é anexada a um diário local (últimas 200). Export em JSON ou CSV. Agora também armazena motivo do skip e trap detectada.
 
 ### 9. Skip justificado (com motivo)
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Ao Skip, perguntar "Por quê?" e comparar com a razão real da IA. Treina vocabulário técnico.
+Ao Skip, um modal pergunta "Por quê?" com cinco razões canônicas (setup ruim, longe do VWAP, contra tendência, sem confluência, não sei). A escolha é comparada com a razão do analista e salva no journal. Comparação aparece no debrief.
 
 ### 10. Dificuldade adaptativa
 
@@ -99,9 +93,9 @@ Manter o usuário na zona de fluxo (60–75% de precisão) ajustando o ruído do
 
 ### 11. Aviso de "armadilha do dia"
 
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Detectar padrões enganosos e mostrar uma nota lateral antes da decisão, sem entregar a resposta.
+`detectTrap()` analisa o histórico visível e sinaliza padrões enganosos: corpo de barra gigante (>1.5× ATR), rejeição por pavio dominante, whipsaw no VWAP (≥4 cruzamentos em 8 barras), empurrão de 3 barras com volume decrescente, e rompimentos falhos nas últimas 4 barras. Um banner aparece na sidebar durante a fase de decisão, sem entregar a resposta.
 
 ---
 
@@ -173,7 +167,7 @@ Detectar aumento de risco após losses e avisar. Ensina psicologia operacional.
 
 **Esforço:** Médio · **Status:** Pendente
 
-ΔELO depende da dificuldade do puzzle. Auto-calibra a progressão.
+ΔELO depende da dificuldade do puzzle.
 
 ### 22. Patentes / níveis
 
@@ -185,7 +179,7 @@ Novato · Em Desenvolvimento · Consistente · Afiado · Institucional.
 
 **Esforço:** Baixo · **Status:** Pendente
 
-1 freeze/dia para não zerar a sequência. Reduz fricção de retorno.
+1 freeze/dia para não zerar a sequência.
 
 ### 24. Onboarding em 30 segundos
 
@@ -209,7 +203,7 @@ Layout vertical, botões touch, gestos.
 
 **Esforço:** Médio · **Status:** Pendente
 
-Cada setup dominado vira uma "carta". Gamifica o estudo.
+Cada setup dominado vira uma "carta".
 
 ### 28. Som sutil
 
@@ -227,25 +221,23 @@ Quando o single-file passar de ~2.000 LOC. Estrutura em módulos.
 
 **Esforço:** Baixo · **Status:** Pendente
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap.
 
 ### 31. Modo offline (service worker)
 
 **Esforço:** Médio · **Status:** Pendente
 
-PWA com cache. Treina no avião.
+PWA com cache.
 
 ### 32. Estado com useReducer
 
 **Esforço:** Baixo · **Status:** Pendente
 
-Substituir os 12 useState interdependentes. Facilita testes e evita bugs de sincronização.
+Substituir os 12+ useState interdependentes.
 
 ---
 
 ## Matriz de priorização
-
-Visão compacta para decidir a ordem de implementação. **Comece pelo quadrante verde.**
 
 | # | Item | Tier | Esforço | Impacto | Status |
 |---|------|------|---------|---------|--------|
@@ -255,9 +247,10 @@ Visão compacta para decidir a ordem de implementação. **Comece pelo quadrante
 | 6 | Heatmap "onde você erra" | T2 | Médio | Alto | ✅ ENTREGUE |
 | 7 | Debrief expandido "Por que não o outro lado?" | T2 | Baixo | Alto | ✅ ENTREGUE |
 | 8 | Journal por decisão com export | T2 | Baixo | Alto | ✅ ENTREGUE |
+| 9 | Skip justificado (com motivo) | T2 | Baixo | Alto | ✅ ENTREGUE |
+| 11 | Aviso de "armadilha do dia" | T2 | Médio | Alto | ✅ ENTREGUE |
 | 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Parcial |
 | 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | Pendente |
-| 9 | Skip justificado (com motivo) | T2 | Baixo | Alto | Pendente |
 | 10 | Dificuldade adaptativa | T2 | Médio | Alto | Pendente |
 | 21 | ELO real (Glicko) | T4 | Médio | Médio-alto | Pendente |
 | 29 | Migração para Vite + TS | T4 | Alto | Habilitador | Recomendado |
@@ -270,10 +263,11 @@ Visão compacta para decidir a ordem de implementação. **Comece pelo quadrante
 - ✅ Heatmap "onde você erra" (#6)
 - ✅ Debrief expandido "Por que não o outro lado?" (#7)
 - ✅ Journal por decisão com export (#8)
+- ✅ Skip justificado com motivo (#9)
+- ✅ Aviso de "armadilha do dia" (#11)
 - ✅ Patentes / níveis (#22)
 - ✅ Onboarding em 30 segundos (#24)
-- → Skip justificado com motivo (#9)
-- → Aviso de armadilha do dia (#11)
+- → Dificuldade adaptativa (#10)
 
 ### Investimentos estruturais
 
@@ -288,10 +282,10 @@ Visão compacta para decidir a ordem de implementação. **Comece pelo quadrante
 
 Hoje, o Tape Puzzles é um *jogo bonito de adivinhar direção*. Para virar uma **ferramenta de treino real**, o pulo do gato está em três itens do Tier 1: **debrief contrafactual**, **rotulagem de setups** e **realismo dos dados**.
 
-Com esses três, o usuário sai de cada puzzle sabendo *o quê* errou, *por quê*, e *o que o mercado teria feito* em qualquer direção — que é exatamente o que *"xadrez para traders"* deveria entregar.
+A adição do **score de processo**, do **heatmap de fraquezas**, do **debrief expandido em quatro eixos**, do **journal por decisão**, do **skip justificado** e do **aviso de armadilha** (Tier 2, #5, #6, #7, #8, #9, #11) fecha o ciclo: o app agora separa boas decisões de bons resultados, diz exatamente onde a edge do usuário está faltando, explica *por que* o outro lado perdeu, mantém um registro persistente e exportável de cada decisão, pede que o usuário justifique os skips, e avisa em tempo real sobre as armadilhas mais comuns.
 
-A adição do **score de processo**, do **heatmap de fraquezas**, do **debrief expandido em quatro eixos** e do **journal por decisão** (Tier 2, #5, #6, #7, #8) fecha o ciclo: o app agora separa boas decisões de bons resultados, diz ao usuário exatamente onde a edge dele está faltando, explica *por que* o outro lado perdeu, e mantém um registro persistente e exportável de cada decisão.
+A próxima fronteira é o **realismo do gerador** (#4) — enquanto os dados não forem realistas, o resto é rodinha de bicicleta em pista sintética.
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.2 · 32 itens · 4 tiers · 8 entregues · 24 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.3 · 32 itens · 4 tiers · 10 entregues · 22 pendentes*
