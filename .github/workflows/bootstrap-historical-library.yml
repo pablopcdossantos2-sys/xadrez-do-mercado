@@ -27,6 +27,7 @@ jobs:
           git reset --hard origin/main
 
       - name: Build real historical library
+        # The builder stops early after the requested session count is available for all assets.
         run: |
           python3 scripts/build-historical-library.py \
             --start-date 2026-09-23 \
