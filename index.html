@@ -19,16 +19,13 @@
   ::-webkit-scrollbar-thumb { background: #2b2b43; border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #363c4e; }
   input[type="range"] { accent-color: #2962FF; }
-  .grid-bg {
-    background-image:
-      linear-gradient(rgba(43,43,67,0.35) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(43,43,67,0.35) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
+  .grid-bg { background-image: linear-gradient(rgba(43,43,67,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(43,43,67,0.35) 1px, transparent 1px); background-size: 32px 32px; }
   .fade-in { animation: fadeIn .35s ease-out both; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
   .bar-track { background: #0E1117; border-radius: 9999px; overflow: hidden; }
   .bar-fill  { height: 100%; transition: width .4s ease; }
+  .modal-enter { animation: modalIn .18s ease-out both; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
@@ -45,26 +42,22 @@ const TRANSLATIONS = {
     appName: 'Tape Puzzles',
     elo: 'ELO', solved: 'Solved', accuracy: 'Accuracy', streak: 'Streak', tradesR: 'Trades R',
     process: 'Process', best: 'best',
-    loading: 'Loading Puzzle',
-    headerDecision: 'Decision', decisionQ: 'Long, short, or skip?',
+    loading: 'Loading Puzzle', headerDecision: 'Decision', decisionQ: 'Long, short, or skip?',
     marketContext: 'Market Context', yourCall: 'Your Call',
     long: 'Long', short: 'Short', skip: 'Skip',
     shortcutsLsk: 'Shortcuts: L = long · S = short · K = skip',
     playbook: 'Playbook', ruleGraded: 'rule-graded',
     bracket: 'Bracket', entry: 'Entry', stop: 'Stop', target: 'Target',
     stopLoss: 'Stop Loss', takeProfit: 'Take Profit',
-    play: 'Play', pause: 'Pause', flatten: 'Flatten',
-    speed: 'Speed', bar: 'Bar',
+    play: 'Play', pause: 'Pause', flatten: 'Flatten', speed: 'Speed', bar: 'Bar',
     spacePlayHint: 'Space: play/pause · F: flatten · →: step',
     resultWin: 'Target Hit', resultLoss: 'Stopped Out', resultTimeout: 'Time Expired',
     resultFlat: 'Flattened', resultSkip: 'Skipped',
     correctMove: 'Correct move', eloDelta: 'ELO',
-    debrief: 'Debrief & Why',
-    nextPuzzle: 'Next Puzzle', nextHint: 'Shortcut: N',
+    debrief: 'Debrief & Why', nextPuzzle: 'Next Puzzle', nextHint: 'Shortcut: N',
     contextAtDecision: 'Context at Decision', awaitingData: 'Awaiting data…',
     whatIf: 'What if…', yourTrade: 'Your trade',
-    altLong: 'If Long', altShort: 'If Short', altSkip: 'If Skip',
-    bestMove: 'best',
+    altLong: 'If Long', altShort: 'If Short', altSkip: 'If Skip', bestMove: 'best',
     counterfactualNote: 'Reference bracket 12 / 24 pts (1:2 R) applied to the same future bars.',
     outcomeWin: 'TP hit', outcomeLoss: 'SL hit', outcomeTimeout: 'Timeout', outcomeSkip: 'No trade',
     rowSessionMove: 'Session move', rowRange: 'Total range', rowAtr: 'ATR(14)',
@@ -94,8 +87,7 @@ const TRANSLATIONS = {
     why3Text: 'Replay with your own stop and target. Learn how bracket choice changes the outcome.',
     byTheNumbers: 'By the numbers',
     numSetups: 'Setup patterns', numPuzzles: 'Puzzle variations',
-    numInstruments: 'Instruments', numTimeframes: 'Timeframes',
-    procedurallyGenerated: 'procedurally generated',
+    numInstruments: 'Instruments', numTimeframes: 'Timeframes', procedurallyGenerated: 'procedurally generated',
     yourProgress: 'Your progress', yourRank: 'Your rank',
     rankNovice: 'Novice', rankDeveloping: 'Developing', rankConsistent: 'Consistent',
     rankSharp: 'Sharp', rankInstitutional: 'Institutional',
@@ -106,11 +98,8 @@ const TRANSLATIONS = {
     insightBalanced: 'Process and outcome are aligned. You are on the right track.',
     whereYouFail: 'Where you fail',
     whereYouFailSub: 'Process accuracy per bucket — sorted weakest first. Buckets with fewer than 2 samples are hidden.',
-    minSample: 'min sample: 2',
-    notEnoughData: 'Not enough data yet',
-    playToSee: 'Play a few puzzles to see your weak spots here.',
-    catSetup: 'By setup', catDirection: 'By direction',
-    catTimeframe: 'By timeframe', catInstrument: 'By instrument',
+    minSample: 'min sample: 2', notEnoughData: 'Not enough data yet', playToSee: 'Play a few puzzles to see your weak spots here.',
+    catSetup: 'By setup', catDirection: 'By direction', catTimeframe: 'By timeframe', catInstrument: 'By instrument',
     debriefWhyNot: 'Why not the other side?',
     debriefWhyNotSub: 'Objective read of four classic axes. A colored dot means the axis supports the analyst call.',
     axisStructure: 'Structure', axisVolume: 'Volume', axisLocation: 'Location', axisConfluence: 'Confluence',
@@ -130,15 +119,38 @@ const TRANSLATIONS = {
     dConfluenceStrongShort: 'Confluence is strong for Short: {shorts}/4 signals agree.',
     dConfluenceMediumShort: 'Confluence is moderate for Short: {shorts}/4 signals agree.',
     dConfluenceWeak: 'Confluence is weak: no clear directional edge from VWAP, EMA, structure, or volume.',
-    journal: 'Journal',
-    journalSub: 'Every decision is logged locally. Export to study offline.',
+    journal: 'Journal', journalSub: 'Every decision is logged locally. Export to study offline.',
     journalEmpty: 'No decisions logged yet. Play a puzzle to start your journal.',
     journalCount: '{n} entries stored (last 200 kept).',
     colTime: 'Time', colContext: 'Context', colSetup: 'Setup', colDecision: 'You', colAi: 'AI',
-    colOutcome: 'Outcome', colR: 'R',
+    colOutcome: 'Outcome', colR: 'R', colReason: 'Reason',
     exportJson: 'Export JSON', exportCsv: 'Export CSV', clearJournal: 'Clear journal',
     confirmClearJournal: 'Clear the entire journal? This cannot be undone.',
     setupHidden: '—',
+    // Skip reason modal (roadmap #9)
+    skipTitle: 'Why are you skipping?',
+    skipSub: 'The analyst will compare your reason against its own.',
+    skipBadSetup: 'Bad setup',
+    skipFarFromVwap: 'Too far from VWAP',
+    skipAgainstTrend: 'Against the trend',
+    skipNoConfluence: 'No confluence',
+    skipUnsure: 'Not sure',
+    skipReasonLabel: 'Your reason',
+    aiReasonLabel: 'Analyst reason',
+    reasonMatched: 'Your read matches the analyst.',
+    reasonMismatched: 'Your read differs from the analyst.',
+    aiReasonDefault: 'Setup is ambiguous — no directional edge.',
+    aiReasonShort: 'Setup lacked a clean directional edge.',
+    // Trap warning (roadmap #11)
+    trapWarning: 'Trap of the day',
+    trapOversizedBar: 'Last bar body is {ratio}× ATR. Oversized candles often precede a mean-reversion wick — be careful with continuation trades.',
+    trapLongWick: 'Last bar has a dominant {side} wick. Rejection was strong; chasing in that direction is a common trap.',
+    trapVwapWhipsaw: 'Price crossed VWAP {count} times in the last 8 bars. Whipsaw zones punish directional bets.',
+    trapVolumeDiverge: 'Last 3 bars pushed price {dir} on decreasing volume — divergence often precedes a fade.',
+    trapFailedBreak: 'Price tried to break {level} in the last 4 bars and failed. Trap for breakout traders.',
+    sideUpper: 'upper', sideLower: 'lower',
+    dirUp: 'up', dirDown: 'down',
+    // Keyboard
     keyboardShortcuts: 'Keyboard shortcuts',
     kbDecision: 'Decision phase', kbReplay: 'Replay phase', kbResult: 'Result phase', kbGeneral: 'Anywhere',
     kbLong: 'Long', kbShort: 'Short', kbSkip: 'Skip',
@@ -154,26 +166,22 @@ const TRANSLATIONS = {
     appName: 'Tape Puzzles',
     elo: 'ELO', solved: 'Resolvidos', accuracy: 'Precisão', streak: 'Sequência', tradesR: 'R Total',
     process: 'Processo', best: 'recorde',
-    loading: 'Carregando Puzzle',
-    headerDecision: 'Decisão', decisionQ: 'Long, short, ou skip?',
+    loading: 'Carregando Puzzle', headerDecision: 'Decisão', decisionQ: 'Long, short, ou skip?',
     marketContext: 'Contexto de Mercado', yourCall: 'Sua Decisão',
     long: 'Long', short: 'Short', skip: 'Skip',
     shortcutsLsk: 'Atalhos: L = long · S = short · K = skip',
     playbook: 'Playbook', ruleGraded: 'regra-avaliado',
     bracket: 'Bracket', entry: 'Entrada', stop: 'Stop', target: 'Alvo',
     stopLoss: 'Stop Loss', takeProfit: 'Take Profit',
-    play: 'Play', pause: 'Pausar', flatten: 'Zerar',
-    speed: 'Velocidade', bar: 'Barra',
+    play: 'Play', pause: 'Pausar', flatten: 'Zerar', speed: 'Velocidade', bar: 'Barra',
     spacePlayHint: 'Espaço: play/pause · F: zerar · →: passo',
     resultWin: 'Alvo Atingido', resultLoss: 'Stopado', resultTimeout: 'Tempo Esgotado',
     resultFlat: 'Zerado', resultSkip: 'Pulado',
     correctMove: 'Jogada correta', eloDelta: 'ELO',
-    debrief: 'Debrief & Motivo',
-    nextPuzzle: 'Próximo Puzzle', nextHint: 'Atalho: N',
+    debrief: 'Debrief & Motivo', nextPuzzle: 'Próximo Puzzle', nextHint: 'Atalho: N',
     contextAtDecision: 'Contexto na Decisão', awaitingData: 'Aguardando dados…',
     whatIf: 'E se…', yourTrade: 'Sua jogada',
-    altLong: 'Se Long', altShort: 'Se Short', altSkip: 'Se Skip',
-    bestMove: 'melhor',
+    altLong: 'Se Long', altShort: 'Se Short', altSkip: 'Se Skip', bestMove: 'melhor',
     counterfactualNote: 'Bracket de referência 12 / 24 pts (1:2 R) aplicado às mesmas barras futuras.',
     outcomeWin: 'TP batido', outcomeLoss: 'SL batido', outcomeTimeout: 'Timeout', outcomeSkip: 'Sem trade',
     rowSessionMove: 'Variação da sessão', rowRange: 'Range total', rowAtr: 'ATR(14)',
@@ -203,8 +211,7 @@ const TRANSLATIONS = {
     why3Text: 'Replay com seu próprio stop e alvo. Aprenda como a escolha do bracket muda o resultado.',
     byTheNumbers: 'Pelos números',
     numSetups: 'Padrões de setup', numPuzzles: 'Variações de puzzle',
-    numInstruments: 'Instrumentos', numTimeframes: 'Timeframes',
-    procedurallyGenerated: 'geradas proceduralmente',
+    numInstruments: 'Instrumentos', numTimeframes: 'Timeframes', procedurallyGenerated: 'geradas proceduralmente',
     yourProgress: 'Seu progresso', yourRank: 'Sua patente',
     rankNovice: 'Novato', rankDeveloping: 'Em Desenvolvimento', rankConsistent: 'Consistente',
     rankSharp: 'Afiado', rankInstitutional: 'Institucional',
@@ -215,11 +222,8 @@ const TRANSLATIONS = {
     insightBalanced: 'Processo e resultado alinhados. Você está no caminho certo.',
     whereYouFail: 'Onde você erra',
     whereYouFailSub: 'Precisão de processo por bucket — ordenado do pior para o melhor. Buckets com menos de 2 amostras são ocultados.',
-    minSample: 'amostra mínima: 2',
-    notEnoughData: 'Ainda sem dados suficientes',
-    playToSee: 'Jogue alguns puzzles para ver seus pontos fracos aqui.',
-    catSetup: 'Por setup', catDirection: 'Por direção',
-    catTimeframe: 'Por timeframe', catInstrument: 'Por instrumento',
+    minSample: 'amostra mínima: 2', notEnoughData: 'Ainda sem dados suficientes', playToSee: 'Jogue alguns puzzles para ver seus pontos fracos aqui.',
+    catSetup: 'Por setup', catDirection: 'Por direção', catTimeframe: 'Por timeframe', catInstrument: 'Por instrumento',
     debriefWhyNot: 'Por que não o outro lado?',
     debriefWhyNotSub: 'Leitura objetiva de quatro eixos clássicos. Ponto colorido = eixo alinhado à jogada do analista.',
     axisStructure: 'Estrutura', axisVolume: 'Volume', axisLocation: 'Localização', axisConfluence: 'Confluência',
@@ -239,15 +243,35 @@ const TRANSLATIONS = {
     dConfluenceStrongShort: 'Confluência forte para Short: {shorts}/4 sinais concordam.',
     dConfluenceMediumShort: 'Confluência moderada para Short: {shorts}/4 sinais concordam.',
     dConfluenceWeak: 'Confluência fraca: sem direção clara de VWAP, EMA, estrutura ou volume.',
-    journal: 'Diário',
-    journalSub: 'Todas as decisões ficam salvas localmente. Exporte para estudar offline.',
+    journal: 'Diário', journalSub: 'Todas as decisões ficam salvas localmente. Exporte para estudar offline.',
     journalEmpty: 'Sem decisões registradas ainda. Jogue um puzzle para começar seu diário.',
     journalCount: '{n} entradas salvas (mantidas as últimas 200).',
     colTime: 'Hora', colContext: 'Contexto', colSetup: 'Setup', colDecision: 'Você', colAi: 'IA',
-    colOutcome: 'Resultado', colR: 'R',
+    colOutcome: 'Resultado', colR: 'R', colReason: 'Motivo',
     exportJson: 'Exportar JSON', exportCsv: 'Exportar CSV', clearJournal: 'Limpar diário',
     confirmClearJournal: 'Limpar todo o diário? Não pode ser desfeito.',
     setupHidden: '—',
+    skipTitle: 'Por que você está pulando?',
+    skipSub: 'O analista vai comparar sua razão com a dele.',
+    skipBadSetup: 'Setup ruim',
+    skipFarFromVwap: 'Muito longe do VWAP',
+    skipAgainstTrend: 'Contra a tendência',
+    skipNoConfluence: 'Sem confluência',
+    skipUnsure: 'Não sei',
+    skipReasonLabel: 'Sua razão',
+    aiReasonLabel: 'Razão do analista',
+    reasonMatched: 'Sua leitura bate com a do analista.',
+    reasonMismatched: 'Sua leitura difere da do analista.',
+    aiReasonDefault: 'Setup ambíguo — sem edge direcional.',
+    aiReasonShort: 'Setup sem edge direcional limpo.',
+    trapWarning: 'Armadilha do dia',
+    trapOversizedBar: 'Corpo da última barra é {ratio}× o ATR. Velas gigantes frequentemente precedem reversão — cuidado com trade de continuação.',
+    trapLongWick: 'Última barra tem pavio {side} dominante. Rejeição foi forte; perseguir nessa direção é armadilha comum.',
+    trapVwapWhipsaw: 'Preço cruzou o VWAP {count} vezes nas últimas 8 barras. Zona de whipsaw pune apostas direcionais.',
+    trapVolumeDiverge: 'Últimas 3 barras empurraram o preço para {dir} com volume decrescente — divergência costuma preceder um fade.',
+    trapFailedBreak: 'Preço tentou romper {level} nas últimas 4 barras e falhou. Armadilha para breakout traders.',
+    sideUpper: 'superior', sideLower: 'inferior',
+    dirUp: 'cima', dirDown: 'baixo',
     keyboardShortcuts: 'Atalhos de teclado',
     kbDecision: 'Fase de Decisão', kbReplay: 'Fase de Replay', kbResult: 'Fase de Resultado', kbGeneral: 'Em qualquer lugar',
     kbLong: 'Long', kbShort: 'Short', kbSkip: 'Skip',
@@ -332,7 +356,7 @@ function exportJournalJson(entries) {
   downloadBlob(`tape-puzzles-journal-${Date.now()}.json`, JSON.stringify(entries, null, 2), 'application/json');
 }
 function exportJournalCsv(entries) {
-  const headers = ['timestamp_iso','puzzle_id','instrument','timeframe','setup_id','setup_en','decision','ai_decision','process_match','outcome','r'];
+  const headers = ['timestamp_iso','puzzle_id','instrument','timeframe','setup_id','setup_en','decision','ai_decision','process_match','outcome','r','skip_reason','skip_reason_match'];
   const rows = entries.map(e => [
     new Date(e.ts).toISOString(),
     e.puzzleId ?? '', e.instrument ?? '', e.timeframe ?? '',
@@ -340,6 +364,7 @@ function exportJournalCsv(entries) {
     e.decision ?? '', e.aiDecision ?? '',
     e.processMatch ? 1 : 0, e.outcome ?? '',
     (typeof e.r === 'number' ? e.r.toFixed(2) : ''),
+    e.skipReason ?? '', e.skipReasonMatch == null ? '' : (e.skipReasonMatch ? 1 : 0),
   ]);
   const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   downloadBlob(`tape-puzzles-journal-${Date.now()}.csv`, csv, 'text/csv');
@@ -360,6 +385,7 @@ const WarningIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" he
 const JournalIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M88,64a8,8,0,0,1,8-8h88a8,8,0,0,1,0,16H96A8,8,0,0,1,88,64ZM96,104h88a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16Zm88,24H96a8,8,0,0,0,0,16h88a8,8,0,0,0,0-16Zm56-80V208a16,16,0,0,1-16,16H64a16,16,0,0,1-16-16v-24H32a8,8,0,0,1,0-16H48V128H32a8,8,0,0,1,0-16H48V72H32a8,8,0,0,1,0-16H48V40a16,16,0,0,1,16-16H224A16,16,0,0,1,240,48Z" /></svg>);
 const DownloadIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM128,32a8,8,0,0,1,8,8v96l35.51-35.52a8,8,0,0,1,11.32,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L120,136V40A8,8,0,0,1,128,32Z" /></svg>);
 const TrashIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z" /></svg>);
+const TrapIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z" /></svg>);
 
 /* ============================================================================
    Hero chart preview
@@ -377,9 +403,7 @@ function HeroChartPreview() {
   const yOf = (v) => pad + (H - pad * 2) * (v / vh);
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto rounded-lg border border-[#2B2B43] bg-[#131722]">
-      {[0,1,2,3].map(i => (
-        <line key={i} x1={0} x2={W} y1={pad + i * ((H - pad * 2) / 3)} y2={pad + i * ((H - pad * 2) / 3)} stroke="#1f2430" strokeWidth="1" />
-      ))}
+      {[0,1,2,3].map(i => <line key={i} x1={0} x2={W} y1={pad + i * ((H - pad * 2) / 3)} y2={pad + i * ((H - pad * 2) / 3)} stroke="#1f2430" strokeWidth="1" />)}
       {bars.map((b, i) => {
         const cx = pad + barW * i + barW / 2;
         const bodyTop = yOf(Math.max(b.o, b.c)), bodyBot = yOf(Math.min(b.o, b.c));
@@ -508,12 +532,85 @@ function classifySetup({ history, atr, vwap, ema }) {
 }
 
 /* ============================================================================
+   Trap detector (roadmap #11)
+============================================================================ */
+function detectTrap(history) {
+  const L = history.length;
+  if (L < 20) return null;
+  const atr = computeATR(history, 14) || 1;
+  const last = history[L - 1];
+  const lastBody = Math.abs(last.close - last.open);
+  const upperWick = last.high - Math.max(last.open, last.close);
+  const lowerWick = Math.min(last.open, last.close) - last.low;
+
+  // 1) Oversized body
+  if (lastBody > atr * 1.5) {
+    return { key: 'trapOversizedBar', vars: { ratio: (lastBody / atr).toFixed(1) }, severity: 'warn' };
+  }
+
+  // 2) Dominant wick
+  const totalRange = last.high - last.low || 1;
+  if (upperWick / totalRange > 0.55 && upperWick > atr * 0.6) {
+    return { key: 'trapLongWick', vars: { side: '__sideUpper' }, severity: 'warn', side: 'upper' };
+  }
+  if (lowerWick / totalRange > 0.55 && lowerWick > atr * 0.6) {
+    return { key: 'trapLongWick', vars: { side: '__sideLower' }, severity: 'warn', side: 'lower' };
+  }
+
+  // 3) VWAP whipsaw
+  const vwapArr = computeVWAP(history);
+  const last8 = history.slice(-8);
+  const last8Vwap = vwapArr.slice(-8);
+  let crossings = 0;
+  for (let i = 1; i < last8.length; i++) {
+    const prevAbove = last8[i - 1].close > last8Vwap[i - 1].value;
+    const currAbove = last8[i].close > last8Vwap[i].value;
+    if (prevAbove !== currAbove) crossings++;
+  }
+  if (crossings >= 4) {
+    return { key: 'trapVwapWhipsaw', vars: { count: crossings }, severity: 'warn' };
+  }
+
+  // 4) Volume divergence (3-bar push with decreasing volume)
+  if (L >= 4) {
+    const b1 = history[L - 3], b2 = history[L - 2], b3 = history[L - 1];
+    const pushUp = b3.close > b1.close;
+    const pushDown = b3.close < b1.close;
+    const volDecreasing = (b3.volume || 0) < (b2.volume || 0) && (b2.volume || 0) < (b1.volume || 0);
+    if (volDecreasing && (pushUp || pushDown)) {
+      return {
+        key: 'trapVolumeDiverge',
+        vars: { dir: pushUp ? '__dirUp' : '__dirDown' },
+        severity: 'warn', dir: pushUp ? 'up' : 'down',
+      };
+    }
+  }
+
+  // 5) Failed break in last 4 bars
+  if (L >= 6) {
+    const lookback = history.slice(-4);
+    const prior = history.slice(-10, -4);
+    const priorHigh = Math.max(...prior.map(b => b.high));
+    const priorLow  = Math.min(...prior.map(b => b.low));
+    const brokeHigh = lookback.some(b => b.high > priorHigh);
+    const brokeLow  = lookback.some(b => b.low  < priorLow);
+    if (brokeHigh && last.close < priorHigh) {
+      return { key: 'trapFailedBreak', vars: { level: 'PDH' }, severity: 'warn', level: 'high' };
+    }
+    if (brokeLow && last.close > priorLow) {
+      return { key: 'trapFailedBreak', vars: { level: 'PDL' }, severity: 'warn', level: 'low' };
+    }
+  }
+
+  return null;
+}
+
+/* ============================================================================
    Debrief axes
 ============================================================================ */
 function analyzeDebrief(history, aiDecision) {
   const entry = history[history.length - 1].close;
   const atr = computeATR(history, 14) || 1;
-
   const last20 = history.slice(-20);
   let hh = 0, ll = 0;
   for (let i = 1; i < last20.length; i++) {
@@ -549,10 +646,7 @@ function analyzeDebrief(history, aiDecision) {
     { name: 'VWAP', price: vwap, kind: 'pivot' },
   ];
   let nearest = null;
-  for (const L of levels) {
-    const d = Math.abs(entry - L.price);
-    if (!nearest || d < nearest.d) nearest = { ...L, d };
-  }
+  for (const L of levels) { const d = Math.abs(entry - L.price); if (!nearest || d < nearest.d) nearest = { ...L, d }; }
   let locationBias = 'neutral', locationKey = 'dLocationMid';
   const locationVars = { level: nearest.name, dist: nearest.d.toFixed(2), atr: (nearest.d / atr).toFixed(2) };
   if (nearest.d < atr * 1.5) {
@@ -565,10 +659,7 @@ function analyzeDebrief(history, aiDecision) {
   const vwapBias = entry > vwap ? 'long' : 'short';
   const emaBias  = entry > ema  ? 'long' : 'short';
   const counts = { long: 0, short: 0 };
-  for (const b of [vwapBias, emaBias, structureBias, volumeBias]) {
-    if (b === 'long') counts.long++;
-    else if (b === 'short') counts.short++;
-  }
+  for (const b of [vwapBias, emaBias, structureBias, volumeBias]) { if (b === 'long') counts.long++; else if (b === 'short') counts.short++; }
   let confluenceBias = 'neutral', confluenceKey = 'dConfluenceWeak';
   if (aiDecision === 'LONG' && counts.long >= 3) { confluenceBias = 'long';  confluenceKey = 'dConfluenceStrongLong'; }
   else if (aiDecision === 'LONG' && counts.long === 2) { confluenceBias = 'long';  confluenceKey = 'dConfluenceMediumLong'; }
@@ -576,11 +667,22 @@ function analyzeDebrief(history, aiDecision) {
   else if (aiDecision === 'SHORT' && counts.short === 2) { confluenceBias = 'short'; confluenceKey = 'dConfluenceMediumShort'; }
 
   return [
-    { axis: 'axisStructure', bias: structureBias, key: structureKey, vars: { hh, ll } },
-    { axis: 'axisVolume',    bias: volumeBias,    key: volumeKey,    vars: { upPct: Math.round(upPct * 100), downPct: Math.round(downPct * 100) } },
-    { axis: 'axisLocation',  bias: locationBias,  key: locationKey,  vars: locationVars },
+    { axis: 'axisStructure',  bias: structureBias,  key: structureKey,  vars: { hh, ll } },
+    { axis: 'axisVolume',     bias: volumeBias,     key: volumeKey,     vars: { upPct: Math.round(upPct * 100), downPct: Math.round(downPct * 100) } },
+    { axis: 'axisLocation',   bias: locationBias,   key: locationKey,   vars: locationVars },
     { axis: 'axisConfluence', bias: confluenceBias, key: confluenceKey, vars: { longs: counts.long, shorts: counts.short } },
   ];
+}
+
+/* ============================================================================
+   AI's reason for skipping (roadmap #9)
+============================================================================ */
+function deriveAiSkipReason(aiData) {
+  if (!aiData) return 'aiReasonDefault';
+  const s = aiData.setup;
+  if (!s) return 'aiReasonDefault';
+  if (s.bias === 'skip') return 'aiReasonDefault';
+  return 'aiReasonShort';
 }
 
 /* ============================================================================
@@ -656,11 +758,7 @@ function TradingChart({ historyData, replayData, showVwap, showEma, showDema, sh
       rightPriceScale: { borderColor: '#2B2B43', scaleMargins: { top: 0.08, bottom: 0.22 } },
       timeScale: { borderColor: '#2B2B43', timeVisible: true, secondsVisible: false, rightOffset: 6 },
     });
-    const candle = chart.addCandlestickSeries({
-      upColor: '#26a69a', downColor: '#ef5350',
-      borderUpColor: '#26a69a', borderDownColor: '#ef5350',
-      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-    });
+    const candle = chart.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderUpColor: '#26a69a', borderDownColor: '#ef5350', wickUpColor: '#26a69a', wickDownColor: '#ef5350' });
     const vol = chart.addHistogramSeries({ color: '#26a69a80', priceFormat: { type: 'volume' }, priceScaleId: 'vol', priceLineVisible: false, lastValueVisible: false });
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
     chartRef.current = chart; candleRef.current = candle; volRef.current = vol;
@@ -714,13 +812,9 @@ function TradingChart({ historyData, replayData, showVwap, showEma, showDema, sh
     const onh = Math.max(...highs.slice(mid)); const onl = Math.min(...lows.slice(mid));
     const LWC = window.LightweightCharts;
     for (const d of [
-      { price: pdh, color: '#ef5350aa', title: 'PDH' },
-      { price: pdl, color: '#26a69aaa', title: 'PDL' },
-      { price: onh, color: '#ef5350aa', title: 'ONH' },
-      { price: onl, color: '#26a69aaa', title: 'ONL' },
-    ]) {
-      levelLinesRef.current.push(series.createPriceLine({ price: d.price, color: d.color, lineWidth: 1, lineStyle: LWC.LineStyle.Dotted, axisLabelVisible: true, title: d.title }));
-    }
+      { price: pdh, color: '#ef5350aa', title: 'PDH' }, { price: pdl, color: '#26a69aaa', title: 'PDL' },
+      { price: onh, color: '#ef5350aa', title: 'ONH' }, { price: onl, color: '#26a69aaa', title: 'ONL' },
+    ]) levelLinesRef.current.push(series.createPriceLine({ price: d.price, color: d.color, lineWidth: 1, lineStyle: LWC.LineStyle.Dotted, axisLabelVisible: true, title: d.title }));
   }, [historyData, showLevels, puzzleKey]);
 
   useEffect(() => {
@@ -753,34 +847,75 @@ function TradingChart({ historyData, replayData, showVwap, showEma, showDema, sh
    UI atoms
 ============================================================================ */
 function StatCell({ label, value, color }) {
-  return (
-    <div className="flex flex-col items-center">
-      <span className="text-gray-500 text-[10px] uppercase tracking-wider">{label}</span>
-      <span className={`font-bold text-base ${color || 'text-white'}`}>{value}</span>
-    </div>
-  );
+  return (<div className="flex flex-col items-center"><span className="text-gray-500 text-[10px] uppercase tracking-wider">{label}</span><span className={`font-bold text-base ${color || 'text-white'}`}>{value}</span></div>);
 }
 function ToggleBtn({ label, on, setter }) {
-  return (
-    <button onClick={() => setter(!on)}
-      className={`px-2 py-1 rounded border ${on ? 'bg-[#2B2B43] text-white border-blue-500/50' : 'text-gray-500 border-transparent hover:text-gray-300'}`}>
-      {label}
-    </button>
-  );
+  return (<button onClick={() => setter(!on)} className={`px-2 py-1 rounded border ${on ? 'bg-[#2B2B43] text-white border-blue-500/50' : 'text-gray-500 border-transparent hover:text-gray-300'}`}>{label}</button>);
 }
 function LanguageToggle({ lang, setLang, className = '' }) {
   return (
     <div className={`flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43] ${className}`}>
-      {['en', 'pt'].map(l => (
-        <button key={l} onClick={() => setLang(l)}
-          className={`px-2 py-0.5 rounded font-mono text-[11px] uppercase ${lang === l ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>
-          {l}
-        </button>
-      ))}
+      {['en', 'pt'].map(l => (<button key={l} onClick={() => setLang(l)} className={`px-2 py-0.5 rounded font-mono text-[11px] uppercase ${lang === l ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>{l}</button>))}
     </div>
   );
 }
 function accColor(p) { return p >= 0.7 ? '#26a69a' : p >= 0.4 ? '#ffa726' : '#ef5350'; }
+
+/* ============================================================================
+   Trap banner (roadmap #11)
+============================================================================ */
+function TrapBanner({ trap }) {
+  const { t } = useT();
+  if (!trap) return null;
+  const vars = { ...(trap.vars || {}) };
+  if (vars.side === '__sideUpper') vars.side = t('sideUpper');
+  if (vars.side === '__sideLower') vars.side = t('sideLower');
+  if (vars.dir === '__dirUp') vars.dir = t('dirUp');
+  if (vars.dir === '__dirDown') vars.dir = t('dirDown');
+  return (
+    <div className="bg-[#FF9800]/10 border border-[#FF9800]/40 rounded-lg p-3 flex gap-2">
+      <div className="text-[#FF9800] shrink-0 mt-0.5"><TrapIcon /></div>
+      <div className="min-w-0">
+        <div className="text-[10px] uppercase text-[#FF9800] font-bold tracking-wider mb-1">{t('trapWarning')}</div>
+        <p className="text-xs text-gray-300 leading-snug">{t(trap.key, vars)}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   Skip reason modal (roadmap #9)
+============================================================================ */
+function SkipReasonModal({ open, onSelect, onCancel }) {
+  const { t } = useT();
+  if (!open) return null;
+  const options = [
+    { key: 'badSetup',       label: t('skipBadSetup') },
+    { key: 'farFromVwap',    label: t('skipFarFromVwap') },
+    { key: 'againstTrend',   label: t('skipAgainstTrend') },
+    { key: 'noConfluence',   label: t('skipNoConfluence') },
+    { key: 'unsure',         label: t('skipUnsure') },
+  ];
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onCancel}>
+      <div className="modal-enter bg-[#1A1E29] border border-[#2B2B43] rounded-xl p-5 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-white font-bold text-base mb-1">{t('skipTitle')}</h2>
+        <p className="text-gray-400 text-xs mb-4">{t('skipSub')}</p>
+        <div className="space-y-2">
+          {options.map(o => (
+            <button key={o.key} onClick={() => onSelect(o.key)}
+              className="w-full text-left px-4 py-2.5 bg-[#0E1117] hover:bg-[#131722] border border-[#2B2B43] hover:border-[#2962FF]/50 rounded-lg text-sm text-gray-200 transition">
+              {o.label}
+            </button>
+          ))}
+        </div>
+        <button onClick={onCancel} className="mt-4 w-full py-2 text-gray-500 hover:text-gray-300 text-xs font-mono transition">
+          {t('home')} · ESC
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /* ============================================================================
    Counterfactual panel
@@ -788,33 +923,16 @@ function accColor(p) { return p >= 0.7 ? '#26a69a' : p >= 0.4 ? '#ffa726' : '#ef
 function CounterfactualPanel({ outcomes, userDecision, tradeResult, userR }) {
   const { t } = useT();
   const opts = ['LONG', 'SHORT', 'SKIP'];
-  const best = opts.reduce((acc, k) => {
-    const r = outcomes[k]?.r ?? 0;
-    if (!acc || r > acc.r) return { key: k, r };
-    return acc;
-  }, null);
-  const resultLabel = (key) => {
-    const o = outcomes[key];
-    if (!o || o.result === 'SKIP') return t('outcomeSkip');
-    if (o.result === 'WIN') return t('outcomeWin');
-    if (o.result === 'LOSS') return t('outcomeLoss');
-    return t('outcomeTimeout');
-  };
-  const resultColor = (key) => {
-    const o = outcomes[key];
-    if (!o || o.result === 'SKIP') return 'text-gray-400';
-    if (o.result === 'WIN') return 'text-[#26a69a]';
-    if (o.result === 'LOSS') return 'text-[#ef5350]';
-    return 'text-gray-300';
-  };
+  const best = opts.reduce((acc, k) => { const r = outcomes[k]?.r ?? 0; if (!acc || r > acc.r) return { key: k, r }; return acc; }, null);
+  const resultLabel = (key) => { const o = outcomes[key]; if (!o || o.result === 'SKIP') return t('outcomeSkip'); if (o.result === 'WIN') return t('outcomeWin'); if (o.result === 'LOSS') return t('outcomeLoss'); return t('outcomeTimeout'); };
+  const resultColor = (key) => { const o = outcomes[key]; if (!o || o.result === 'SKIP') return 'text-gray-400'; if (o.result === 'WIN') return 'text-[#26a69a]'; if (o.result === 'LOSS') return 'text-[#ef5350]'; return 'text-gray-300'; };
   const rFmt = (r) => `${r > 0 ? '+' : ''}${Number(r).toFixed(2)}R`;
   return (
     <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
       <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-2">{t('whatIf')}</h3>
       <div className="space-y-1.5">
         {opts.map(k => {
-          const o = outcomes[k];
-          const isUser = userDecision === k;
+          const o = outcomes[k]; const isUser = userDecision === k;
           const isBest = best && best.key === k && best.r > 0.5;
           const label = k === 'LONG' ? t('altLong') : k === 'SHORT' ? t('altShort') : t('altSkip');
           const r = o?.r ?? 0;
@@ -827,19 +945,13 @@ function CounterfactualPanel({ outcomes, userDecision, tradeResult, userR }) {
               </div>
               <div className="flex items-center space-x-2">
                 <span className={resultColor(k)}>{resultLabel(k)}</span>
-                <span className={`font-bold ${r > 0 ? 'text-[#26a69a]' : r < 0 ? 'text-[#ef5350]' : 'text-gray-400'} w-14 text-right`}>
-                  {k === 'SKIP' ? '0.00R' : rFmt(r)}
-                </span>
+                <span className={`font-bold ${r > 0 ? 'text-[#26a69a]' : r < 0 ? 'text-[#ef5350]' : 'text-gray-400'} w-14 text-right`}>{k === 'SKIP' ? '0.00R' : rFmt(r)}</span>
               </div>
             </div>
           );
         })}
       </div>
-      {userDecision !== 'SKIP' && tradeResult && (
-        <div className="mt-2 pt-2 border-t border-[#2B2B43] text-[10px] text-gray-500">
-          {t('yourTrade')}: <span className="font-mono">{rFmt(userR)}</span>
-        </div>
-      )}
+      {userDecision !== 'SKIP' && tradeResult && (<div className="mt-2 pt-2 border-t border-[#2B2B43] text-[10px] text-gray-500">{t('yourTrade')}: <span className="font-mono">{rFmt(userR)}</span></div>)}
       <p className="text-[10px] text-gray-500 mt-2 italic leading-snug">{t('counterfactualNote')}</p>
     </div>
   );
@@ -884,21 +996,42 @@ function DebriefAxesPanel({ axes, aiDecision, userDecision }) {
 }
 
 /* ============================================================================
+   Skip reason debrief block (roadmap #9)
+============================================================================ */
+function SkipReasonDebrief({ userReason, aiReasonKey, match }) {
+  const { t } = useT();
+  if (!userReason) return null;
+  const userLabel = userReason === 'badSetup' ? t('skipBadSetup')
+                  : userReason === 'farFromVwap' ? t('skipFarFromVwap')
+                  : userReason === 'againstTrend' ? t('skipAgainstTrend')
+                  : userReason === 'noConfluence' ? t('skipNoConfluence')
+                  : t('skipUnsure');
+  return (
+    <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
+      <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-2">{t('skipTitle')}</h3>
+      <div className="space-y-1.5 text-xs">
+        <div className="flex justify-between gap-2">
+          <span className="text-gray-500">{t('skipReasonLabel')}</span>
+          <span className="text-gray-200 text-right">{userLabel}</span>
+        </div>
+        <div className="flex justify-between gap-2">
+          <span className="text-gray-500">{t('aiReasonLabel')}</span>
+          <span className="text-gray-200 text-right">{t(aiReasonKey)}</span>
+        </div>
+        <div className={`mt-2 pt-2 border-t border-[#2B2B43] text-[11px] ${match ? 'text-[#26a69a]' : 'text-[#ffa726]'}`}>
+          {match ? t('reasonMatched') : t('reasonMismatched')}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
    Weakness panel
 ============================================================================ */
-function BreakdownBar({ value }) {
-  const pct = Math.max(0, Math.min(1, value)) * 100;
-  return <div className="bar-track h-1.5 w-full"><div className="bar-fill" style={{ width: `${pct}%`, background: accColor(value) }} /></div>;
-}
+function BreakdownBar({ value }) { const pct = Math.max(0, Math.min(1, value)) * 100; return (<div className="bar-track h-1.5 w-full"><div className="bar-fill" style={{ width: `${pct}%`, background: accColor(value) }} /></div>); }
 function BreakdownSection({ title, rows, emptyLabel, subLabel }) {
-  if (rows.length === 0) {
-    return (
-      <div className="bg-[#0E1117]/60 border border-[#2B2B43] rounded-lg p-3">
-        <div className="text-gray-500 text-[10px] uppercase font-mono mb-2">{title}</div>
-        <div className="text-gray-600 text-[11px] italic">{emptyLabel}</div>
-      </div>
-    );
-  }
+  if (rows.length === 0) return (<div className="bg-[#0E1117]/60 border border-[#2B2B43] rounded-lg p-3"><div className="text-gray-500 text-[10px] uppercase font-mono mb-2">{title}</div><div className="text-gray-600 text-[11px] italic">{emptyLabel}</div></div>);
   return (
     <div className="bg-[#0E1117]/60 border border-[#2B2B43] rounded-lg p-3">
       <div className="flex justify-between items-center mb-2">
@@ -910,10 +1043,7 @@ function BreakdownSection({ title, rows, emptyLabel, subLabel }) {
           <div key={r.key}>
             <div className="flex items-center justify-between text-[11px] mb-1">
               <span className="text-gray-300 font-mono truncate pr-2">{r.label}</span>
-              <span className="font-mono shrink-0" style={{ color: accColor(r.processAcc) }}>
-                {Math.round(r.processAcc * 100)}%
-                <span className="text-gray-600 ml-1.5">n={r.n}</span>
-              </span>
+              <span className="font-mono shrink-0" style={{ color: accColor(r.processAcc) }}>{Math.round(r.processAcc * 100)}%<span className="text-gray-600 ml-1.5">n={r.n}</span></span>
             </div>
             <BreakdownBar value={r.processAcc} />
           </div>
@@ -925,12 +1055,7 @@ function BreakdownSection({ title, rows, emptyLabel, subLabel }) {
 function WeaknessPanel({ breakdown, lang, t }) {
   const toRows = (obj, labelFn) => Object.entries(obj || {})
     .filter(([_, b]) => b.n >= 2)
-    .map(([k, b]) => ({
-      key: k, label: labelFn(k, b), n: b.n,
-      processAcc: b.n > 0 ? b.processMatch / b.n : 0,
-      outcomeAcc: b.n > 0 ? b.correct / b.n : 0,
-      rSum: b.rSum,
-    }))
+    .map(([k, b]) => ({ key: k, label: labelFn(k, b), n: b.n, processAcc: b.n > 0 ? b.processMatch / b.n : 0, outcomeAcc: b.n > 0 ? b.correct / b.n : 0, rSum: b.rSum }))
     .sort((a, b) => a.processAcc - b.processAcc);
   const setupRows = toRows(breakdown.bySetup, (id, b) => lang === 'pt' ? (b.labelPt || id) : (b.labelEn || id));
   const dirRows   = toRows(breakdown.byDirection, (k) => k);
@@ -945,9 +1070,7 @@ function WeaknessPanel({ breakdown, lang, t }) {
       </div>
       <p className="text-gray-400 text-xs mb-5 max-w-3xl leading-relaxed">{t('whereYouFailSub')}</p>
       {!anyData ? (
-        <div className="bg-[#131722] border border-[#2B2B43] rounded-xl p-6 text-center">
-          <p className="text-gray-500 text-xs italic">{t('playToSee')}</p>
-        </div>
+        <div className="bg-[#131722] border border-[#2B2B43] rounded-xl p-6 text-center"><p className="text-gray-500 text-xs italic">{t('playToSee')}</p></div>
       ) : (
         <div className="grid md:grid-cols-2 gap-3">
           <BreakdownSection title={t('catSetup')}      rows={setupRows} emptyLabel={t('notEnoughData')} subLabel="process %" />
@@ -970,6 +1093,11 @@ function JournalPanel({ entries, lang, t, onClear }) {
   const recent = [...entries].reverse().slice(0, 20);
   const resultColor = (o) => o === 'WIN' ? 'text-[#26a69a]' : o === 'LOSS' ? 'text-[#ef5350]' : o === 'TIMEOUT' ? 'text-gray-400' : 'text-blue-400';
   const setupLabel = (e) => e.setup ? (lang === 'pt' ? e.setup.pt : e.setup.en) : t('setupHidden');
+  const reasonLabel = (r) => {
+    if (!r) return '—';
+    const map = { badSetup: t('skipBadSetup'), farFromVwap: t('skipFarFromVwap'), againstTrend: t('skipAgainstTrend'), noConfluence: t('skipNoConfluence'), unsure: t('skipUnsure') };
+    return map[r] || '—';
+  };
   return (
     <section>
       <div className="flex items-center gap-3 mb-3">
@@ -979,23 +1107,11 @@ function JournalPanel({ entries, lang, t, onClear }) {
       <p className="text-gray-400 text-xs mb-5 max-w-3xl leading-relaxed">{t('journalSub')}</p>
       <div className="bg-[#131722] border border-[#2B2B43] rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#2B2B43] flex-wrap gap-2">
-          <div className="flex items-center gap-2 text-gray-500">
-            <JournalIcon />
-            <span className="text-[11px] font-mono uppercase tracking-wider">{t('journal')}</span>
-          </div>
+          <div className="flex items-center gap-2 text-gray-500"><JournalIcon /><span className="text-[11px] font-mono uppercase tracking-wider">{t('journal')}</span></div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={handleExportJson} disabled={entries.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-300 hover:text-white bg-[#1A1E29] hover:bg-[#2B2B43] border border-[#2B2B43] rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
-              <DownloadIcon /> {t('exportJson')}
-            </button>
-            <button onClick={handleExportCsv} disabled={entries.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-300 hover:text-white bg-[#1A1E29] hover:bg-[#2B2B43] border border-[#2B2B43] rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
-              <DownloadIcon /> {t('exportCsv')}
-            </button>
-            <button onClick={handleClear} disabled={entries.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-500 hover:text-[#ef5350] bg-transparent hover:bg-[#ef5350]/10 border border-transparent rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
-              <TrashIcon /> {t('clearJournal')}
-            </button>
+            <button onClick={handleExportJson} disabled={entries.length === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-300 hover:text-white bg-[#1A1E29] hover:bg-[#2B2B43] border border-[#2B2B43] rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"><DownloadIcon /> {t('exportJson')}</button>
+            <button onClick={handleExportCsv} disabled={entries.length === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-300 hover:text-white bg-[#1A1E29] hover:bg-[#2B2B43] border border-[#2B2B43] rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"><DownloadIcon /> {t('exportCsv')}</button>
+            <button onClick={handleClear} disabled={entries.length === 0} className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-500 hover:text-[#ef5350] bg-transparent hover:bg-[#ef5350]/10 border border-transparent rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"><TrashIcon /> {t('clearJournal')}</button>
           </div>
         </div>
         {recent.length === 0 ? (
@@ -1010,6 +1126,7 @@ function JournalPanel({ entries, lang, t, onClear }) {
                   <th className="text-left p-3 font-normal">{t('colSetup')}</th>
                   <th className="text-left p-3 font-normal">{t('colDecision')}</th>
                   <th className="text-left p-3 font-normal">{t('colAi')}</th>
+                  <th className="text-left p-3 font-normal">{t('colReason')}</th>
                   <th className="text-right p-3 font-normal">{t('colOutcome')}</th>
                   <th className="text-right p-3 font-normal">{t('colR')}</th>
                 </tr>
@@ -1017,19 +1134,14 @@ function JournalPanel({ entries, lang, t, onClear }) {
               <tbody className="divide-y divide-[#2B2B43]">
                 {recent.map((e, i) => (
                   <tr key={i} className="hover:bg-[#1A1E29]">
-                    <td className="p-3 font-mono text-gray-500 whitespace-nowrap">
-                      {new Date(e.ts).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                    </td>
+                    <td className="p-3 font-mono text-gray-500 whitespace-nowrap">{new Date(e.ts).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="p-3 font-mono text-gray-400 whitespace-nowrap">{e.instrument} · {e.timeframe}</td>
-                    <td className="p-3 text-gray-300 truncate max-w-[180px]">{setupLabel(e)}</td>
-                    <td className="p-3 font-mono">
-                      <span className={`${e.decision === 'LONG' ? 'text-[#26a69a]' : e.decision === 'SHORT' ? 'text-[#ef5350]' : 'text-gray-400'}`}>{e.decision}</span>
-                    </td>
+                    <td className="p-3 text-gray-300 truncate max-w-[160px]">{setupLabel(e)}</td>
+                    <td className="p-3 font-mono"><span className={`${e.decision === 'LONG' ? 'text-[#26a69a]' : e.decision === 'SHORT' ? 'text-[#ef5350]' : 'text-gray-400'}`}>{e.decision}</span></td>
                     <td className="p-3 font-mono text-gray-400">{e.aiDecision}</td>
+                    <td className="p-3 text-gray-400 truncate max-w-[120px]">{reasonLabel(e.skipReason)}</td>
                     <td className={`p-3 font-mono text-right ${resultColor(e.outcome)}`}>{e.outcome}</td>
-                    <td className={`p-3 font-mono text-right font-bold ${e.r > 0 ? 'text-[#26a69a]' : e.r < 0 ? 'text-[#ef5350]' : 'text-gray-400'}`}>
-                      {e.r > 0 ? '+' : ''}{(e.r ?? 0).toFixed(2)}
-                    </td>
+                    <td className={`p-3 font-mono text-right font-bold ${e.r > 0 ? 'text-[#26a69a]' : e.r < 0 ? 'text-[#ef5350]' : 'text-gray-400'}`}>{e.r > 0 ? '+' : ''}{(e.r ?? 0).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1049,40 +1161,21 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
   const accuracy = stats.solved === 0 ? 0 : Math.round((stats.correct / stats.solved) * 100);
   const processAccuracy = stats.solved === 0 ? 0 : Math.round(((stats.processMatch || 0) / stats.solved) * 100);
   const rank = rankFromElo(stats.elo, t);
-
   const handleReset = () => {
     if (window.confirm(t('confirmReset'))) {
-      try {
-        localStorage.removeItem('tape_puzzle_stats_v3');
-        localStorage.removeItem('tape_puzzle_played');
-      } catch (e) {}
+      try { localStorage.removeItem('tape_puzzle_stats_v3'); localStorage.removeItem('tape_puzzle_played'); } catch (e) {}
       window.location.reload();
     }
   };
-
-  const steps = [
-    { icon: <BookIcon />,  title: t('step1Title'), text: t('step1Text') },
-    { icon: <TargetIcon />, title: t('step2Title'), text: t('step2Text') },
-    { icon: <ChartIcon />, title: t('step3Title'), text: t('step3Text') },
-  ];
-  const whys = [
-    { title: t('why1Title'), text: t('why1Text'), color: '#26a69a' },
-    { title: t('why2Title'), text: t('why2Text'), color: '#2962FF' },
-    { title: t('why3Title'), text: t('why3Text'), color: '#FF9800' },
-  ];
-  const numbers = [
-    { k: t('numSetups'),      v: '12' },
-    { k: t('numPuzzles'),     v: '∞', sub: t('procedurallyGenerated') },
-    { k: t('numInstruments'), v: 'MES · MNQ' },
-    { k: t('numTimeframes'),  v: '1m · 5m · 15m · 1h' },
-  ];
+  const steps = [{ icon: <BookIcon />, title: t('step1Title'), text: t('step1Text') }, { icon: <TargetIcon />, title: t('step2Title'), text: t('step2Text') }, { icon: <ChartIcon />, title: t('step3Title'), text: t('step3Text') }];
+  const whys = [{ title: t('why1Title'), text: t('why1Text'), color: '#26a69a' }, { title: t('why2Title'), text: t('why2Text'), color: '#2962FF' }, { title: t('why3Title'), text: t('why3Text'), color: '#FF9800' }];
+  const numbers = [{ k: t('numSetups'), v: '12' }, { k: t('numPuzzles'), v: '∞', sub: t('procedurallyGenerated') }, { k: t('numInstruments'), v: 'MES · MNQ' }, { k: t('numTimeframes'), v: '1m · 5m · 15m · 1h' }];
   const shortcuts = [
     { phase: t('kbDecision'), keys: [['L', t('kbLong')], ['S', t('kbShort')], ['K', t('kbSkip')]] },
     { phase: t('kbReplay'),   keys: [['Space', t('kbPlayPause')], ['→', t('kbStep')], ['F', t('kbFlatten')]] },
     { phase: t('kbResult'),   keys: [['N', t('kbNext')]] },
     { phase: t('kbGeneral'),  keys: [['Esc', t('kbHome')]] },
   ];
-
   let insight = null;
   if (stats.solved >= 5) {
     if (processAccuracy > accuracy + 5) insight = { tone: 'warn', text: t('insightUnlucky') };
@@ -1090,7 +1183,6 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
     else insight = { tone: 'good', text: t('insightBalanced') };
   }
   const insightColor = insight?.tone === 'good' ? '#26a69a' : insight?.tone === 'warn' ? '#ffa726' : insight?.tone === 'danger' ? '#ef5350' : null;
-
   return (
     <div className="flex-1 overflow-y-auto bg-[#0E1117] fade-in">
       <div className="grid-bg border-b border-[#2B2B43]">
@@ -1107,9 +1199,7 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">{t('tagline')}</h1>
               <p className="text-gray-400 text-base md:text-lg mb-8 leading-relaxed">{t('heroSubtitle')}</p>
               <div className="flex flex-wrap gap-3 items-center">
-                <button onClick={onStart} className="px-6 py-3 bg-[#2962FF] hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition flex items-center gap-2 text-sm">
-                  <PlayIcon /> {t('startTraining')}
-                </button>
+                <button onClick={onStart} className="px-6 py-3 bg-[#2962FF] hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition flex items-center gap-2 text-sm"><PlayIcon /> {t('startTraining')}</button>
                 <span className="text-gray-600 text-[11px] font-mono">{t('heroFooter')}</span>
               </div>
             </div>
@@ -1117,7 +1207,6 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
           </div>
         </div>
       </div>
-
       <div className="max-w-6xl mx-auto px-6 py-12 space-y-14">
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">{t('howItWorks')}</div>
@@ -1131,7 +1220,6 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
             ))}
           </div>
         </section>
-
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">{t('whyDifferent')}</div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -1143,7 +1231,6 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
             ))}
           </div>
         </section>
-
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">{t('byTheNumbers')}</div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1156,22 +1243,18 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
             ))}
           </div>
         </section>
-
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">{t('yourProgress')}</div>
           <div className="bg-[#131722] border border-[#2B2B43] rounded-xl p-5">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm font-mono"
-                  style={{ background: `${rank.color}22`, border: `1px solid ${rank.color}66`, color: rank.color }}>{stats.elo}</div>
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm font-mono" style={{ background: `${rank.color}22`, border: `1px solid ${rank.color}66`, color: rank.color }}>{stats.elo}</div>
                 <div>
                   <div className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">{t('yourRank')}</div>
                   <div className="text-sm font-bold" style={{ color: rank.color }}>{rank.label}</div>
                 </div>
               </div>
-              {stats.solved > 0 && (
-                <button onClick={handleReset} className="text-[11px] text-gray-600 hover:text-[#ef5350] font-mono transition">↻ {t('resetStats')}</button>
-              )}
+              {stats.solved > 0 && (<button onClick={handleReset} className="text-[11px] text-gray-600 hover:text-[#ef5350] font-mono transition">↻ {t('resetStats')}</button>)}
             </div>
             {stats.solved === 0 ? (
               <p className="text-gray-500 text-xs italic">{t('noPlayYet')}</p>
@@ -1179,30 +1262,20 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
               <>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-4 pt-3 border-t border-[#2B2B43]">
                   <StatCell label={t('elo')} value={stats.elo} />
-                  <StatCell label={t('process')} value={`${processAccuracy}%`}
-                    color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
+                  <StatCell label={t('process')} value={`${processAccuracy}%`} color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
                   <StatCell label={t('solved')} value={stats.solved} />
                   <StatCell label={t('accuracy')} value={`${accuracy}%`} />
                   <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
-                  <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`}
-                    color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
+                  <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`} color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
                 </div>
                 <p className="text-[10px] text-gray-600 mt-3 font-mono">{t('processHint')}</p>
-                {insight && (
-                  <div className="mt-3 pt-3 border-t border-[#2B2B43] text-[11px] leading-relaxed flex gap-2">
-                    <div className="w-1 rounded shrink-0" style={{ background: insightColor }} />
-                    <span style={{ color: insightColor }}>{insight.text}</span>
-                  </div>
-                )}
+                {insight && (<div className="mt-3 pt-3 border-t border-[#2B2B43] text-[11px] leading-relaxed flex gap-2"><div className="w-1 rounded shrink-0" style={{ background: insightColor }} /><span style={{ color: insightColor }}>{insight.text}</span></div>)}
               </>
             )}
           </div>
         </section>
-
         <WeaknessPanel breakdown={stats.breakdown || emptyBreakdown()} lang={lang} t={t} />
-
         <JournalPanel entries={journal} lang={lang} t={t} onClear={onClearJournal} />
-
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">{t('keyboardShortcuts')}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -1221,7 +1294,6 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
             ))}
           </div>
         </section>
-
         <section className="bg-[#131722] border border-[#2B2B43] rounded-xl p-5 border-l-4 border-l-[#ef5350] flex gap-3">
           <div className="text-[#ef5350] shrink-0 mt-0.5"><WarningIcon /></div>
           <div>
@@ -1229,11 +1301,8 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
             <p className="text-gray-400 text-xs leading-relaxed">{t('disclaimer')}</p>
           </div>
         </section>
-
         <section className="text-center pb-4">
-          <button onClick={onStart} className="px-6 py-3 bg-[#2962FF] hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition inline-flex items-center gap-2 text-sm">
-            <PlayIcon /> {t('startTraining')}
-          </button>
+          <button onClick={onStart} className="px-6 py-3 bg-[#2962FF] hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition inline-flex items-center gap-2 text-sm"><PlayIcon /> {t('startTraining')}</button>
           <p className="text-gray-600 text-[11px] mt-4 font-mono">{t('readyToStart')}</p>
           <p className="text-gray-700 text-[10px] mt-6">{t('footerMadeWith')}</p>
         </section>
@@ -1246,9 +1315,7 @@ function HomeScreen({ stats, journal, onStart, onClearJournal, lang, setLang }) 
    App
 ============================================================================ */
 function App() {
-  const [lang, setLang] = useState(() => {
-    try { return localStorage.getItem('tape_puzzle_lang') || 'en'; } catch (e) { return 'en'; }
-  });
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('tape_puzzle_lang') || 'en'; } catch (e) { return 'en'; } });
   useEffect(() => { try { localStorage.setItem('tape_puzzle_lang', lang); } catch (e) {} }, [lang]);
   useEffect(() => { document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en'; }, [lang]);
 
@@ -1256,10 +1323,7 @@ function App() {
   const i18nValue = useMemo(() => ({ lang, t, setLang }), [lang, t]);
 
   const [stats, setStats] = useState(() => {
-    try {
-      const s = localStorage.getItem('tape_puzzle_stats_v3');
-      if (s) return migrateStats(JSON.parse(s));
-    } catch (e) {}
+    try { const s = localStorage.getItem('tape_puzzle_stats_v3'); if (s) return migrateStats(JSON.parse(s)); } catch (e) {}
     return migrateStats(null);
   });
   useEffect(() => { try { localStorage.setItem('tape_puzzle_stats_v3', JSON.stringify(stats)); } catch (e) {} }, [stats]);
@@ -1290,6 +1354,11 @@ function App() {
   const [puzzleId, setPuzzleId] = useState(1001);
   const [eloDelta, setEloDelta] = useState(0);
   const [debriefAxes, setDebriefAxes] = useState([]);
+  const [trap, setTrap] = useState(null);
+  const [skipModalOpen, setSkipModalOpen] = useState(false);
+  const [skipReason, setSkipReason] = useState(null);
+  const [skipReasonMatch, setSkipReasonMatch] = useState(null);
+  const [aiSkipReasonKey, setAiSkipReasonKey] = useState('aiReasonDefault');
 
   const loadNewPuzzle = useCallback((tfArg, instrArg) => {
     const tf = tfArg || timeframe; const instr = instrArg || instrument;
@@ -1297,16 +1366,18 @@ function App() {
     setReplayData([]); setPlaybackIdx(0); setIsPlaying(false);
     setTradeResult(null); setUserDecision(null); setEntryPrice(null);
     setRMultiple(0); setEloDelta(0); setSlOffset(REF_SL); setTpOffset(REF_TP);
-    setDebriefAxes([]);
+    setDebriefAxes([]); setTrap(null); setSkipReason(null); setSkipReasonMatch(null);
+    setSkipModalOpen(false);
     setPuzzleId(p => p + 1);
     setTimeout(() => {
       const data = generateMarketData(tf, instr);
       const analysis = analyzePuzzle(data.history, data.future);
-      setPuzzleData(data); setAiData(analysis); setPhase('DECISION');
+      const detectedTrap = detectTrap(data.history);
+      setPuzzleData(data); setAiData(analysis); setTrap(detectedTrap); setPhase('DECISION');
     }, 220);
   }, [timeframe, instrument]);
 
-  const goHome = useCallback(() => { setPhase('HOME'); setIsPlaying(false); }, []);
+  const goHome = useCallback(() => { setPhase('HOME'); setIsPlaying(false); setSkipModalOpen(false); }, []);
   const startTraining = useCallback(() => { loadNewPuzzle(timeframe, instrument); }, [loadNewPuzzle, timeframe, instrument]);
   const handleClearJournal = useCallback(() => { clearJournalStorage(); setJournal([]); }, []);
 
@@ -1321,7 +1392,7 @@ function App() {
   const tpPrice = entryPrice !== null && userDecision !== 'SKIP'
     ? (userDecision === 'LONG' ? entryPrice + tpOffset : entryPrice - tpOffset) : null;
 
-  const evaluateResult = useCallback((resultType, rMult) => {
+  const evaluateResult = useCallback((resultType, rMult, extra) => {
     setPhase('RESULT');
     setTradeResult(resultType);
     setRMultiple(rMult ?? 0);
@@ -1332,6 +1403,9 @@ function App() {
 
     const axes = analyzeDebrief(puzzleData.history, aiDec);
     setDebriefAxes(axes);
+
+    const aiReasonKey = deriveAiSkipReason(aiData);
+    setAiSkipReasonKey(aiReasonKey);
 
     let outcomeCorrect = false;
     if (resultType === 'WIN') outcomeCorrect = true;
@@ -1344,20 +1418,18 @@ function App() {
     else delta = -15;
     setEloDelta(delta);
 
+    const reason = extra?.skipReason ?? null;
+    const reasonMatchesAi = extra?.skipReasonMatch ?? null;
+
     appendJournalEntry({
-      ts: Date.now(),
-      puzzleId,
-      instrument,
-      timeframe,
+      ts: Date.now(), puzzleId, instrument, timeframe,
       setup: aiData?.setup ? { id: aiData.setup.id, en: aiData.setup.en, pt: aiData.setup.pt } : null,
-      decision: userDecision,
-      aiDecision: aiDec,
-      processMatch,
-      outcome: resultType,
-      r: +(rMult ?? 0).toFixed(2),
-      entry: entryPrice,
-      slOffset,
-      tpOffset,
+      decision: userDecision, aiDecision: aiDec, processMatch,
+      outcome: resultType, r: +(rMult ?? 0).toFixed(2),
+      entry: entryPrice, slOffset, tpOffset,
+      skipReason: reason,
+      skipReasonMatch: reasonMatchesAi,
+      trap: trap ? trap.key : null,
     });
     setJournal(loadJournal());
 
@@ -1368,10 +1440,7 @@ function App() {
       if (aiData?.setup?.id) {
         const sid = aiData.setup.id;
         recordBucket(breakdown.bySetup, sid, patch);
-        if (!breakdown.bySetup[sid].labelEn) {
-          breakdown.bySetup[sid].labelEn = aiData.setup.en;
-          breakdown.bySetup[sid].labelPt = aiData.setup.pt;
-        }
+        if (!breakdown.bySetup[sid].labelEn) { breakdown.bySetup[sid].labelEn = aiData.setup.en; breakdown.bySetup[sid].labelPt = aiData.setup.pt; }
       }
       recordBucket(breakdown.byTimeframe, timeframe, patch);
       recordBucket(breakdown.byDirection, userDecision, patch);
@@ -1388,16 +1457,36 @@ function App() {
         breakdown,
       };
     });
-  }, [aiData, userDecision, timeframe, instrument, puzzleId, entryPrice, slOffset, tpOffset, puzzleData.history]);
+  }, [aiData, userDecision, timeframe, instrument, puzzleId, entryPrice, slOffset, tpOffset, puzzleData.history, trap]);
 
   const handleDecision = useCallback((decision) => {
     if (phase !== 'DECISION') return;
+    if (decision === 'SKIP') {
+      setSkipModalOpen(true);
+      return;
+    }
     setUserDecision(decision);
     const currentPrice = puzzleData.history[puzzleData.history.length - 1].close;
     setEntryPrice(currentPrice);
-    if (decision === 'SKIP') evaluateResult('SKIP', 0);
-    else setPhase('REPLAY');
-  }, [phase, puzzleData.history, evaluateResult]);
+    setPhase('REPLAY');
+  }, [phase, puzzleData.history]);
+
+  const handleSkipReason = useCallback((reasonKey) => {
+    if (phase !== 'DECISION') return;
+    setSkipModalOpen(false);
+    setUserDecision('SKIP');
+    setSkipReason(reasonKey);
+    const currentPrice = puzzleData.history[puzzleData.history.length - 1].close;
+    setEntryPrice(currentPrice);
+    // Compare with AI's reason: match if user said the same underlying thing.
+    // Simple heuristic: "badSetup" and "noConfluence" both map to "no edge"; "farFromVwap" and "againstTrend" are directional; "unsure" never matches.
+    const aiDec = aiData?.decision ?? 'SKIP';
+    const aiHadEdge = aiDec === 'LONG' || aiDec === 'SHORT';
+    const reasonImpliesNoEdge = reasonKey === 'badSetup' || reasonKey === 'noConfluence' || reasonKey === 'unsure';
+    const match = aiHadEdge ? false : reasonImpliesNoEdge;
+    setSkipReasonMatch(match);
+    evaluateResult('SKIP', 0, { skipReason: reasonKey, skipReasonMatch: match });
+  }, [phase, puzzleData.history, aiData, evaluateResult]);
 
   const advancePlayback = useCallback(() => {
     if (phase !== 'REPLAY') return;
@@ -1406,13 +1495,8 @@ function App() {
     setReplayData(prev => [...prev, nextBar]); setPlaybackIdx(prev => prev + 1);
     if (userDecision === 'SKIP') return;
     let hitSL = false, hitTP = false;
-    if (userDecision === 'LONG') {
-      if (nextBar.low <= slPrice) hitSL = true;
-      if (nextBar.high >= tpPrice) hitTP = true;
-    } else if (userDecision === 'SHORT') {
-      if (nextBar.high >= slPrice) hitSL = true;
-      if (nextBar.low <= tpPrice) hitTP = true;
-    }
+    if (userDecision === 'LONG') { if (nextBar.low <= slPrice) hitSL = true; if (nextBar.high >= tpPrice) hitTP = true; }
+    else if (userDecision === 'SHORT') { if (nextBar.high >= slPrice) hitSL = true; if (nextBar.low <= tpPrice) hitTP = true; }
     if (hitSL && hitTP) hitTP = false;
     if (hitTP) { const r = +(tpOffset / slOffset).toFixed(2); evaluateResult('WIN', r); }
     else if (hitSL) { evaluateResult('LOSS', -1); }
@@ -1436,7 +1520,15 @@ function App() {
   useEffect(() => {
     const onKey = (e) => {
       if (e.target && ['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
-      if (e.key === 'Escape' && phase !== 'HOME') { goHome(); return; }
+      if (e.key === 'Escape') {
+        if (skipModalOpen) { setSkipModalOpen(false); return; }
+        if (phase !== 'HOME') { goHome(); return; }
+      }
+      if (skipModalOpen) {
+        const map = { '1': 'badSetup', '2': 'farFromVwap', '3': 'againstTrend', '4': 'noConfluence', '5': 'unsure' };
+        if (map[e.key]) { handleSkipReason(map[e.key]); return; }
+        return;
+      }
       if (phase === 'DECISION') {
         if (e.key === 'l' || e.key === 'L') handleDecision('LONG');
         if (e.key === 's' || e.key === 'S') handleDecision('SHORT');
@@ -1451,7 +1543,7 @@ function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, handleDecision, advancePlayback, handleFlatten, loadNewPuzzle, goHome]);
+  }, [phase, handleDecision, advancePlayback, handleFlatten, loadNewPuzzle, goHome, skipModalOpen, handleSkipReason]);
 
   const accuracy = stats.solved === 0 ? 0 : Math.round((stats.correct / stats.solved) * 100);
   const processAccuracy = stats.solved === 0 ? 0 : Math.round(((stats.processMatch || 0) / stats.solved) * 100);
@@ -1478,11 +1570,7 @@ function App() {
   const contextText = useMemo(() => {
     if (!aiData) return '';
     const vwapDir = aiData.vwapDir === 'above' ? t('vwapAbove') : t('vwapBelow');
-    return t('contextTpl', {
-      range: aiData.range.toFixed(1), vwapDir,
-      distVwap: aiData.distVwapAbs.toFixed(2), atrPct: aiData.atrPct.toFixed(2),
-      atr: aiData.atr.toFixed(2), lastClose: aiData.lastClose.toFixed(2),
-    });
+    return t('contextTpl', { range: aiData.range.toFixed(1), vwapDir, distVwap: aiData.distVwapAbs.toFixed(2), atrPct: aiData.atrPct.toFixed(2), atr: aiData.atr.toFixed(2), lastClose: aiData.lastClose.toFixed(2) });
   }, [aiData, t, lang]);
 
   const setupLabel = aiData?.setup ? (lang === 'pt' ? aiData.setup.pt : aiData.setup.en) : '';
@@ -1503,237 +1591,17 @@ function App() {
     <I18nCtx.Provider value={i18nValue}>
       <div className="flex flex-col h-screen w-screen bg-[#0E1117] text-gray-200 overflow-hidden select-none">
 
+        <SkipReasonModal open={skipModalOpen} onSelect={handleSkipReason} onCancel={() => setSkipModalOpen(false)} />
+
         {!isHome && (
           <div className="flex flex-wrap justify-between items-center px-4 py-2 bg-[#131722] border-b border-[#2B2B43] z-10 text-xs md:text-sm">
             <div className="flex items-center space-x-3">
-              <button onClick={goHome} className="flex items-center space-x-1.5 text-white font-bold hover:text-[#6f8cff] transition" title={t('home')}>
-                <HomeIcon /><span>{t('appName')}</span>
-              </button>
+              <button onClick={goHome} className="flex items-center space-x-1.5 text-white font-bold hover:text-[#6f8cff] transition" title={t('home')}><HomeIcon /><span>{t('appName')}</span></button>
               <div className="flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43]">
-                {['MES', 'MNQ'].map(i => (
-                  <button key={i} onClick={() => setInstrument(i)}
-                    className={`px-2 py-0.5 rounded ${instrument === i ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>{i}</button>
-                ))}
+                {['MES', 'MNQ'].map(i => (<button key={i} onClick={() => setInstrument(i)} className={`px-2 py-0.5 rounded ${instrument === i ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>{i}</button>))}
               </div>
             </div>
             <div className="hidden lg:flex items-center space-x-5 font-mono">
               <StatCell label={t('elo')} value={stats.elo} />
-              <StatCell label={t('process')} value={`${processAccuracy}%`}
-                color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
-              <StatCell label={t('solved')} value={stats.solved} />
-              <StatCell label={t('accuracy')} value={`${accuracy}%`} />
-              <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
-              <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`}
-                color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43]">
-                {['1m', '5m', '15m', '1h'].map(tf => (
-                  <button key={tf} onClick={() => setTimeframe(tf)}
-                    className={`px-2 py-0.5 rounded ${timeframe === tf ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>{tf}</button>
-                ))}
-              </div>
-              <div className="hidden md:flex space-x-1 border-l border-[#2B2B43] pl-2">
-                <ToggleBtn label="VWAP" on={showVwap} setter={setShowVwap} />
-                <ToggleBtn label="200 EMA" on={showEma} setter={setShowEma} />
-                <ToggleBtn label="DEMA" on={showDema} setter={setShowDema} />
-                <ToggleBtn label="Levels" on={showLevels} setter={setShowLevels} />
-                <ToggleBtn label="Vol" on={showVol} setter={setShowVol} />
-              </div>
-              <LanguageToggle lang={lang} setLang={setLang} className="ml-2" />
-            </div>
-          </div>
-        )}
-
-        {isHome ? (
-          <HomeScreen stats={stats} journal={journal} onStart={startTraining}
-            onClearJournal={handleClearJournal} lang={lang} setLang={setLang} />
-        ) : (
-          <div className="flex flex-1 overflow-hidden relative min-h-0">
-            <div className="flex-1 bg-[#131722] relative min-w-0">
-              {phase === 'LOADING' && (
-                <div className="absolute inset-0 z-30 bg-[#131722]/85 flex flex-col items-center justify-center backdrop-blur-sm">
-                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3" />
-                  <span className="text-sm font-mono text-gray-400">{t('loading')} #{puzzleId}…</span>
-                </div>
-              )}
-              <TradingChart
-                puzzleKey={puzzleId}
-                historyData={puzzleData.history} replayData={replayData}
-                showVwap={showVwap} showEma={showEma} showDema={showDema}
-                showLevels={showLevels} showVol={showVol}
-                slPrice={slPrice} tpPrice={tpPrice} entryPrice={entryPrice}
-              />
-            </div>
-
-            <div className="w-[380px] shrink-0 bg-[#1A1E29] border-l border-[#2B2B43] flex flex-col p-4 overflow-y-auto">
-              <div className="flex justify-between items-start mb-4 border-b border-[#2B2B43] pb-3">
-                <div className="min-w-0">
-                  <h2 className="text-sm font-bold text-white truncate">{instrument} • {timeframe} • {t('headerDecision')}</h2>
-                  <p className="text-xs text-gray-400">{t('decisionQ')}</p>
-                  {aiData?.setup && (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      <span className="text-[10px] font-mono bg-[#2B2B43] text-gray-300 px-2 py-0.5 rounded">{t('playbook')} · {t('ruleGraded')}</span>
-                      <span className="text-[10px] font-mono bg-[#2962FF]/20 text-[#6f8cff] px-2 py-0.5 rounded">{setupLabel}</span>
-                    </div>
-                  )}
-                </div>
-                <span className="text-[11px] font-mono bg-[#2B2B43] px-2 py-0.5 rounded text-gray-300 shrink-0 ml-2">#{puzzleId}</span>
-              </div>
-
-              {phase === 'DECISION' && aiData && (
-                <div className="space-y-4 mb-4">
-                  <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
-                    <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-1">{t('marketContext')}</h3>
-                    <p className="text-xs text-gray-300 leading-relaxed">{contextText}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold mb-2 text-gray-300">{t('yourCall')}</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button onClick={() => handleDecision('LONG')}
-                        className="py-2.5 bg-gradient-to-t from-[#26a69a] to-[#33b8ab] text-white rounded font-bold shadow hover:opacity-90 transition">{t('long')}</button>
-                      <button onClick={() => handleDecision('SHORT')}
-                        className="py-2.5 bg-gradient-to-t from-[#ef5350] to-[#f46c69] text-white rounded font-bold shadow hover:opacity-90 transition">{t('short')}</button>
-                      <button onClick={() => handleDecision('SKIP')}
-                        className="py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded font-bold shadow transition">{t('skip')}</button>
-                    </div>
-                    <p className="text-[10px] text-gray-500 mt-2 text-center font-mono">{t('shortcutsLsk')}</p>
-                  </div>
-                </div>
-              )}
-
-              {phase === 'REPLAY' && (
-                <div className="space-y-4 mb-4">
-                  <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-semibold text-gray-300">{t('bracket')}</span>
-                      <span className={`text-[11px] px-2 py-0.5 rounded font-bold ${
-                        userDecision === 'LONG' ? 'bg-[#26a69a]/20 text-[#26a69a]' : 'bg-[#ef5350]/20 text-[#ef5350]'
-                      }`}>{userDecision} · RR {rrRatio}:1</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
-                      <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]">
-                        <div className="text-gray-500 text-[10px] uppercase">{t('entry')}</div>
-                        <div className="text-[#2962FF] font-bold">{entryPrice ? entryPrice.toFixed(2) : '—'}</div>
-                      </div>
-                      <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]">
-                        <div className="text-gray-500 text-[10px] uppercase">{t('stop')}</div>
-                        <div className="text-[#ef5350] font-bold">{slPrice !== null ? slPrice.toFixed(2) : '—'}</div>
-                      </div>
-                      <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]">
-                        <div className="text-gray-500 text-[10px] uppercase">{t('target')}</div>
-                        <div className="text-[#26a69a] font-bold">{tpPrice !== null ? tpPrice.toFixed(2) : '—'}</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-[11px] text-gray-400 mb-1">
-                        <span>{t('stopLoss')}</span><span className="font-mono text-white">{slOffset} pts</span>
-                      </div>
-                      <input type="range" min="4" max="40" value={slOffset}
-                        onChange={(e) => setSlOffset(Number(e.target.value))} className="w-full" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-[11px] text-gray-400 mb-1">
-                        <span>{t('takeProfit')}</span><span className="font-mono text-white">{tpOffset} pts</span>
-                      </div>
-                      <input type="range" min="8" max="80" value={tpOffset}
-                        onChange={(e) => setTpOffset(Number(e.target.value))} className="w-full" />
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button onClick={() => setIsPlaying(p => !p)}
-                      className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 rounded flex items-center justify-center text-white font-bold transition">
-                      {isPlaying ? <PauseIcon /> : <PlayIcon />}
-                      <span className="ml-1.5">{isPlaying ? t('pause') : t('play')}</span>
-                    </button>
-                    <button onClick={advancePlayback} disabled={isPlaying}
-                      className="px-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 rounded flex items-center justify-center text-white transition">
-                      <StepIcon />
-                    </button>
-                    <button onClick={handleFlatten}
-                      className="px-3 bg-[#ef5350]/20 text-[#ef5350] hover:bg-[#ef5350]/30 rounded font-bold transition">{t('flatten')}</button>
-                  </div>
-                  <div className="flex items-center justify-between bg-[#131722] p-2 rounded border border-[#2B2B43]">
-                    <span className="text-[11px] text-gray-400">{t('speed')}</span>
-                    <div className="flex space-x-1">
-                      {[1, 3, 10, 30].map(s => (
-                        <button key={s} onClick={() => setSpeed(s)}
-                          className={`px-2 py-0.5 rounded text-[11px] font-mono ${speed === s ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>{s}x</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-[11px] text-gray-500 font-mono flex justify-between">
-                    <span>{t('bar')} {playbackIdx}/{puzzleData.future.length}</span>
-                    <span>{t('spacePlayHint')}</span>
-                  </div>
-                </div>
-              )}
-
-              {phase === 'RESULT' && aiData && (
-                <div className="space-y-4 mb-4">
-                  <div className={`p-3 rounded-lg border ${
-                    tradeResult === 'WIN' ? 'bg-[#26a69a]/10 border-[#26a69a]/50 text-[#26a69a]' :
-                    tradeResult === 'LOSS' ? 'bg-[#ef5350]/10 border-[#ef5350]/50 text-[#ef5350]' :
-                    tradeResult === 'SKIP' && userDecision === aiData.decision ? 'bg-blue-500/10 border-blue-500/50 text-blue-400' :
-                    'bg-gray-800/50 border-gray-700 text-gray-300'
-                  }`}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-bold text-sm">{resultTitle}</span>
-                      <span className="text-xs font-mono font-bold uppercase">{userDecision}</span>
-                    </div>
-                    <p className="text-xs text-gray-300">
-                      <span className="text-gray-400">{t('correctMove')}:</span> <strong className="text-white">{aiData.decision}</strong>
-                    </p>
-                    <p className="text-xs mt-1">
-                      <span className="text-gray-400">{t('eloDelta')}:</span>{' '}
-                      <strong className={eloDelta >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}>
-                        {eloDelta >= 0 ? `+${eloDelta}` : eloDelta}
-                      </strong>
-                    </p>
-                  </div>
-                  <CounterfactualPanel outcomes={aiData.outcomes} userDecision={userDecision}
-                    tradeResult={tradeResult} userR={rMultiple} />
-                  <DebriefAxesPanel axes={debriefAxes} aiDecision={aiData.decision} userDecision={userDecision} />
-                  <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
-                    <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-1">{t('debrief')}</h3>
-                    <p className="text-xs text-gray-300 leading-relaxed mb-2">{t(`expl_${aiData.decision}`)}</p>
-                    <div className="text-[10px] text-gray-500 font-mono border-t border-[#2B2B43] pt-2">
-                      {t('playbook')}: <span className="text-gray-300">{setupLabel}</span>
-                    </div>
-                  </div>
-                  <button onClick={() => loadNewPuzzle()}
-                    className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition flex justify-center items-center">
-                    {t('nextPuzzle')}
-                    <svg className="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                  <p className="text-[10px] text-gray-500 text-center font-mono">{t('nextHint')}</p>
-                </div>
-              )}
-
-              <div className="mt-auto bg-[#131722] p-3 rounded-lg border border-[#2B2B43] space-y-2 text-xs font-mono">
-                <div className="text-[11px] text-gray-400 uppercase font-bold tracking-wider mb-2 border-b border-[#2B2B43] pb-1">
-                  {t('contextAtDecision')}
-                </div>
-                {contextRows.length === 0 && <div className="text-gray-500 text-[11px]">{t('awaitingData')}</div>}
-                {contextRows.map((r, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span className="text-gray-400">{r.k}</span>
-                    <span className={r.c}>{r.v}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </I18nCtx.Provider>
-  );
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
-</script>
-</body>
-</html>
+              <StatCell label={t('process')} value={`${processAccuracy}%`} color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
+              <StatCell label={t('solved')} value={stats.solved
