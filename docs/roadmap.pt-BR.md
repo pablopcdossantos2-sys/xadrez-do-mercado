@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Roadmap de Melhorias
 
-> **Documento Estratégico** · v1.6
+> **Documento Estratégico** · v1.7
 >
 > 32 melhorias para transformar o Tape Puzzles de um jogo de adivinhação em uma ferramenta real de treino.
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 17 entregues · 15 pendentes
+**Resumo:** 32 itens · 4 tiers · 19 entregues · 13 pendentes
 
 ---
 
@@ -61,6 +61,8 @@ Cada item é classificado por **impacto no aprendizado do usuário**, consideran
 ### 10. Dificuldade adaptativa
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
+Uma janela móvel das últimas 20 decisões mede precisão de processo (`decisão === decisão do analista`), e não resultado bruto do trade. Um pequeno aquecimento mantém menos de cinco amostras em Normal. Abaixo de 60% seleciona Fácil; acima de 75% seleciona Difícil; entre esses limites, Normal. O gerador aplica então os multiplicadores documentados de volatilidade, força do setup e ruído. O nível ativo aparece no cabeçalho do jogo.
+
 Mantém o usuário na zona de fluxo (60–75% de precisão). Uma janela móvel das últimas 20 decisões (correto/incorreto — **não** sorte/azar) alimenta três níveis de dificuldade: **fácil**, **normal**, **difícil**. A dificuldade modula o gerador em três eixos:
 
 - **Volatilidade base** × 0,75 / 1,0 / 1,30 — tape mais calmo ou mais ruidoso.
@@ -95,6 +97,8 @@ O nível atual aparece num pequeno badge na barra superior do jogo, então o usu
 
 ### 17. Replay reverso pós-resultado
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
+
+Após o resultado, o usuário pode explorar o mesmo puzzle com Long, Short ou Skip. As mesmas 38 barras futuras são reproduzidas a partir da entrada original, sem criar uma nova decisão contabilizada. Long/Short usam o bracket completo, Play/Pause/Step e todas as velocidades; Skip reproduz o futuro sem posição. A exploração é explicitamente não contabilizada: ELO, streak, estatísticas e journal permanecem intactos. Um banner azul identifica o modo e o botão Voltar ao resultado restaura o resultado original.
 
 Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para replay-ar o mesmo puzzle com Long, Short ou Skip — *não* para rodar os números de novo, mas para **sentir** a sequência de barras desenrolar do outro lado. O replay de exploração usa a engine completa de bracket SL/TP, Play/Pause/Step em todas as velocidades, e Flatten. Um banner azul marca a sidebar como **"Exploração — não contabilizado"**, e nada é escrito nas estatísticas ou no journal. Um botão **"Voltar ao resultado"** restaura a visão original.
 
@@ -206,15 +210,15 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 
 ## Resumo executivo
 
-**Dezessete dos trinta e dois itens entregues.** Todo o Tier 1 e o Tier 2 estão completos. As duas novas adições — **dificuldade adaptativa** e **replay reverso** — fecham o último trabalho do "loop de aprendizado":
+**Dezenove dos trinta e dois itens estão entregues.** O Tier 2 está completo, enquanto os itens 3 e 4 do Tier 1 permanecem pendentes porque as capacidades anteriormente documentadas ainda não estão totalmente presentes no código auditado.
 
-- **Dificuldade adaptativa** garante que o usuário esteja sempre no limite da própria competência, com a chave no **processo** (bater com o analista), e não no **resultado**, para que uma streak de sorte não empurre o usuário ao modo difícil.
-- **Replay reverso** deixa o usuário **sentir** o lado alternativo, não só ler sobre ele. É a última peça que faltava da filosofia "contrafactual" que tem sido central neste projeto desde o item #1.
+Os dois itens de loop de aprendizado agora efetivamente verificados são **dificuldade adaptativa** e **replay reverso**:
 
-O sistema de aprendizado agora é autocontido: decide, replaya, debate, calibra, e permite ao usuário atravessar lateralmente para o caminho não trilhado.
+- **Dificuldade adaptativa** mantém o usuário em uma zona alvo de precisão de processo usando uma janela móvel de 20 decisões, alterando a dificuldade com base na qualidade da decisão, e não em resultados de sorte.
+- **Replay reverso** transforma os números contrafactuais existentes em uma exploração interativa e não contabilizada da mesma sequência futura.
 
-O que resta é majoritariamente **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (testes, PWA offline). Nenhum deles está no caminho crítico — a ferramenta já ensina.
+O trabalho restante está concentrado em **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (testes, PWA offline).
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.6 · 32 itens · 4 tiers · 17 entregues · 15 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.7 · 32 itens · 4 tiers · 19 entregues · 13 pendentes*
