@@ -22,7 +22,6 @@ import zipfile
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from statistics import median
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,7 +85,8 @@ def fetch_zip(trade_date: date) -> bytes | None:
 
 
 def parse_price(value: str) -> float:
-    normalized = value.strip().replace(".", "").replace(",", ".")
+    raw = value.strip()
+    normalized = raw.replace(".", "").replace(",", ".") if "," in raw else raw
     return float(normalized)
 
 
