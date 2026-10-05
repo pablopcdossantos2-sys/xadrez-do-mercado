@@ -1604,4 +1604,172 @@ function App() {
             <div className="hidden lg:flex items-center space-x-5 font-mono">
               <StatCell label={t('elo')} value={stats.elo} />
               <StatCell label={t('process')} value={`${processAccuracy}%`} color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
-              <StatCell label={t('solved')} value={stats.solved
+              <StatCell label={t('solved')} value={stats.solved} />
+              <StatCell label={t('accuracy')} value={`${accuracy}%`} />
+              <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
+              <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`} color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="flex space-x-1 bg-[#1A1E29] p-1 rounded border border-[#2B2B43]">
+                {['1m', '5m', '15m', '1h'].map(tf => (<button key={tf} onClick={() => setTimeframe(tf)} className={`px-2 py-0.5 rounded ${timeframe === tf ? 'bg-[#2962FF] text-white font-bold' : 'text-gray-400 hover:text-white'}`}>{tf}</button>))}
+              </div>
+              <div className="hidden md:flex space-x-1 border-l border-[#2B2B43] pl-2">
+                <ToggleBtn label="VWAP" on={showVwap} setter={setShowVwap} />
+                <ToggleBtn label="200 EMA" on={showEma} setter={setShowEma} />
+                <ToggleBtn label="DEMA" on={showDema} setter={setShowDema} />
+                <ToggleBtn label="Levels" on={showLevels} setter={setShowLevels} />
+                <ToggleBtn label="Vol" on={showVol} setter={setShowVol} />
+              </div>
+              <LanguageToggle lang={lang} setLang={setLang} className="ml-2" />
+            </div>
+          </div>
+        )}
+
+        {isHome ? (
+          <HomeScreen stats={stats} journal={journal} onStart={startTraining} onClearJournal={handleClearJournal} lang={lang} setLang={setLang} />
+        ) : (
+          <div className="flex flex-1 overflow-hidden relative min-h-0">
+            <div className="flex-1 bg-[#131722] relative min-w-0">
+              {phase === 'LOADING' && (
+                <div className="absolute inset-0 z-30 bg-[#131722]/85 flex flex-col items-center justify-center backdrop-blur-sm">
+                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3" />
+                  <span className="text-sm font-mono text-gray-400">{t('loading')} #{puzzleId}…</span>
+                </div>
+              )}
+              <TradingChart
+                puzzleKey={puzzleId}
+                historyData={puzzleData.history} replayData={replayData}
+                showVwap={showVwap} showEma={showEma} showDema={showDema}
+                showLevels={showLevels} showVol={showVol}
+                slPrice={slPrice} tpPrice={tpPrice} entryPrice={entryPrice}
+              />
+            </div>
+
+            <div className="w-[380px] shrink-0 bg-[#1A1E29] border-l border-[#2B2B43] flex flex-col p-4 overflow-y-auto">
+              <div className="flex justify-between items-start mb-4 border-b border-[#2B2B43] pb-3">
+                <div className="min-w-0">
+                  <h2 className="text-sm font-bold text-white truncate">{instrument} • {timeframe} • {t('headerDecision')}</h2>
+                  <p className="text-xs text-gray-400">{t('decisionQ')}</p>
+                  {aiData?.setup && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      <span className="text-[10px] font-mono bg-[#2B2B43] text-gray-300 px-2 py-0.5 rounded">{t('playbook')} · {t('ruleGraded')}</span>
+                      <span className="text-[10px] font-mono bg-[#2962FF]/20 text-[#6f8cff] px-2 py-0.5 rounded">{setupLabel}</span>
+                    </div>
+                  )}
+                </div>
+                <span className="text-[11px] font-mono bg-[#2B2B43] px-2 py-0.5 rounded text-gray-300 shrink-0 ml-2">#{puzzleId}</span>
+              </div>
+
+              {phase === 'DECISION' && aiData && (
+                <div className="space-y-4 mb-4">
+                  {trap && <TrapBanner trap={trap} />}
+                  <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
+                    <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-1">{t('marketContext')}</h3>
+                    <p className="text-xs text-gray-300 leading-relaxed">{contextText}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold mb-2 text-gray-300">{t('yourCall')}</h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button onClick={() => handleDecision('LONG')} className="py-2.5 bg-gradient-to-t from-[#26a69a] to-[#33b8ab] text-white rounded font-bold shadow hover:opacity-90 transition">{t('long')}</button>
+                      <button onClick={() => handleDecision('SHORT')} className="py-2.5 bg-gradient-to-t from-[#ef5350] to-[#f46c69] text-white rounded font-bold shadow hover:opacity-90 transition">{t('short')}</button>
+                      <button onClick={() => handleDecision('SKIP')} className="py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded font-bold shadow transition">{t('skip')}</button>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-2 text-center font-mono">{t('shortcutsLsk')}</p>
+                  </div>
+                </div>
+              )}
+
+              {phase === 'REPLAY' && (
+                <div className="space-y-4 mb-4">
+                  <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold text-gray-300">{t('bracket')}</span>
+                      <span className={`text-[11px] px-2 py-0.5 rounded font-bold ${userDecision === 'LONG' ? 'bg-[#26a69a]/20 text-[#26a69a]' : 'bg-[#ef5350]/20 text-[#ef5350]'}`}>{userDecision} · RR {rrRatio}:1</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
+                      <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]"><div className="text-gray-500 text-[10px] uppercase">{t('entry')}</div><div className="text-[#2962FF] font-bold">{entryPrice ? entryPrice.toFixed(2) : '—'}</div></div>
+                      <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]"><div className="text-gray-500 text-[10px] uppercase">{t('stop')}</div><div className="text-[#ef5350] font-bold">{slPrice !== null ? slPrice.toFixed(2) : '—'}</div></div>
+                      <div className="bg-[#131722] p-2 rounded border border-[#2B2B43]"><div className="text-gray-500 text-[10px] uppercase">{t('target')}</div><div className="text-[#26a69a] font-bold">{tpPrice !== null ? tpPrice.toFixed(2) : '—'}</div></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[11px] text-gray-400 mb-1"><span>{t('stopLoss')}</span><span className="font-mono text-white">{slOffset} pts</span></div>
+                      <input type="range" min="4" max="40" value={slOffset} onChange={(e) => setSlOffset(Number(e.target.value))} className="w-full" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[11px] text-gray-400 mb-1"><span>{t('takeProfit')}</span><span className="font-mono text-white">{tpOffset} pts</span></div>
+                      <input type="range" min="8" max="80" value={tpOffset} onChange={(e) => setTpOffset(Number(e.target.value))} className="w-full" />
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button onClick={() => setIsPlaying(p => !p)} className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 rounded flex items-center justify-center text-white font-bold transition">
+                      {isPlaying ? <PauseIcon /> : <PlayIcon />}<span className="ml-1.5">{isPlaying ? t('pause') : t('play')}</span>
+                    </button>
+                    <button onClick={advancePlayback} disabled={isPlaying} className="px-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 rounded flex items-center justify-center text-white transition"><StepIcon /></button>
+                    <button onClick={handleFlatten} className="px-3 bg-[#ef5350]/20 text-[#ef5350] hover:bg-[#ef5350]/30 rounded font-bold transition">{t('flatten')}</button>
+                  </div>
+                  <div className="flex items-center justify-between bg-[#131722] p-2 rounded border border-[#2B2B43]">
+                    <span className="text-[11px] text-gray-400">{t('speed')}</span>
+                    <div className="flex space-x-1">
+                      {[1, 3, 10, 30].map(s => (<button key={s} onClick={() => setSpeed(s)} className={`px-2 py-0.5 rounded text-[11px] font-mono ${speed === s ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>{s}x</button>))}
+                    </div>
+                  </div>
+                  <div className="text-[11px] text-gray-500 font-mono flex justify-between">
+                    <span>{t('bar')} {playbackIdx}/{puzzleData.future.length}</span>
+                    <span>{t('spacePlayHint')}</span>
+                  </div>
+                </div>
+              )}
+
+              {phase === 'RESULT' && aiData && (
+                <div className="space-y-4 mb-4">
+                  <div className={`p-3 rounded-lg border ${
+                    tradeResult === 'WIN' ? 'bg-[#26a69a]/10 border-[#26a69a]/50 text-[#26a69a]' :
+                    tradeResult === 'LOSS' ? 'bg-[#ef5350]/10 border-[#ef5350]/50 text-[#ef5350]' :
+                    tradeResult === 'SKIP' && userDecision === aiData.decision ? 'bg-blue-500/10 border-blue-500/50 text-blue-400' :
+                    'bg-gray-800/50 border-gray-700 text-gray-300'
+                  }`}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-sm">{resultTitle}</span>
+                      <span className="text-xs font-mono font-bold uppercase">{userDecision}</span>
+                    </div>
+                    <p className="text-xs text-gray-300"><span className="text-gray-400">{t('correctMove')}:</span> <strong className="text-white">{aiData.decision}</strong></p>
+                    <p className="text-xs mt-1"><span className="text-gray-400">{t('eloDelta')}:</span>{' '}<strong className={eloDelta >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}>{eloDelta >= 0 ? `+${eloDelta}` : eloDelta}</strong></p>
+                  </div>
+                  <CounterfactualPanel outcomes={aiData.outcomes} userDecision={userDecision} tradeResult={tradeResult} userR={rMultiple} />
+                  <DebriefAxesPanel axes={debriefAxes} aiDecision={aiData.decision} userDecision={userDecision} />
+                  {userDecision === 'SKIP' && skipReason && (
+                    <SkipReasonDebrief userReason={skipReason} aiReasonKey={aiSkipReasonKey} match={skipReasonMatch} />
+                  )}
+                  <div className="bg-[#2B2B43]/30 p-3 rounded-lg border border-[#2B2B43]/50">
+                    <h3 className="text-[11px] uppercase text-gray-400 font-bold tracking-wider mb-1">{t('debrief')}</h3>
+                    <p className="text-xs text-gray-300 leading-relaxed mb-2">{t(`expl_${aiData.decision}`)}</p>
+                    <div className="text-[10px] text-gray-500 font-mono border-t border-[#2B2B43] pt-2">{t('playbook')}: <span className="text-gray-300">{setupLabel}</span></div>
+                  </div>
+                  <button onClick={() => loadNewPuzzle()} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition flex justify-center items-center">
+                    {t('nextPuzzle')}
+                    <svg className="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                  <p className="text-[10px] text-gray-500 text-center font-mono">{t('nextHint')}</p>
+                </div>
+              )}
+
+              <div className="mt-auto bg-[#131722] p-3 rounded-lg border border-[#2B2B43] space-y-2 text-xs font-mono">
+                <div className="text-[11px] text-gray-400 uppercase font-bold tracking-wider mb-2 border-b border-[#2B2B43] pb-1">{t('contextAtDecision')}</div>
+                {contextRows.length === 0 && <div className="text-gray-500 text-[11px]">{t('awaitingData')}</div>}
+                {contextRows.map((r, i) => (
+                  <div key={i} className="flex justify-between"><span className="text-gray-400">{r.k}</span><span className={r.c}>{r.v}</span></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </I18nCtx.Provider>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
