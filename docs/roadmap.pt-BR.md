@@ -201,8 +201,6 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 ### Quick wins — faça primeiro
 
 - → Níveis de verdade (RTH/ETH) (#12)
-- → Session clock (#18)
-- → Revenge trade warning (#20)
 
 ### Investimentos estruturais
 
