@@ -20,7 +20,7 @@ export function generateMarketData(timeframe:Timeframe,instrument:Instrument,see
   let price=basePrice+(random()-0.5)*200, trendBias=(random()-0.5)*1.5;
   for(let i=0;i<total;i++){
     if(i===0||i%22===0)trendBias=(random()-0.5)*3.2;
-    const localBias=i>decisionIdx-15&&i<=decisionIdx?trendBias*1.6*params.setup:trendBias*params.setup;
+    const localBias=i>=decisionIdx-15&&i<decisionIdx?trendBias*1.6*params.setup:trendBias;
     const noise=(random()-0.5)*volatility*params.noise, open=price, move=localBias+noise, close=open+move;
     const high=Math.max(open,close)+random()*volatility*0.55, low=Math.min(open,close)-random()*volatility*0.55;
     const volume=Math.round(2500+random()*4500+Math.abs(move)*800);
