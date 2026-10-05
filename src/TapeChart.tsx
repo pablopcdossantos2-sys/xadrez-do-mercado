@@ -16,10 +16,10 @@ interface Props {
   slPrice:number|null;
   tpPrice:number|null;
   sessionLevels?:SessionLevels;
-  dataSource:'historical'|'synthetic';
+  dataSourceLabel:string;
 }
 
-export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,showVol,blind,entryPrice,slPrice,tpPrice,sessionLevels,dataSource}:Props){
+export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,showVol,blind,entryPrice,slPrice,tpPrice,sessionLevels,dataSourceLabel}:Props){
   const ref=useRef<HTMLDivElement|null>(null);
   const chartRef=useRef<IChartApi|null>(null);
   const candleRef=useRef<ReturnType<IChartApi['addCandlestickSeries']>|null>(null);
@@ -86,5 +86,5 @@ export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,sho
     chart.timeScale().fitContent();
   },[bars,blind,showVwap,showEma,showDema,showLevels,showVol,entryPrice,slPrice,tpPrice,sessionLevels]);
 
-  return <div className="chart-wrap"><div ref={ref} className="tape-chart" />{!blind&&<div className="chart-legend"><span>VWAP</span><span>EMA 20</span><span>DEMA</span><span className="legend-note">Interactive chart · {dataSource==='historical'?'real historical market data':'synthetic procedural data'}</span></div>}</div>;
+  return <div className="chart-wrap"><div ref={ref} className="tape-chart" />{!blind&&<div className="chart-legend"><span>VWAP</span><span>EMA 20</span><span>DEMA</span><span className="legend-note">Interactive chart · {dataSourceLabel'}</span></div>}</div>;
 }
