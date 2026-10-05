@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trading Tape Puzzles — Improvement Roadmap</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0E1117;
+    color: #d1d4dc;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #131722; }
+  ::-webkit-scrollbar-thumb { background: #2b2b43; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #363c4e; }
+
+  .toc-link:hover { color: #6f8cff; }
+  .toc-link.active { color: #2962FF; border-left-color: #2962FF; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-family: ui-monospace, monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+  .badge-critical { background: rgba(239,83,80,0.18); color: #ef5350; }
+  .badge-high     { background: rgba(255,152,0,0.18); color: #ffa726; }
+  .badge-medium   { background: rgba(41,98,255,0.18); color: #6f8cff; }
+  .badge-low      { background: rgba(120,120,140,0.18); color: #9aa0b4; }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: ui-monospace, monospace;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #2B2B43;
+    color: #9aa0b4;
+  }
+
+  .card {
+    background: #131722;
+    border: 1px solid #2B2B43;
+    border-radius: 10px;
+    transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: #363c4e; }
+
+  .rank-num {
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 13px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .r-critical { background: linear-gradient(135deg, #ef5350, #b71c1c); color: #fff; }
+  .r-high     { background: linear-gradient(135deg, #ffa726, #e65100); color: #fff; }
+  .r-medium   { background: linear-gradient(135deg, #2962FF, #0d3ab5); color: #fff; }
+  .r-low      { background: linear-gradient(135deg, #4a4a5e, #2b2b43); color: #d1d4dc; }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(43,43,67,0.35) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(43,43,67,0.35) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+</style>
+</head>
+<body>
+
+<header class="border-b border-[#2B2B43] bg-[#131722] sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded bg-gradient-to-br from-[#2962FF] to-[#0d3ab5] flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#fff" viewBox="0 0 256 256">
+          <path d="M240,88a48.05,48.05,0,0,1-48,48H181.71a64.12,64.12,0,0,1-16.1,38.16l-13.88,15.42a32,32,0,0,0-7.73,20.89V224a16,16,0,0,1-16,16H128a16,16,0,0,1-16-16V210.47a32,32,0,0,0-7.73-20.89l-13.88-15.42A64.12,64.12,0,0,1,74.29,136H64a48,48,0,0,1,0-96H192a48.05,48.05,0,0,1,48,48Z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="text-white font-bold text-sm leading-tight">Tape Puzzles · Roadmap</div>
+        <div class="text-gray-500 text-[11px] font-mono">Prioritized improvements for the Pro Scalp Trainer</div>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-4 text-[11px] font-mono text-gray-500">
+      <span><span class="text-[#ef5350] font-bold">4</span> critical</span>
+      <span><span class="text-[#ffa726] font-bold">7</span> high</span>
+      <span><span class="text-[#6f8cff] font-bold">9</span> medium</span>
+      <span><span class="text-gray-400 font-bold">12</span> low</span>
+    </div>
+  </div>
+</header>
+
+<section class="grid-bg border-b border-[#2B2B43]">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="inline-block badge badge-critical mb-3">Strategic Document</div>
+    <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+      32 improvements to turn Tape Puzzles<br />
+      <span class="text-gray-400 font-normal text-2xl md:text-3xl">from a guessing game into a real training tool</span>
+    </h1>
+    <p class="text-gray-400 max-w-3xl text-sm leading-relaxed">
+      Every item is ranked by <strong class="text-white">impact on user learning</strong>,
+      also considering implementation effort, technical dependencies, and alignment with the
+      project's stated goal: <em>"chess puzzles for futures day traders"</em>.
+    </p>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 max-w-3xl">
+      <div class="card p-3">
+        <div class="badge badge-critical mb-2">Tier 1</div>
+        <div class="text-white font-bold text-sm">Learning foundation</div>
+        <div class="text-gray-500 text-[11px] font-mono mt-1">Without it, the app is a quiz</div>
+      </div>
+      <div class="card p-3">
+        <div class="badge badge-high mb-2">Tier 2</div>
+        <div class="text-white font-bold text-sm">Process feedback</div>
+        <div class="text-gray-500 text-[11px] font-mono mt-1">Antidote to result bias</div>
+      </div>
+      <div class="card p-3">
+        <div class="badge badge-medium mb-2">Tier 3</div>
+        <div class="text-white font-bold text-sm">Context & tools</div>
+        <div class="text-gray-500 text-[11px] font-mono mt-1">Depth and variety</div>
+      </div>
+      <div class="card p-3">
+        <div class="badge badge-low mb-2">Tier 4</div>
+        <div class="text-white font-bold text-sm">Polish & retention</div>
+        <div class="text-gray-500 text-[11px] font-mono mt-1">Long-term engagement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="max-w-6xl mx-auto px-6 py-10 flex gap-8">
+
+  <aside class="hidden lg:block w-56 shrink-0">
+    <div class="sticky top-24">
+      <div class="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-3">Index</div>
+      <nav class="space-y-0.5 text-xs">
+        <a href="#tier1" class="toc-link block py-1.5 px-3 border-l-2 border-transparent text-gray-400 transition">Tier 1 · Critical</a>
+        <a href="#tier2" class="toc-link block py-1.5 px-3 border-l-2 border-transparent text-gray-400 transition">Tier 2 · High</a>
+        <a href="#tier3" class="toc-link block py-1.5 px-3 border-l-2 border-transparent text-gray-400 transition">Tier 3 · Medium</a>
+        <a href="#tier4" class="toc-link block py-1.5 px-3 border-l-2 border-transparent text-gray-400 transition">Tier 4 · Low</a>
+        <a href="#matrix" class="toc-link block py-1.5 px-3 border-l-2 border-transparent text-gray-400 transition mt-4">Prioritization matrix</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0 space-y-12">
+
+    <section id="tier1">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="badge badge-critical">Tier 1 · Critical</div>
+        <div class="text-gray-500 text-[11px] font-mono">Foundation — without this, the app doesn't teach</div>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Learning foundation</h2>
+      <p class="text-gray-400 text-sm mb-6 max-w-3xl">
+        These are the items that separate a <em>direction quiz</em> from a <em>deliberate training tool</em>.
+        Every other tier depends on these to make pedagogical sense.
+      </p>
+
+      <div class="space-y-4">
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-critical">1</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-white font-bold">Counterfactual debrief</h3>
+                <span class="tag">Low effort</span>
+                <span class="tag">✅ shipped</span>
+              </div>
+              <p class="text-gray-300 text-sm mb-3">
+                After the result, show what would have happened with <strong class="text-white">each alternative</strong>
+                (Long, Short, Skip) against the same future bars.
+              </p>
+              <div class="text-xs text-gray-500 bg-[#0E1117] border border-[#2B2B43] rounded p-3 font-mono leading-relaxed">
+                <span class="text-gray-400">Why it's #1:</span> learning doesn't happen on the win — it happens on the <em>contrast</em>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-critical">2</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-white font-bold">Playbook with labeled setups</h3>
+                <span class="tag">Medium effort</span>
+                <span class="tag">✅ shipped</span>
+              </div>
+              <p class="text-gray-300 text-sm mb-3">
+                Tag every puzzle with a setup type (VWAP Reclaim, ORB, Failed Breakdown, Liquidity Sweep,
+                Trend Pullback, Range Fade, Momentum Push, Consolidation) and show the label in the sidebar.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-critical">3</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-white font-bold">AI validation against hindsight bias</h3>
+                <span class="tag">High effort</span>
+                <span class="tag">Architectural</span>
+              </div>
+              <p class="text-gray-300 text-sm mb-3">
+                The current "correct answer" is <em>which side hit TP before SL</em> — that's pure hindsight.
+                Accept multiple valid answers, use an auditable rule tree, and expose a confidence score.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-critical">4</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-white font-bold">Realism of the procedural generator</h3>
+                <span class="tag">High effort</span>
+              </div>
+              <p class="text-gray-300 text-sm mb-3">
+                Inject volatility clustering, session regimes, volume correlated with |return|,
+                opening gaps. Alternative: real historical CSV of MES/MNQ.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="tier2">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="badge badge-high">Tier 2 · High</div>
+        <div class="text-gray-500 text-[11px] font-mono">Learning multipliers</div>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Process and feedback</h2>
+      <p class="text-gray-400 text-sm mb-6 max-w-3xl">
+        We fight the most common trader vice: <em>bad process with good outcome</em>.
+      </p>
+
+      <div class="space-y-4">
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">5</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">Process score vs. outcome score</h3>
+              <p class="text-gray-300 text-sm">A second score that rewards good decisions even when the market doesn't cooperate. Fights result bias.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">6</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">Heatmap of "where you fail"</h3>
+              <p class="text-gray-300 text-sm">Stats aggregated by setup, timeframe, time of day, direction, and instrument. The user learns where they're weak.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">7</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">Expanded debrief "Why not the other side?"</h3>
+              <p class="text-gray-300 text-sm">After a loss, objective bullets: structure, volume, location, confluence.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">8</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">Per-decision journal with export</h3>
+              <p class="text-gray-300 text-sm">Chart snapshot, context, decisions, final R. Export as JSON/CSV.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">9</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">Justified skip (with reason)</h3>
+              <p class="text-gray-300 text-sm">On Skip, ask "Why?" and compare against the AI's real reason. Trains technical vocabulary.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">10</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">Adaptive difficulty</h3>
+              <p class="text-gray-300 text-sm">Keep the user in flow zone (60–75% accuracy) by tuning generator noise.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex gap-4">
+            <div class="rank-num r-high">11</div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-bold mb-1">"Trap of the day" warning</h3>
+              <p class="text-gray-300 text-sm">Detect deceptive patterns and surface a side note before the decision, without giving away the answer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tier3">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="badge badge-medium">Tier 3 · Medium</div>
+        <div class="text-gray-500 text-[11px] font-mono">Depth and tools</div>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Context and training tools</h2>
+
+      <div class="space-y-4">
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">12</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Real levels (RTH vs ETH)</h3><p class="text-gray-300 text-sm">Simulated session model with RTH PDH/PDL, ONH/ONL, gap, OR.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">13</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Synthetic tape microstructure</h3><p class="text-gray-300 text-sm">Cumulative delta, simplified footprint, Volume Profile (POC, VAH, VAL).</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">14</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Macro events mid-puzzle</h3><p class="text-gray-300 text-sm">Inject plausible events to teach risk management around news.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">15</div><div class="flex-1"><h3 class="text-white font-bold mb-1">"Blind tape" mode</h3><p class="text-gray-300 text-sm">Hide price/time to force pure structure reading.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">16</div><div class="flex-1"><h3 class="text-white font-bold mb-1">"Only structure" vs "Full context" mode</h3><p class="text-gray-300 text-sm">Toggle to hide context. Trains pure price action first.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">17</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Reverse replay after result</h3><p class="text-gray-300 text-sm">Re-test with a different choice on the same puzzle. Confidence calibration.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">18</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Visual session clock</h3><p class="text-gray-300 text-sm">Bar with markers at 09:30, 10:00, 11:30, 13:00, 15:00, 16:00.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">19</div><div class="flex-1"><h3 class="text-white font-bold mb-1">"Speed run" mode</h3><p class="text-gray-300 text-sm">10 puzzles in 15 minutes, no debrief. Warm-up before the open.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-medium">20</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Revenge trade warning</h3><p class="text-gray-300 text-sm">Detect risk escalation after losses and warn. Teaches trading psychology.</p></div></div></div>
+      </div>
+    </section>
+
+    <section id="tier4">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="badge badge-low">Tier 4 · Low</div>
+        <div class="text-gray-500 text-[11px] font-mono">Polish, retention, infra</div>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Polish and retention</h2>
+
+      <div class="space-y-4">
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">21</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Real ELO curve (Glicko / classical Elo)</h3><p class="text-gray-300 text-sm">ΔELO depends on puzzle difficulty. Self-calibrating progression.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">22</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Ranks / tiers</h3><p class="text-gray-300 text-sm">Novice · Developing · Consistent · Sharp · Institutional.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">23</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Streak with "freeze"</h3><p class="text-gray-300 text-sm">1 freeze/day to avoid resetting the streak. Reduces return friction.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">24</div><div class="flex-1"><h3 class="text-white font-bold mb-1">30-second onboarding</h3><p class="text-gray-300 text-sm">3-step overlay on first visit.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">25</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Mobile responsiveness</h3><p class="text-gray-300 text-sm">Vertical layout, touch buttons, gestures.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">26</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Daily challenges with deterministic seed</h3><p class="text-gray-300 text-sm">1 puzzle/day. Local ranking: you vs. yesterday's you.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">27</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Collectible pattern cards</h3><p class="text-gray-300 text-sm">Each mastered setup becomes a "card". Gamifies study.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">28</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Subtle sound</h3><p class="text-gray-300 text-sm">Chime on TP hit, thud on stop. Toggleable.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">29</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Migrate to Vite + React + TypeScript</h3><p class="text-gray-300 text-sm">When single-file exceeds ~2,000 LOC. Modular structure.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">30</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Tests for pure functions</h3><p class="text-gray-300 text-sm">classifySetup, computeVWAP, computeATR, analyzePuzzle.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">31</div><div class="flex-1"><h3 class="text-white font-bold mb-1">Offline mode (service worker)</h3><p class="text-gray-300 text-sm">PWA with cache. Train on a plane.</p></div></div></div>
+        <div class="card p-5"><div class="flex gap-4"><div class="rank-num r-low">32</div><div class="flex-1"><h3 class="text-white font-bold mb-1">State via useReducer</h3><p class="text-gray-300 text-sm">Replace the 12 interdependent useState hooks. Easier to test, fewer sync bugs.</p></div></div></div>
+      </div>
+    </section>
+
+    <section id="matrix">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="badge badge-medium">Synthesis</div>
+        <div class="text-gray-500 text-[11px] font-mono">Effort × impact</div>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Prioritization matrix</h2>
+      <p class="text-gray-400 text-sm mb-6 max-w-3xl">
+        Compact view to decide implementation order. <strong class="text-white">Start with the green quadrant</strong>.
+      </p>
+
+      <div class="overflow-x-auto rounded-lg border border-[#2B2B43]">
+        <table class="w-full text-xs">
+          <thead class="bg-[#1A1E29] text-gray-400 uppercase text-[10px] font-mono">
+            <tr>
+              <th class="text-left p-3 font-normal">#</th>
+              <th class="text-left p-3 font-normal">Item</th>
+              <th class="text-left p-3 font-normal">Tier</th>
+              <th class="text-left p-3 font-normal">Effort</th>
+              <th class="text-left p-3 font-normal">Impact</th>
+              <th class="text-left p-3 font-normal">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#2B2B43] text-gray-300">
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">1</td><td class="p-3">Counterfactual debrief</td><td class="p-3"><span class="badge badge-critical">T1</span></td><td class="p-3 text-gray-400">Low</td><td class="p-3 text-[#26a69a] font-bold">Very high</td><td class="p-3 text-[#26a69a] text-[10px] font-mono">✅ SHIPPED</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">2</td><td class="p-3">Playbook with labeled setups</td><td class="p-3"><span class="badge badge-critical">T1</span></td><td class="p-3 text-gray-400">Medium</td><td class="p-3 text-[#26a69a] font-bold">Very high</td><td class="p-3 text-[#26a69a] text-[10px] font-mono">✅ SHIPPED</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">5</td><td class="p-3">Process score vs. outcome score</td><td class="p-3"><span class="badge badge-high">T2</span></td><td class="p-3 text-gray-400">Medium</td><td class="p-3 text-[#26a69a] font-bold">High</td><td class="p-3 text-gray-500 text-[10px] font-mono">pending</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">6</td><td class="p-3">Heatmap of "where you fail"</td><td class="p-3"><span class="badge badge-high">T2</span></td><td class="p-3 text-gray-400">Medium</td><td class="p-3 text-[#26a69a] font-bold">High</td><td class="p-3 text-gray-500 text-[10px] font-mono">pending</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">8</td><td class="p-3">Per-decision journal with export</td><td class="p-3"><span class="badge badge-high">T2</span></td><td class="p-3 text-gray-400">Low</td><td class="p-3 text-[#26a69a] font-bold">High</td><td class="p-3 text-gray-500 text-[10px] font-mono">pending</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">3</td><td class="p-3">AI validation (hindsight bias)</td><td class="p-3"><span class="badge badge-critical">T1</span></td><td class="p-3 text-gray-400">High</td><td class="p-3 text-[#26a69a] font-bold">Very high</td><td class="p-3 text-gray-500 text-[10px] font-mono">partial</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">4</td><td class="p-3">Realism of procedural generator</td><td class="p-3"><span class="badge badge-critical">T1</span></td><td class="p-3 text-gray-400">High</td><td class="p-3 text-[#26a69a] font-bold">Very high (long term)</td><td class="p-3 text-gray-500 text-[10px] font-mono">pending</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">10</td><td class="p-3">Adaptive difficulty</td><td class="p-3"><span class="badge badge-high">T2</span></td><td class="p-3 text-gray-400">Medium</td><td class="p-3 text-[#ffa726] font-bold">High</td><td class="p-3 text-gray-500 text-[10px] font-mono">pending</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">21</td><td class="p-3">Real ELO (Glicko)</td><td class="p-3"><span class="badge badge-low">T4</span></td><td class="p-3 text-gray-400">Medium</td><td class="p-3 text-[#ffa726] font-bold">Medium-high</td><td class="p-3 text-gray-500 text-[10px] font-mono">pending</td></tr>
+            <tr class="hover:bg-[#1A1E29]"><td class="p-3 font-mono">29</td><td class="p-3">Migration to Vite + TS</td><td class="p-3"><span class="badge badge-low">T4</span></td><td class="p-3 text-gray-400">High</td><td class="p-3 text-gray-300 font-bold">Enabler</td><td class="p-3 text-gray-500 text-[10px] font-mono">recommended</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <div class="text-[10px] uppercase text-[#26a69a] font-bold tracking-wider mb-2">Quick wins — do first</div>
+          <ul class="text-xs text-gray-300 space-y-1.5">
+            <li>✓ Counterfactual debrief <span class="text-[#26a69a] font-mono">✅ done</span></li>
+            <li>✓ Playbook with labeled setups <span class="text-[#26a69a] font-mono">✅ done</span></li>
+            <li>→ Justified skip (#9)</li>
+            <li>→ Expanded debrief (#7)</li>
+            <li>→ Exportable journal (#8)</li>
+            <li>→ 30s onboarding (#24)</li>
+          </ul>
+        </div>
+        <div class="card p-4">
+          <div class="text-[10px] uppercase text-[#ef5350] font-bold tracking-wider mb-2">Structural investments</div>
+          <ul class="text-xs text-gray-300 space-y-1.5">
+            <li>→ AI validation (#3)</li>
+            <li>→ Generator realism (#4)</li>
+            <li>→ Process score (#5)</li>
+            <li>→ Error heatmap (#6)</li>
+            <li>→ Vite + TS migration (#29)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card p-6 border-l-4 border-l-[#2962FF]">
+      <h2 class="text-lg font-bold text-white mb-2">Executive summary</h2>
+      <p class="text-sm text-gray-300 leading-relaxed mb-3">
+        Today, Tape Puzzles is a <em>beautiful direction-guessing game</em>. To become a
+        <strong class="text-white">real training tool</strong>, the key lies in three Tier 1 items:
+        <strong class="text-white">counterfactual debrief</strong>,
+        <strong class="text-white">setup labeling</strong>, and
+        <strong class="text-white">data realism</strong>.
+      </p>
+      <p class="text-sm text-gray-300 leading-relaxed">
+        With those three, the user leaves every puzzle knowing <em>what</em> they missed, <em>why</em>, and
+        <em>what the market would have done</em> in any direction — which is exactly what
+        <em>"chess puzzles for traders"</em> should deliver.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="border-t border-[#2B2B43] mt-8">
+  <div class="max-w-6xl mx-auto px-6 py-6 text-[11px] text-gray-500 font-mono flex flex-wrap justify-between items-center gap-3">
+    <div>Trading Tape Puzzles · Improvement Roadmap · v1.0</div>
+    <div>32 items · 4 tiers · 2 shipped · 30 pending</div>
+  </div>
+</footer>
+
+<script>
+  const links = document.querySelectorAll('.toc-link');
+  const sections = document.querySelectorAll('section[id]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
