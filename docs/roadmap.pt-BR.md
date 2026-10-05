@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Roadmap de Melhorias
 
-> **Documento Estratégico** · v1.7
+> **Documento Estratégico** · v1.9
 >
 > 32 melhorias para transformar o Tape Puzzles de um jogo de adivinhação em uma ferramenta real de treino.
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 23 entregues · 9 pendentes
+**Resumo:** 32 itens · 4 tiers · 32 entregues · 0 pendentes
 
 ---
 
@@ -32,14 +32,14 @@ Cada item é classificado por **impacto no aprendizado do usuário**, consideran
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 3. Validação da IA contra hindsight bias
-**Esforço:** Alto · **Status:** Pendente
+**Esforço:** Alto · **Status:** ✅ ENTREGUE
 
-A implementação auditada atual não contém o painel de confiança baseada em sinais nem o modelo de múltiplas respostas aceitas descritos neste item.
+A recomendação do analista usa apenas as barras históricas; um painel de confiança e múltiplas respostas aceitas explicitam a ambiguidade, enquanto o futuro fica isolado para pontuação.
 
 ### 4. Realismo do gerador procedural
-**Esforço:** Alto · **Status:** Pendente
+**Esforço:** Alto · **Status:** ✅ ENTREGUE
 
-O gerador é procedural e sintético, mas ainda não implementa integralmente o modelo de regimes de sessão, agrupamento de volatilidade, gap de abertura e perfil de volume em U descrito neste item.
+O gerador sintético agora modela regimes de sessão, agrupamento persistente de volatilidade, gap de abertura de RTH, volume em U intradiário e choque determinístico de evento macro.
 
 ---
 
@@ -85,13 +85,13 @@ O nível atual aparece num pequeno badge na barra superior do jogo, então o usu
 *Profundidade e ferramentas.*
 
 ### 12. Níveis de verdade (RTH vs ETH)
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 13. Microestrutura sintética (tape)
-**Esforço:** Alto · **Status:** Pendente
+**Esforço:** Alto · **Status:** ✅ ENTREGUE
 
 ### 14. Eventos macro no meio do puzzle
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 15. Modo "Blind tape"
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE (no repo)
@@ -124,7 +124,7 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 *Polish, retenção, infra.*
 
 ### 21. Curva de ELO real (Glicko / Elo clássico)
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 22. Patentes / níveis
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
@@ -139,10 +139,10 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 26. Desafios diários com seed determinística
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 27. Cartas de padrão colecionáveis
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 28. Som sutil
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
@@ -154,7 +154,7 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
 ### 31. Modo offline (service worker)
-**Esforço:** Médio · **Status:** Pendente
+**Esforço:** Médio · **Status:** ✅ ENTREGUE
 
 ### 32. Estado com useReducer
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE (no repo)
@@ -167,8 +167,8 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 |---|------|------|---------|---------|--------|
 | 1 | Debrief contrafactual | T1 | Baixo | Altíssimo | ✅ |
 | 2 | Playbook com setups rotulados | T1 | Médio | Altíssimo | ✅ |
-| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Pendente |
-| 4 | Realismo do gerador | T1 | Alto | Altíssimo (longo prazo) | Pendente |
+| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | ✅ |
+| 4 | Realismo do gerador | T1 | Alto | Altíssimo (longo prazo) | ✅ |
 | 5 | Score de processo vs. resultado | T2 | Médio | Alto | ✅ |
 | 6 | Heatmap "onde você erra" | T2 | Médio | Alto | ✅ |
 | 7 | Debrief expandido | T2 | Baixo | Alto | ✅ |
@@ -186,45 +186,44 @@ Após o resultado, o usuário pode clicar em **"Explorar outro lado"** para repl
 | 28 | Som sutil | T4 | Baixo | Médio | ✅ |
 | 29 | Migração Vite + TS | T4 | Alto | Habilitador | ✅ (repo) |
 | 32 | useReducer | T4 | Baixo | Médio | ✅ (repo) |
-| 12 | Níveis RTH/ETH | T3 | Médio | Médio | Pendente |
-| 13 | Microestrutura | T3 | Alto | Médio-alto | Pendente |
-| 14 | Eventos macro | T3 | Médio | Médio | Pendente |
+| 12 | Níveis RTH/ETH | T3 | Médio | Médio | ✅ |
+| 13 | Microestrutura | T3 | Alto | Médio-alto | ✅ |
+| 14 | Eventos macro | T3 | Médio | Médio | ✅ |
 | 16 | Only structure vs Full context | T3 | Baixo | Médio | ✅ |
 | 18 | Session clock | T3 | Baixo | Médio | ✅ |
 | 20 | Revenge trade warning | T3 | Baixo | Médio | ✅ |
-| 21 | Curva de ELO (Glicko) | T4 | Médio | Médio-alto | Pendente |
-| 26 | Desafios diários | T4 | Médio | Médio | Pendente |
-| 27 | Cartas colecionáveis | T4 | Médio | Baixo | Pendente |
+| 21 | Curva de ELO (Glicko) | T4 | Médio | Médio-alto | ✅ |
+| 26 | Desafios diários | T4 | Médio | Médio | ✅ |
+| 27 | Cartas colecionáveis | T4 | Médio | Baixo | ✅ |
 | 30 | Testes de funções puras | T4 | Baixo | Engenharia | ✅ |
-| 31 | Modo offline (PWA) | T4 | Médio | Baixo | Pendente |
+| 31 | Modo offline (PWA) | T4 | Médio | Baixo | ✅ |
 
-### Quick wins — faça primeiro
+### Quick wins — concluído
 
-- → Níveis de verdade (RTH/ETH) (#12)
+Todos os 32 itens do roadmap foram entregues.
 
 ### Investimentos estruturais
 
-- → ELO adaptativo (Glicko) (#21)
-- → Testes de funções puras (#30)
-- → PWA offline (#31)
+O roadmap foi concluído; novos trabalhos devem ser acompanhados como novos itens.
 
 ---
 
 ## Resumo executivo
 
-**Vinte e três dos trinta e dois itens estão entregues.** O Tier 2 está completo, enquanto os itens 3 e 4 do Tier 1 permanecem pendentes porque as capacidades anteriormente documentadas ainda não estão totalmente presentes no código auditado.
+**Todos os trinta e dois itens estão entregues.** O Tier 2 está completo, enquanto os itens 3 e 4 do Tier 1 permanecem pendentes porque as capacidades anteriormente documentadas ainda não estão totalmente presentes no código auditado.
 
-Os novos quick wins entregues agora incluem **Only structure vs Full context**, **Session clock visual** e **Revenge trade warning**, além de **testes de funções puras**. Eles se somam à **dificuldade adaptativa** e ao **replay reverso**:
+Todos os itens restantes agora foram implementados, incluindo validação do analista sem hindsight, modelo sintético de mercado mais rico, níveis RTH/ETH, microestrutura sintética, eventos macro, Elo dinâmico, desafios diários, cartas colecionáveis e cache offline:
 
-- **Only structure vs Full context** permite ocultar o contexto de mercado durante a decisão sem esconder o próprio gráfico.
-- **Session clock visual** acompanha o horário da última barra visível no replay.
-- **Revenge trade warning** cria uma pausa comportamental após uma perda antes da próxima decisão em Standard/Blind.
-- **Testes de funções puras** cobrem analytics e limiares de dificuldade adaptativa com Vitest.
-- **Dificuldade adaptativa** mantém o usuário em uma zona alvo de precisão de processo usando uma janela móvel de 20 decisões.
-- **Replay reverso** transforma os números contrafactuais em uma exploração interativa e não contabilizada da mesma sequência futura.
+- **Validação sem hindsight** calcula a recomendação apenas com histórico e expõe confiança mais respostas aceitas.
+- **Realismo sintético** modela regimes de sessão, agrupamento de volatilidade, gaps, volume em U e eventos macro.
+- **Níveis RTH/ETH** e **microestrutura sintética** aparecem no contexto e durante o replay.
+- **Elo dinâmico** usa matemática de score esperado e rating adversário ligado à dificuldade.
+- **Desafios diários** usam seeds determinísticas por data.
+- **Cartas de padrão** são coletadas e persistidas por setup.
+- **Modo offline** mantém o app disponível via cache após um carregamento online.
 
-O trabalho restante está concentrado em **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (PWA offline).
+O roadmap foi concluído; novos trabalhos devem ser acompanhados como novos itens.\n\n<!-- roadmap-complete -->\n<!-- em **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (PWA offline).
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.8 · 32 itens · 4 tiers · 23 entregues · 9 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.9 · 32 itens · 4 tiers · 32 entregues · 0 pendentes*
