@@ -24,7 +24,7 @@ Requer Python 3.10+:
 python scripts/build-historical-library.py
 ```
 
-Por padrão o script consulta uma janela de pregões de 15/09/2026 a 02/10/2026 e mantém até seis sessões por ativo, priorizando diversidade de volatilidade, direção e atividade.
+A primeira biblioteca publicada contém 12 sessões reais: quatro de WINFUT, quatro de WDOFUT e quatro de BIT, cobrindo 23/09/2026 a 28/09/2026. O pipeline prioriza diversidade de volatilidade, direção e atividade e pode ser regenerado com uma janela maior.
 
 O mesmo script é executado pelo workflow de bootstrap do GitHub Actions.
 
