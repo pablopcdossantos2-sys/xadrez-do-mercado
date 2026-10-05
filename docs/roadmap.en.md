@@ -32,10 +32,14 @@ Every item is ranked by **impact on user learning**, also considering implementa
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 3. AI validation against hindsight bias
-**Effort:** High · **Status:** ✅ SHIPPED
+**Effort:** High · **Status:** Pending
+
+The currently audited implementation does not contain the documented signal-confidence panel and multi-answer acceptance model.
 
 ### 4. Realism of the procedural generator
-**Effort:** High · **Status:** ✅ SHIPPED
+**Effort:** High · **Status:** Pending
+
+The generator is procedural and synthetic, but it does not yet implement the full session-regime, volatility-clustering, opening-gap, and U-shaped-volume model described by this item.
 
 ---
 
@@ -159,7 +163,7 @@ This is the purest form of counterfactual training: not "what would have happene
 |---|------|------|--------|--------|--------|
 | 1 | Counterfactual debrief | T1 | Low | Very high | ✅ |
 | 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ |
-| 3 | AI validation (hindsight bias) | T1 | High | Very high | ✅ |
+| 3 | AI validation (hindsight bias) | T1 | High | Very high | Pending |
 | 4 | Realism of procedural generator | T1 | High | Very high (long term) | ✅ |
 | 5 | Process score vs. outcome score | T2 | Medium | High | ✅ |
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ |
