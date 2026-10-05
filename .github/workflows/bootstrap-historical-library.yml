@@ -36,7 +36,7 @@ jobs:
 
       - name: Commit generated library
         run: |
-          if git diff --quiet -- public/data/historical; then
+          if git diff --quiet -- public/data/historical ':(exclude)public/data/historical/manifest.json'; then
             echo "No historical-library changes were generated."
             exit 1
           fi
@@ -44,4 +44,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/historical
           git commit -m "data: bootstrap real historical market library [historical-bootstrap]"
+          git fetch origin main
+          git rebase origin/main
           git push origin HEAD:main
