@@ -72,6 +72,7 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 - [Roadmap em português](docs/roadmap.pt-BR.md)
 - [Roadmap em inglês](docs/roadmap.en.md)
 - [Notas de implementação](docs/roadmap-implementation.md)
+- [Plano de dados reais](docs/real-market-data-plan.pt-BR.md)
 - [Tutorial para criação de puzzles — português](docs/tutorial-create-puzzles.pt-BR.md)
 - [Puzzle creation tutorial — English](docs/tutorial-create-puzzles.md)
 
