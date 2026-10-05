@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.7
+> **Strategic Document** · v1.9
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 23 shipped · 9 pending
+**Summary:** 32 items · 4 tiers · 32 shipped · 0 pending
 
 ---
 
@@ -32,12 +32,12 @@ Every item is ranked by **impact on user learning**, also considering implementa
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 3. AI validation against hindsight bias
-**Effort:** High · **Status:** Pending
+**Effort:** High · **Status:** ✅ SHIPPED
 
 The currently audited implementation does not contain the documented signal-confidence panel and multi-answer acceptance model.
 
 ### 4. Realism of the procedural generator
-**Effort:** High · **Status:** Pending
+**Effort:** High · **Status:** ✅ SHIPPED
 
 The generator is procedural and synthetic, but it does not yet implement the full session-regime, volatility-clustering, opening-gap, and U-shaped-volume model described by this item.
 
@@ -83,13 +83,13 @@ The current level is shown in a small badge in the game top bar, so the user alw
 *Depth and tools.*
 
 ### 12. Real levels (RTH vs ETH)
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 13. Synthetic tape microstructure
-**Effort:** High · **Status:** Pending
+**Effort:** High · **Status:** ✅ SHIPPED
 
 ### 14. Macro events mid-puzzle
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 15. "Blind tape" mode
 **Effort:** Low · **Status:** ✅ SHIPPED (in repo)
@@ -120,7 +120,7 @@ This is the purest form of counterfactual training: not "what would have happene
 *Polish, retention, infra.*
 
 ### 21. Real ELO curve (Glicko / classical Elo)
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 22. Ranks / tiers
 **Effort:** Low · **Status:** ✅ SHIPPED
@@ -135,10 +135,10 @@ This is the purest form of counterfactual training: not "what would have happene
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 26. Daily challenges with deterministic seed
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 27. Collectible pattern cards
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 28. Subtle sound
 **Effort:** Low · **Status:** ✅ SHIPPED
@@ -150,7 +150,7 @@ This is the purest form of counterfactual training: not "what would have happene
 **Effort:** Low · **Status:** ✅ SHIPPED
 
 ### 31. Offline mode (service worker)
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ### 32. State via useReducer
 **Effort:** Low · **Status:** ✅ SHIPPED (in repo)
