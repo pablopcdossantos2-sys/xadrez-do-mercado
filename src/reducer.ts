@@ -38,6 +38,12 @@ export function reducer(state: AppState, action: Action): AppState {
         skipModalOpen: false,
         skipReasonDraft: '',
         clockNow: action.speedNow ?? Date.now(),
+        reverseDecision: null,
+        reverseReplayData: [],
+        reversePlaybackIdx: 0,
+        reverseIsPlaying: false,
+        reverseResult: null,
+        reverseEntryPrice: null,
       };
     case 'SET_DECISION':
       return { ...state, userDecision: action.decision, entryPrice: action.entryPrice };
@@ -49,6 +55,11 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'SET_PLAYING': return { ...state, isPlaying: action.playing };
     case 'SET_SPEED': return { ...state, speed: action.speed };
     case 'SET_BRACKET': return { ...state, slOffset: action.slOffset ?? state.slOffset, tpOffset: action.tpOffset ?? state.tpOffset };
+    case 'REVERSE_START': return { ...state, phase: 'REVERSE_REPLAY', reverseDecision: action.decision, reverseReplayData: [], reversePlaybackIdx: 0, reverseIsPlaying: false, reverseResult: null, reverseEntryPrice: state.entryPrice };
+    case 'REVERSE_TICK': return { ...state, reversePlaybackIdx: action.idx, reverseReplayData: action.data };
+    case 'REVERSE_SET_PLAYING': return { ...state, reverseIsPlaying: action.playing };
+    case 'REVERSE_FINISH': return { ...state, reverseResult: action.result, reverseIsPlaying: false };
+    case 'REVERSE_BACK': return { ...state, phase: 'RESULT', reverseDecision: null, reverseReplayData: [], reversePlaybackIdx: 0, reverseIsPlaying: false, reverseResult: null, reverseEntryPrice: null };
     case 'EVALUATE':
       return {
         ...state,
