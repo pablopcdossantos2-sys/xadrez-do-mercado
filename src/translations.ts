@@ -1,6 +1,6 @@
 
 const en={
-  appName:'Trading Tape Puzzles',trainingTool:'Trading decision trainer',tagline:'Chess puzzles, but for futures day traders.',
+  appName:'Xadrez do Mercado',trainingTool:'Trading decision trainer',tagline:'Chess puzzles, but for futures day traders.',
   heroSubtitle:'Read the tape, make one call, learn from what the market would have done.',heroFooter:'Runs entirely in your browser. No account. No backend.',
   mode:'Mode',standard:'Standard',blind:'Blind tape',speedRun:'Speed run',contextMode:'Context',fullContext:'Full context',onlyStructure:'Only structure',structureModeHint:'Hide market context during the decision, while keeping the chart visible.',startTraining:'Start training',startBlind:'Start blind tape',startSpeedRun:'Start speed run',home:'Home',blindBadge:'BLIND TAPE',difficulty:'Difficulty',difficultyEasy:'Easy',difficultyNormal:'Normal',difficultyHard:'Hard',difficultyProcessHint:'Based on your process accuracy over the last 20 decisions.',
   blindHint:'During the decision phase, context, playbook, price/time scales, indicators, and volume are hidden.',speedHint:'10 rapid decisions within a 15-minute session. No intermediate debrief; each round is evaluated automatically.',
@@ -37,7 +37,7 @@ const en={
   autoNext:'The next round is loading…'
 };
 const pt={
-  appName:'Trading Tape Puzzles',trainingTool:'Treinador de tomada de decisão',tagline:'Enigmas de xadrez, mas para day traders de futuros.',
+  appName:'Xadrez do Mercado',trainingTool:'Treinador de tomada de decisão',tagline:'Enigmas de xadrez, mas para day traders de futuros.',
   heroSubtitle:'Leia o tape, faça uma escolha e aprenda com o que o mercado teria feito.',heroFooter:'Executado no navegador. Sem conta. Sem backend.',
   mode:'Modo',standard:'Padrão',blind:'Blind tape',speedRun:'Speed run',contextMode:'Contexto',fullContext:'Contexto completo',onlyStructure:'Só estrutura',structureModeHint:'Oculta o contexto durante a decisão, mantendo o gráfico visível.',startTraining:'Iniciar treinamento',startBlind:'Iniciar blind tape',startSpeedRun:'Iniciar speed run',home:'Início',blindBadge:'BLIND TAPE',difficulty:'Dificuldade',difficultyEasy:'Fácil',difficultyNormal:'Normal',difficultyHard:'Difícil',difficultyProcessHint:'Baseada na precisão de processo das últimas 20 decisões.',
   blindHint:'Durante a decisão, contexto, playbook, escalas de preço/tempo, indicadores e volume ficam ocultos.',speedHint:'10 decisões rápidas em até 15 minutos. Sem debrief intermediário; cada rodada é avaliada automaticamente.',
