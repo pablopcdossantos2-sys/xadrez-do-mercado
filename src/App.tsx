@@ -44,6 +44,7 @@ function resultText(t:T,r:string|null){return r==='WIN'?t('resultWin'):r==='LOSS
 function fmtR(r:number){return (r>=0?'+':'')+r.toFixed(2)+'R';}
 function fmtDuration(ms:number){const s=Math.max(0,Math.round(ms/1000)),m=Math.floor(s/60);return m+':'+String(s%60).padStart(2,'0');}
 function fmtSessionTime(ts:number|null){if(ts===null)return '—';const d=new Date(ts*1000);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function hasRecentLoss(journal:JournalEntry[]){return journal.length>0&&journal[journal.length-1].outcome==='LOSS';}
 function rank(elo:number,t:T){return elo<1180?t('rankNovice'):elo<1260?t('rankDeveloping'):elo<1360?t('rankConsistent'):elo<1480?t('rankSharp'):t('rankInstitutional');}
 function Toggle({active,children,onClick}:{active:boolean;children:ReactNode;onClick:()=>void}){return <button className={'toggle '+(active?'active':'')} onClick={onClick}>{children}</button>;}
 
