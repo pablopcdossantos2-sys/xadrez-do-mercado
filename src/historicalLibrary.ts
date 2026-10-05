@@ -21,7 +21,11 @@ export interface HistoricalLibraryManifest {
   sessions:HistoricalSession[];
 }
 
-export async function loadHistoricalManifest(base='/data/historical'):Promise<HistoricalLibraryManifest>{
+function defaultBase(){
+  return (import.meta.env.BASE_URL+'data/historical').replace(/\/+$/,'');
+}
+
+export async function loadHistoricalManifest(base=defaultBase()):Promise<HistoricalLibraryManifest>{
   const response=await fetch(base+'/manifest.json',{cache:'no-store'});
   if(!response.ok)throw new Error('Historical library manifest request failed: '+response.status);
   return response.json() as Promise<HistoricalLibraryManifest>;
@@ -30,7 +34,9 @@ export async function loadHistoricalManifest(base='/data/historical'):Promise<Hi
 export async function loadHistoricalSession(session:HistoricalSession,timeframe:Timeframe):Promise<Bar[]>{
   const path=session.bars[timeframe];
   if(!path)throw new Error('Historical timeframe is unavailable: '+timeframe);
-  const response=await fetch(path,{cache:'force-cache'});
+  const root=import.meta.env.BASE_URL.replace(/\/+$/,'');
+  const url=path.startsWith('/')?root+path:path;
+  const response=await fetch(url,{cache:'force-cache'});
   if(!response.ok)throw new Error('Historical dataset request failed: '+response.status);
   const bars=await response.json() as Bar[];
   if(!Array.isArray(bars)||bars.length<40)throw new Error('Historical dataset is too small: '+session.id+'/'+timeframe);
