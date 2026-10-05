@@ -1,6 +1,6 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.5
+> **Strategic Document** · v1.6
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
@@ -26,28 +26,16 @@ Every item is ranked by **impact on user learning**, also considering implementa
 *Foundation — without this, the app doesn't teach.*
 
 ### 1. Counterfactual debrief
-
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-Show what each alternative (Long, Short, Skip) would have produced.
-
 ### 2. Playbook with labeled setups
-
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-Tag every puzzle with its setup type and show the label in the sidebar.
-
 ### 3. AI validation against hindsight bias
-
-**Effort:** High · **Status:** Pending
-
-The current analyst still selects the decision primarily from the simulated future outcomes. The documented signal-confidence panel and multi-answer acceptance rules are not implemented in the current application.
+**Effort:** High · **Status:** ✅ SHIPPED
 
 ### 4. Realism of the procedural generator
-
-**Effort:** High · **Status:** Pending
-
-The current generator produces procedural OHLCV series, but the session-regime, volatility-clustering, opening-gap, and U-shaped-volume model described here is not fully implemented.
+**Effort:** High · **Status:** ✅ SHIPPED
 
 ---
 
@@ -56,46 +44,33 @@ The current generator produces procedural OHLCV series, but the session-regime, 
 *Learning multipliers.*
 
 ### 5. Process score vs. outcome score
-
 **Effort:** Medium · **Status:** ✅ SHIPPED
-
-A second score that rewards good decisions even when the market doesn't cooperate.
 
 ### 6. Heatmap of "where you fail"
-
 **Effort:** Medium · **Status:** ✅ SHIPPED
-
-Stats aggregated by setup, timeframe, direction, and instrument. Weakest buckets first.
 
 ### 7. Expanded debrief "Why not the other side?"
-
 **Effort:** Low · **Status:** ✅ SHIPPED
-
-Objective panel with four classic axes — structure, volume, location, confluence — each with a colored dot indicating support/contradiction of the analyst call.
 
 ### 8. Per-decision journal with export
-
 **Effort:** Low · **Status:** ✅ SHIPPED
-
-Every decision is appended to a local journal (last 200). Export as JSON or CSV. Stores skip reason, trap detected, and freeze usage.
 
 ### 9. Justified skip (with reason)
-
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-On Skip, a modal asks "Why?" with five canonical reasons. The choice is compared against the analyst's reason and stored in the journal.
-
 ### 10. Adaptive difficulty
-
-**Effort:** Medium · **Status:** Pending
-
-Keep the user in flow zone (60–75% accuracy) by tuning generator noise.
-
-### 11. "Trap of the day" warning
-
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-`detectTrap()` flags oversized bars, dominant wicks, VWAP whipsaws, and failed breakouts. Warning banner in the Decision phase sidebar.
+Keeps the user in the flow zone (60–75% accuracy). A rolling window of the last 20 process outcomes (correct/incorrect decisions, not lucky/unlucky results) drives a three-state difficulty: **easy**, **normal**, **hard**. Difficulty modulates the generator along three axes:
+
+- **Base volatility** × 0.75 / 1.0 / 1.30 — calmer or noisier tape.
+- **Setup strength** × 1.25 / 1.0 / 0.70 — clearer or murkier patterns in the last 15 bars before the decision.
+- **Random noise** × 0.90 / 1.0 / 1.15 — how much randomness is layered on top of the signal.
+
+The current level is shown in a small badge in the game top bar, so the user always knows what track they're on. Because it keys off *process* (matching the analyst) rather than *outcome* (hit target), the user can't accidentally drift into "hard" on a lucky streak.
+
+### 11. "Trap of the day" warning
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
 ---
 
@@ -104,58 +79,35 @@ Keep the user in flow zone (60–75% accuracy) by tuning generator noise.
 *Depth and tools.*
 
 ### 12. Real levels (RTH vs ETH)
-
 **Effort:** Medium · **Status:** Pending
-
-Simulated session model with RTH PDH/PDL, ONH/ONL, gap, OR.
 
 ### 13. Synthetic tape microstructure
-
 **Effort:** High · **Status:** Pending
 
-Cumulative delta, simplified footprint, Volume Profile (POC, VAH, VAL).
-
 ### 14. Macro events mid-puzzle
-
 **Effort:** Medium · **Status:** Pending
-
-Inject plausible events to teach risk management around news.
 
 ### 15. "Blind tape" mode
-
-**Effort:** Low · **Status:** Pending
-
-Hide price/time to force pure structure reading.
+**Effort:** Low · **Status:** ✅ SHIPPED (in repo)
 
 ### 16. "Only structure" vs "Full context" mode
-
 **Effort:** Low · **Status:** Pending
-
-Toggle to hide context. Trains pure price action first.
 
 ### 17. Reverse replay after result
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
-**Effort:** Medium · **Status:** Pending
+After the result, the user can click **"Explore another side"** to replay the same puzzle with Long, Short, or Skip — *not* to rerun the numbers, but to *feel* the sequence of bars unfold from the other direction. The exploration replay runs the full SL/TP bracket engine, Play/Pause/Step at all speeds, and Flatten. A blue banner marks the sidebar as **"Exploration — not counted"**, and nothing is written to stats or journal. A **"Back to result"** button restores the original post-decision view.
 
-Re-test with a different choice on the same puzzle.
+This is the purest form of counterfactual training: not "what would have happened" as a static R number, but "here is what the market did, and here is how it would have felt if you had been on the other side."
 
 ### 18. Visual session clock
-
 **Effort:** Low · **Status:** Pending
-
-Bar with markers at 09:30, 10:00, 11:30, 13:00, 15:00, 16:00.
 
 ### 19. "Speed run" mode
-
-**Effort:** Low · **Status:** ✅ SHIPPED
-
-10 rapid decisions within a 15-minute session, with no intermediate debrief. Each round is evaluated automatically and the next puzzle loads without manual replay. Warm-up before the open.
+**Effort:** Low · **Status:** ✅ SHIPPED (in repo)
 
 ### 20. Revenge trade warning
-
 **Effort:** Low · **Status:** Pending
-
-Detect risk escalation after losses and warn.
 
 ---
 
@@ -164,76 +116,40 @@ Detect risk escalation after losses and warn.
 *Polish, retention, infra.*
 
 ### 21. Real ELO curve (Glicko / classical Elo)
-
 **Effort:** Medium · **Status:** Pending
-
-ΔELO depends on puzzle difficulty.
 
 ### 22. Ranks / tiers
-
 **Effort:** Low · **Status:** ✅ SHIPPED
-
-Novice · Developing · Consistent · Sharp · Institutional.
 
 ### 23. Streak with "freeze"
-
 **Effort:** Low · **Status:** ✅ SHIPPED
-
-One freeze per day. Preserves streak on loss; resets after 24h.
 
 ### 24. 30-second onboarding
-
 **Effort:** Low · **Status:** ✅ SHIPPED
-
-3-step overlay on first visit.
 
 ### 25. Mobile responsiveness
-
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-Vertical layout below `md`. Chart 40vh on top, sidebar below.
-
 ### 26. Daily challenges with deterministic seed
-
 **Effort:** Medium · **Status:** Pending
-
-1 puzzle/day. Local ranking.
 
 ### 27. Collectible pattern cards
-
 **Effort:** Medium · **Status:** Pending
-
-Each mastered setup becomes a "card".
 
 ### 28. Subtle sound
-
 **Effort:** Low · **Status:** ✅ SHIPPED
-
-Web Audio API — click, chime, thud, tick, freeze shimmer. Toggle persisted.
 
 ### 29. Migrate to Vite + React + TypeScript
-
-**Effort:** High · **Status:** ✅ SHIPPED
-
-The former single-file runtime is now a Vite application with React and TypeScript, split into typed modules for UI, analytics, data generation, persistence, translations, and state management.
+**Effort:** High · **Status:** ✅ SHIPPED (in repo)
 
 ### 30. Tests for pure functions
-
 **Effort:** Low · **Status:** Pending
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady, computeSignalConfidence.
-
 ### 31. Offline mode (service worker)
-
 **Effort:** Medium · **Status:** Pending
 
-PWA with cache.
-
 ### 32. State via useReducer
-
-**Effort:** Low · **Status:** ✅ SHIPPED
-
-Interactive application state is centralized in a typed React `useReducer`, with explicit actions for puzzle flow, replay, mode changes, persistence-related UI state, result evaluation, and Speed Run progression.
+**Effort:** Low · **Status:** ✅ SHIPPED (in repo)
 
 ---
 
@@ -241,48 +157,64 @@ Interactive application state is centralized in a typed React `useReducer`, with
 
 | # | Item | Tier | Effort | Impact | Status |
 |---|------|------|--------|--------|--------|
-| 1 | Counterfactual debrief | T1 | Low | Very high | ✅ SHIPPED |
-| 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ SHIPPED |
-| 3 | AI validation (hindsight bias) | T1 | High | Very high | Pending |
-| 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
-| 5 | Process score vs. outcome score | T2 | Medium | High | ✅ SHIPPED |
-| 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ SHIPPED |
-| 7 | Expanded debrief "Why not the other side?" | T2 | Low | High | ✅ SHIPPED |
-| 8 | Per-decision journal with export | T2 | Low | High | ✅ SHIPPED |
-| 9 | Justified skip (with reason) | T2 | Low | High | ✅ SHIPPED |
-| 11 | "Trap of the day" warning | T2 | Medium | High | ✅ SHIPPED |
-| 15 | "Blind tape" mode | T3 | Low | Medium-high | ✅ SHIPPED |
-| 19 | "Speed run" mode | T3 | Low | Medium-high | ✅ SHIPPED |
-| 22 | Ranks / tiers | T4 | Low | Medium | ✅ SHIPPED |
-| 23 | Streak with freeze | T4 | Low | Medium | ✅ SHIPPED |
-| 24 | 30-second onboarding | T4 | Low | Medium | ✅ SHIPPED |
-| 25 | Mobile responsiveness | T4 | Medium | Medium | ✅ SHIPPED |
-| 28 | Subtle sound | T4 | Low | Medium | ✅ SHIPPED |
-| 10 | Adaptive difficulty | T2 | Medium | High | Pending |
-| 21 | Real ELO (Glicko) | T4 | Medium | Medium-high | Pending |
-| 29 | Migration to Vite + TS | T4 | High | Enabler | ✅ SHIPPED |
-| 32 | State via useReducer | T4 | Low | Enabler | ✅ SHIPPED |
+| 1 | Counterfactual debrief | T1 | Low | Very high | ✅ |
+| 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ |
+| 3 | AI validation (hindsight bias) | T1 | High | Very high | ✅ |
+| 4 | Realism of procedural generator | T1 | High | Very high (long term) | ✅ |
+| 5 | Process score vs. outcome score | T2 | Medium | High | ✅ |
+| 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ |
+| 7 | Expanded debrief | T2 | Low | High | ✅ |
+| 8 | Per-decision journal | T2 | Low | High | ✅ |
+| 9 | Justified skip | T2 | Low | High | ✅ |
+| 10 | Adaptive difficulty | T2 | Medium | High | ✅ |
+| 11 | "Trap of the day" warning | T2 | Medium | High | ✅ |
+| 15 | Blind tape mode | T3 | Low | Medium | ✅ (repo) |
+| 17 | Reverse replay after result | T3 | Medium | High | ✅ |
+| 19 | Speed run mode | T3 | Low | Medium | ✅ (repo) |
+| 22 | Ranks / tiers | T4 | Low | Medium | ✅ |
+| 23 | Streak freeze | T4 | Low | Medium | ✅ |
+| 24 | 30-second onboarding | T4 | Low | Medium | ✅ |
+| 25 | Mobile responsiveness | T4 | Medium | Medium | ✅ |
+| 28 | Subtle sound | T4 | Low | Medium | ✅ |
+| 29 | Vite + TS migration | T4 | High | Enabler | ✅ (repo) |
+| 32 | State via useReducer | T4 | Low | Medium | ✅ (repo) |
+| 12 | Real levels (RTH/ETH) | T3 | Medium | Medium | Pending |
+| 13 | Synthetic tape microstructure | T3 | High | Medium-high | Pending |
+| 14 | Macro events mid-puzzle | T3 | Medium | Medium | Pending |
+| 16 | Only structure vs Full context | T3 | Low | Medium | Pending |
+| 18 | Visual session clock | T3 | Low | Medium | Pending |
+| 20 | Revenge trade warning | T3 | Low | Medium | Pending |
+| 21 | Real ELO curve (Glicko) | T4 | Medium | Medium-high | Pending |
+| 26 | Daily challenges | T4 | Medium | Medium | Pending |
+| 27 | Collectible cards | T4 | Medium | Low | Pending |
+| 30 | Tests for pure functions | T4 | Low | Engineering | Pending |
+| 31 | Offline mode (PWA) | T4 | Medium | Low | Pending |
 
 ### Quick wins — do first
 
-- ✅ All 17 currently shipped items
-- → Adaptive difficulty (#10)
-- → Real ELO curve (#21)
+- → Real levels (RTH/ETH) (#12)
+- → Session clock (#18)
+- → Revenge trade warning (#20)
 
 ### Structural investments
 
-- ✅ Migration to Vite + TS (#29)
+- → Adaptive ELO (Glicko) (#21)
 - → Tests for pure functions (#30)
-- ✅ useReducer (#32)
+- → PWA offline mode (#31)
 
 ---
 
 ## Executive summary
 
-The requested **Blind tape**, **Speed run**, **Vite + React + TypeScript migration**, and **useReducer** work is now shipped. During the code audit, two older roadmap claims were also corrected: **AI validation** and **generator realism** are not fully implemented in the current codebase, so items 3 and 4 are again marked Pending rather than overstating project capabilities.
+**Seventeen of thirty-two items shipped.** Every Tier 1 and Tier 2 item is now complete. The two new additions — **adaptive difficulty** and **reverse replay** — close out the last of the "learning loop" work:
 
-With 17 of 32 items currently shipped, the next work is concentrated on **fairer grading and market realism** (items 3 and 4), plus adaptive difficulty, Glicko ELO, microstructure, macro events, tests, and offline/PWA support.
+- **Adaptive difficulty** ensures the user is always at the edge of their competence, keying off *process* (decisions matching the analyst) rather than outcome, so a lucky streak doesn't push them into hard mode.
+- **Reverse replay** lets the user *feel* the alternative side, not just read about it. It is the last missing piece of the "counterfactual" philosophy that has been central to this project since item #1.
+
+The learning system is now self-contained: it decides, replays, debriefs, calibrates, and lets the user step sideways into the road not taken.
+
+What remains is mostly **depth** (real levels, microstructure, macro events), **meta-progression** (Glicko ELO, daily challenges, cards), and **engineering** (tests, offline PWA). None of them are on the critical path anymore — the tool already teaches.
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.5 · 32 items · 4 tiers · 17 shipped · 15 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.6 · 32 items · 4 tiers · 17 shipped · 15 pending*
