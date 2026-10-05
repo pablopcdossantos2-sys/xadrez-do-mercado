@@ -51,7 +51,7 @@ Começaremos pelos ativos brasileiros:
 - WDOFUT;
 - BIT.
 
-A primeira coleção não precisa representar anos inteiros. Um conjunto pequeno, porém diversificado, já é suficiente para validar a experiência:
+A primeira coleção de cada família não precisa representar anos inteiros. Um conjunto pequeno, porém diversificado, já é suficiente para validar a experiência:
 
 - pregões de tendência;
 - rompimentos e falhas;
