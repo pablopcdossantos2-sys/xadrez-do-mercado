@@ -34,7 +34,7 @@ Each puzzle presents 82 historical bars and asks for one decision. In Standard m
 ## Features
 
 - Procedural generation of synthetic OHLCV series.
-- MES and MNQ across 1m, 5m, 15m, and 1h timeframes.
+- MES, MNQ, WINFUT, WDOFUT, and BIT across 1m, 5m, 15m, and 1h timeframes.
 - Candles, volume, VWAP, EMA 20, DEMA, and session levels.
 - Setup classifier covering Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push, and Consolidation.
 - Rule-based analyst with a 12-point stop / 24-point target reference bracket.
@@ -50,7 +50,7 @@ Each puzzle presents 82 historical bars and asks for one decision. In Standard m
 
 ## Architecture
 
-The project was migrated from a monolithic browser implementation to **Vite + React + TypeScript**. UI orchestration is in `src/App.tsx`; analytics in `src/analytics.ts`; data generation in `src/data.ts`; persistence in `src/storage.ts`; translations in `src/translations.ts`; state in `src/reducer.ts`; types in `src/types.ts`; and the React entry point in `src/main.tsx`.
+The project was migrated from a monolithic browser implementation to **Vite + React + TypeScript**. UI orchestration is in `src/App.tsx`; analytics in `src/analytics.ts`; data generation in `src/data.ts`; persistence in `src/storage.ts`; translations in `src/translations.ts`; state in `src/reducer.ts`; types in `src/types.ts`; and the React entry point in `src/main.tsx`; asset metadata is in `src/assets.ts`, and the real OHLCV parser is in `src/realData.ts`.
 
 Interactive state is centralized in `useReducer`, replacing a collection of interdependent local state hooks.
 
@@ -62,7 +62,8 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 ## Scope and limitations
 
-- Current data is synthetic and procedurally generated; there is no real historical MES/MNQ feed.
+- Synthetic generation remains available as a fallback. Real-data integration is prepared to consume licensed intraday datasets without exposing credentials in the browser.
+- WINFUT, WDOFUT, and BIT use the B3 product codes WIN, WDO, and BIT respectively.
 - Analyst grading uses rules and the simulated future window. This does not validate a trading strategy or demonstrate predictive capability.
 - The project is a training tool and does not place market orders.
 
