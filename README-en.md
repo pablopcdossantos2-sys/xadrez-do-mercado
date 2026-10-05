@@ -1,4 +1,4 @@
-# Xadrez do Mercado
+# Market Chess
 
 *Leia isto em outros idiomas: [Português](README.md)*
 
@@ -78,7 +78,7 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 ## 👤 Authorship and development
 
-Xadrez do Mercado is a browser-based training tool independently developed by Pablo Phillipe Cândido dos Santos for futures day-trading decision practice through price-action puzzles, trade replay, and counterfactual debriefing.
+Market Chess is a browser-based training tool independently developed by Pablo Phillipe Cândido dos Santos for futures day-trading decision practice through price-action puzzles, trade replay, and counterfactual debriefing.
 
 Development used generative artificial intelligence tools as an auxiliary resource, while the author remained responsible for the project's conception, implementation, integration, and verification.
 
