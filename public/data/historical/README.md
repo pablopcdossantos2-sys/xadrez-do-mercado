@@ -11,7 +11,7 @@ public/data/historical/
 ├── manifest.json
 ├── WINFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
 ├── WDOFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
-└── BIT/<contrato>/<data>/{1m,5m,15m,1h}.json
+
 ```
 
 Cada sessão preserva o contrato específico negociado naquele pregão. A seleção do contrato dominante usa a quantidade negociada no arquivo do dia.
@@ -24,7 +24,7 @@ Requer Python 3.10+:
 python scripts/build-historical-library.py
 ```
 
-A primeira biblioteca publicada contém 12 sessões reais: quatro de WINFUT, quatro de WDOFUT e quatro de BIT, cobrindo 23/09/2026 a 28/09/2026. O pipeline prioriza diversidade de volatilidade, direção e atividade e pode ser regenerado com uma janela maior.
+A primeira biblioteca publicada contém 8 sessões reais: quatro de WINFUT e quatro de WDOFUT, cobrindo 23/09/2026 a 30/09/2026. O pipeline prioriza diversidade de volatilidade, direção e atividade e pode ser regenerado com uma janela maior.
 
 O mesmo script é executado pelo workflow de bootstrap do GitHub Actions.
 
