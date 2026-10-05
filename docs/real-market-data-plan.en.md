@@ -34,8 +34,8 @@ References:
 
 Completed.
 
-- Assets: MES, MNQ, WINFUT, WDOFUT, and BIT.
-- Brazilian B3 product codes: WIN, WDO, and BIT.
+- Assets: MES, MNQ, WINFUT, and WDOFUT.
+- Brazilian B3 product codes: WIN and WDO.
 - Per-asset metadata in `src/assets.ts`.
 - Real OHLCV CSV/JSON parser in `src/realData.ts`.
 - History/future puzzle split.
@@ -160,7 +160,6 @@ The historical migration is complete when there is:
 
 - at least one working real historical dataset for WINFUT;
 - at least one for WDOFUT;
-- at least one for BIT;
 - 1m, 5m, and 15m support;
 - real volume;
 - contract/session metadata;
