@@ -5,6 +5,7 @@ import { eloDelta } from '../src/rating';
 import { getAdaptiveDifficulty } from '../src/difficulty';
 import { parseOhlcvCsv, parseOhlcvJson, splitDataset } from '../src/realData';
 import { ACTIVE_ASSETS } from '../src/assets';
+import { selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
 import type { Bar, JournalEntry } from '../src/types';
 
 function bar(close:number,open=close,high=Math.max(open,close),low=Math.min(open,close),time=0):Bar{
@@ -77,6 +78,28 @@ describe('real market data foundation',()=>{
     const bars=parseOhlcvJson([{time:2,open:11,high:12,low:10,close:11.5,volume:200},{time:1,open:10,high:11,low:9,close:10.5,volume:100}]);
     expect(bars.map(x=>x.time)).toEqual([1,2]);
     expect(splitDataset(bars,1).history).toHaveLength(1);
+  });
+
+  it('selects a reproducible historical exercise window',()=>{
+    const bars=Array.from({length:130},(_,i)=>bar(100+i,100+i,101+i,99+i,i*60));
+    const a=selectHistoricalWindow(bars,123,82,38);
+    const b=selectHistoricalWindow(bars,123,82,38);
+    expect(a).toEqual(b);
+    expect(a?.history).toHaveLength(82);
+    expect(a?.future).toHaveLength(38);
+  });
+
+  it('filters historical sessions by asset and timeframe',()=>{
+    const manifest={
+      version:1,generatedAt:'x',
+      source:{provider:'B3',feed:'deriv',endpoint:'x',notes:'x'},
+      sessions:[
+        {id:'w',asset:'WINFUT',contract:'WINJ26',tradeDate:'2026-09-20',timezone:'America/Sao_Paulo',source:'b3',sourceUrl:'x',tickCount:100,stats:{first:1,last:1,high:1,low:1,rangePct:0,trendPct:0,volume:1,tags:[]},bars:{'1m':'/w.json','15m':'/w15.json'},barCount1m:120},
+        {id:'d',asset:'WDOFUT',contract:'WDOJ26',tradeDate:'2026-09-20',timezone:'America/Sao_Paulo',source:'b3',sourceUrl:'x',tickCount:100,stats:{first:1,last:1,high:1,low:1,rangePct:0,trendPct:0,volume:1,tags:[]},bars:{'1m':'/d.json'},barCount1m:120}
+      ]
+    } as const;
+    expect(selectHistoricalSessions(manifest,'WINFUT','15m').map(x=>x.id)).toEqual(['w']);
+    expect(selectHistoricalSessions(manifest,'WDOFUT','15m')).toHaveLength(0);
   });
 
   it('includes the requested Brazilian futures',()=>{
