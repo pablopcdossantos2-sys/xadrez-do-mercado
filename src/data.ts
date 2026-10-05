@@ -28,12 +28,12 @@ function sessionProfile(minutes:number){
 }
 
 export function generateMarketData(timeframe:Timeframe,instrument:Instrument,seed=Date.now(),difficulty:GeneratorDifficulty='normal'):{history:Bar[];future:Bar[];macroEvents:MacroEvent[]}{
-  const stepSec=TF_SEC[timeframe],volUnit=TF_VOL_MULT[timeframe],basePrice=instrument==='MES'?4200:15500,params=DIFFICULTY_PARAMS[difficulty];
+  const stepSec=TF_SEC[timeframe],volUnit=TF_VOL_MULT[timeframe],basePrices={MES:4200,MNQ:15500,WINFUT:130000,WDOFUT:5000,BIT:600000},basePrice=basePrices[instrument],params=DIFFICULTY_PARAMS[difficulty];
   const baseVol=(timeframe==='1m'?0.9:timeframe==='5m'?2.4:timeframe==='15m'?5.5:11)*volUnit*params.vol;
   const total=120,decisionIdx=82,bars:Bar[]=[];
   let state=(seed>>>0)||1;
   const random=()=>{state=(1664525*state+1013904223)>>>0;return state/4294967296;};
-  const sessionStart=new Date();sessionStart.setHours(9,30,0,0);
+  const sessionStart=new Date();sessionStart.setHours(instrument==='BIT'?9:9,instrument==='BIT'?0:30,0,0);
   let t=Math.floor(sessionStart.getTime()/1000)-decisionIdx*stepSec;
   let price=basePrice+(random()-0.5)*200;
   let trendBias=(random()-0.5)*1.5;
