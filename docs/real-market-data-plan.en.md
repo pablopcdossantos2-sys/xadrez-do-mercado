@@ -154,6 +154,12 @@ Generate a procedural sequence for rare cases, tests, and controlled training.
 
 The user experience remains the same. Only the data source differs.
 
+## Phase 8 — Foreign futures
+
+The next front is building a real historical library for **MES and MNQ** from an authorized source, using the same dataset contract already used for the Brazilian library. The foreign library should preserve regular-session timestamps, contract identity, volume, and rollover rules without mixing expiries.
+
+At this time, MES and MNQ remain on the synthetic generator and are not part of the published real historical library.
+
 ## Completion criteria
 
 The historical migration is complete when there is:
