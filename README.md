@@ -34,7 +34,7 @@ Cada puzzle apresenta 82 barras de histórico e solicita uma decisão. No modo P
 ## Recursos
 
 - Geração procedural de séries OHLCV sintéticas.
-- MES e MNQ nos timeframes 1m, 5m, 15m e 1h.
+- MES, MNQ, WINFUT, WDOFUT e BIT nos timeframes 1m, 5m, 15m e 1h.
 - Candles, volume, VWAP, EMA 20, DEMA e níveis de sessão.
 - Classificador de setups: Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push e Consolidation.
 - Analista baseado em regras com bracket de referência de 12 pontos de stop por 24 pontos de alvo.
@@ -62,7 +62,8 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 ## Escopo e limitações
 
-- Os dados atuais são sintéticos e gerados proceduralmente; não há feed histórico real de MES/MNQ.
+- O gerador sintético continua disponível como fallback. A integração de dados reais está preparada para receber datasets intraday licenciados sem expor credenciais no navegador.
+- WINFUT, WDOFUT e BIT usam os códigos de produto B3 WIN, WDO e BIT, respectivamente.
 - A avaliação do analista usa regras e a janela futura simulada. Isso não constitui validação de estratégia nem demonstra capacidade preditiva.
 - O projeto é uma ferramenta de treinamento e não executa ordens no mercado.
 
