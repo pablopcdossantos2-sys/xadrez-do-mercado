@@ -29,10 +29,6 @@ The interactive application state is centralized in a typed React `useReducer`. 
 - Added an explicit EN/PT-BR dictionary parity guard.
 - Corrected the documentation to distinguish synthetic procedural data from real historical market data.
 
-## Roadmap consistency audit
-
-The audit also reconciled roadmap claims with the actual implementation. Items 3 (AI validation against hindsight bias) and 4 (procedural-generator realism) were marked Pending because the current source did not contain the capabilities previously described as shipped. This avoids documenting functionality that is not actually present.
-
 ## 10. Adaptive difficulty — shipped
 
 Implemented a rolling process-accuracy controller using the last 20 scored decisions in the local journal. The warm-up phase keeps the difficulty at Normal until five process observations exist; after that, below 60% selects Easy, above 75% selects Hard, and the 60–75% zone stays Normal. Reverse exploration is not journaled, so it cannot distort difficulty.
@@ -104,8 +100,18 @@ Added a persistent collection of setup cards. Each solved puzzle exposes its set
 
 Added a minimal PWA shell with a web manifest, SVG app icon, service-worker registration, shell precaching, and runtime same-origin caching. After an online load, the application assets can be served from cache when the network is unavailable.
 
+## Advanced phase — historical real market data
 
+The next phase is explicitly **historical-first**. There is no real-time feed requirement.
 
-## Advanced phase — real market data
+The preferred initial source is B3's public Daily Market Bulletin / historical session files, especially the derivatives **Negócio a negócio** table, which can be queried retroactively by trading date.
 
-The 32-item roadmap is complete. The next phase is tracked separately in the [real market data plan](real-market-data-plan.pt-BR.md), covering licensed historical data, runtime feed integration, professional replay, and real microstructure.
+The implementation path is:
+1. acquire a curated set of real sessions for WINFUT, WDOFUT, and BIT;
+2. normalize trades and contract metadata;
+3. aggregate to 1m and derive 5m/15m/1h;
+4. build a historical exercise library with pedagogical metadata;
+5. connect the puzzle selector to the historical library;
+6. retain synthetic generation as fallback and for controlled test cases.
+
+There is intentionally no backend streaming stage in this plan. Any storage/distribution decision must still respect the applicable market-data usage terms.
