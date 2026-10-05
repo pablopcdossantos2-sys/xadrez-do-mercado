@@ -15,7 +15,6 @@ export interface Breakdown { bySetup:Record<string,StatsBucket>; byTimeframe:Rec
 export interface Stats { elo:number; solved:number; correct:number; processMatch:number; streak:number; bestStreak:number; rSum:number; breakdown:Breakdown; freezeAvailable:number; freezeUsedAt:number; }
 export type Instrument = 'MES'|'MNQ';
 export type Timeframe = '1m'|'5m'|'15m'|'1h';
-export type AdaptiveDifficulty = 'easy' | 'normal' | 'hard';
 
 export interface JournalEntry { ts:number; puzzleId:number; instrument:Instrument; timeframe:Timeframe; mode:Mode; setup:{id:string;en:string;pt:string}|null; decision:Decision; aiDecision:Decision; processMatch:boolean; outcome:Exclude<TradeResult,null>; r:number; entry:number|null; slOffset:number; tpOffset:number; skipReason:string|null; skipReasonMatch:boolean|null; trap:string|null; freezeUsed:boolean; speedRunRound:number|null; speedRunDurationMs:number|null; }
 export interface SpeedRun { active:boolean; round:number; totalRounds:number; correct:number; processMatch:number; rSum:number; startedAt:number; deadlineAt:number; lastDurationMs:number|null; }
