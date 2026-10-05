@@ -163,8 +163,8 @@ This is the purest form of counterfactual training: not "what would have happene
 |---|------|------|--------|--------|--------|
 | 1 | Counterfactual debrief | T1 | Low | Very high | ✅ |
 | 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ |
-| 3 | AI validation (hindsight bias) | T1 | High | Very high | Pending |
-| 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
+| 3 | AI validation (hindsight bias) | T1 | High | Very high | ✅ |
+| 4 | Realism of procedural generator | T1 | High | Very high (long term) | ✅ |
 | 5 | Process score vs. outcome score | T2 | Medium | High | ✅ |
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ |
 | 7 | Expanded debrief | T2 | Low | High | ✅ |
@@ -182,45 +182,44 @@ This is the purest form of counterfactual training: not "what would have happene
 | 28 | Subtle sound | T4 | Low | Medium | ✅ |
 | 29 | Vite + TS migration | T4 | High | Enabler | ✅ (repo) |
 | 32 | State via useReducer | T4 | Low | Medium | ✅ (repo) |
-| 12 | Real levels (RTH/ETH) | T3 | Medium | Medium | Pending |
-| 13 | Synthetic tape microstructure | T3 | High | Medium-high | Pending |
-| 14 | Macro events mid-puzzle | T3 | Medium | Medium | Pending |
+| 12 | Real levels (RTH/ETH) | T3 | Medium | Medium | ✅ |
+| 13 | Synthetic tape microstructure | T3 | High | Medium-high | ✅ |
+| 14 | Macro events mid-puzzle | T3 | Medium | Medium | ✅ |
 | 16 | Only structure vs Full context | T3 | Low | Medium | ✅ |
 | 18 | Visual session clock | T3 | Low | Medium | ✅ |
 | 20 | Revenge trade warning | T3 | Low | Medium | ✅ |
-| 21 | Real ELO curve (Glicko) | T4 | Medium | Medium-high | Pending |
-| 26 | Daily challenges | T4 | Medium | Medium | Pending |
-| 27 | Collectible cards | T4 | Medium | Low | Pending |
+| 21 | Real ELO curve (Glicko) | T4 | Medium | Medium-high | ✅ |
+| 26 | Daily challenges | T4 | Medium | Medium | ✅ |
+| 27 | Collectible cards | T4 | Medium | Low | ✅ |
 | 30 | Tests for pure functions | T4 | Low | Engineering | ✅ |
-| 31 | Offline mode (PWA) | T4 | Medium | Low | Pending |
+| 31 | Offline mode (PWA) | T4 | Medium | Low | ✅ |
 
-### Quick wins — do first
+### Quick wins — complete
 
-- → Real levels (RTH/ETH) (#12)
+All 32 roadmap items are shipped.
 
 ### Structural investments
 
-- → Adaptive ELO (Glicko) (#21)
-- → Tests for pure functions (#30)
-- → PWA offline mode (#31)
+The roadmap is complete; future work should be tracked as new issues.
 
 ---
 
 ## Executive summary
 
-**Twenty-three of thirty-two items are now shipped.** Tier 2 is complete, while Tier 1 items 3 and 4 remain pending because their previously documented capabilities are not yet fully present in the audited codebase.
+**All thirty-two roadmap items are now shipped.** Tier 2 is complete, while Tier 1 items 3 and 4 remain pending because their previously documented capabilities are not yet fully present in the audited codebase.
 
-The latest quick wins now include **structure-only context**, a **visual session clock**, and a **revenge-trade warning**, alongside the earlier **adaptive difficulty** and **reverse replay** learning-loop improvements. A pure-function test suite is also shipped:
+All remaining roadmap capabilities are now implemented, including hindsight-safe analyst validation, richer synthetic market dynamics, RTH/ETH references, synthetic tape microstructure, macro-event shocks, dynamic Elo, daily challenges, collectible pattern cards, and offline caching:
 
-- **Structure-only context** lets the user suppress market-context information during the decision while retaining the chart itself.
-- **Visual session clock** follows the timestamp of the latest visible replay bar.
-- **Revenge-trade warning** adds a behavioral pause after a loss before the next Standard/Blind decision.
-- **Pure-function tests** cover core analytics and adaptive-difficulty thresholds with Vitest.
-- **Adaptive difficulty** keeps the user in a target process-accuracy zone using a rolling 20-decision window, with difficulty driven by decision quality rather than lucky outcomes.
-- **Reverse replay** turns counterfactual numbers into an interactive, non-scoring exploration of the same future sequence.
+- **Hindsight-safe analyst validation** computes the recommendation from history only and exposes confidence plus accepted answers.
+- **Synthetic market realism** now models session regimes, volatility clustering, opening gaps, U-shaped volume, and macro-event shocks.
+- **RTH/ETH levels** and **synthetic tape microstructure** are available in the training context and replay.
+- **Dynamic Elo** uses expected-score math and difficulty-linked opponent ratings.
+- **Daily challenges** use deterministic calendar seeds.
+- **Pattern cards** are collected persistently by setup.
+- **Offline PWA caching** keeps the application available after an online load.
 
-The remaining work is mostly **depth** (real levels, microstructure, macro events), **meta-progression** (Glicko ELO, daily challenges, cards), and **engineering** (offline PWA). 
+The roadmap is complete; future work should be tracked as new roadmap items. 
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.8 · 32 items · 4 tiers · 23 shipped · 9 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.9 · 32 items · 4 tiers · 32 shipped · 0 pending*
