@@ -36,6 +36,7 @@ const checks=[
  ['Daily challenge deterministic seed', app.includes('startDaily') && await readFile('src/data.ts','utf8').then(x=>x.includes('getDailyChallengeSeed'))],
  ['Collectible pattern cards', await readFile('src/cards.ts','utf8').then(x=>x.includes('PATTERN_CARDS')) && app.includes('collectedCards')],
  ['Offline PWA shell', index.includes('manifest.webmanifest') && await readFile('src/main.tsx','utf8').then(x=>x.includes("serviceWorker.register('/sw.js')")) && await readFile('public/sw.js','utf8').then(x=>x.includes("caches.open(CACHE)"))],
+ ['Historical library populated', JSON.parse(await readFile('public/data/historical/manifest.json','utf8')).sessions.length===12 && ['WINFUT','WDOFUT','BIT'].every(asset=>JSON.parse(await readFile('public/data/historical/manifest.json','utf8')).sessions.filter(s=>s.asset===asset).length===4)],
  ['Historical library foundation', await readFile('scripts/build-historical-library.py','utf8').then(x=>x.includes('rapinegocios/tickercsv')&&x.includes('WINFUT')&&x.includes('WDOFUT')&&x.includes('BIT')) && await readFile('src/historicalLibrary.ts','utf8').then(x=>x.includes('selectHistoricalWindow')&&x.includes('loadHistoricalManifest'))],
  ['Multi-asset catalog', await readFile('src/assets.ts','utf8').then(x=>x.includes('WINFUT')&&x.includes('WDOFUT')&&x.includes('BIT'))],
  ['Real OHLCV adapter', await readFile('src/realData.ts','utf8').then(x=>x.includes('parseOhlcvCsv')&&x.includes('parseOhlcvJson')&&x.includes('loadRealDataset'))],
