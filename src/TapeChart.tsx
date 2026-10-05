@@ -86,5 +86,5 @@ export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,sho
     chart.timeScale().fitContent();
   },[bars,blind,showVwap,showEma,showDema,showLevels,showVol,entryPrice,slPrice,tpPrice,sessionLevels]);
 
-  return <div className="chart-wrap"><div ref={ref} className="tape-chart" />{!blind&&<div className="chart-legend"><span>VWAP</span><span>EMA 20</span><span>DEMA</span><span className="legend-note">Interactive chart · {dataSourceLabel'}</span></div>}</div>;
+  return <div className="chart-wrap"><div ref={ref} className="tape-chart" />{!blind&&<div className="chart-legend"><span>VWAP</span><span>EMA 20</span><span>DEMA</span><span className="legend-note">Interactive chart · {dataSourceLabel}</span></div>}</div>;
 }
