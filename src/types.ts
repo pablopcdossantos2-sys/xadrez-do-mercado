@@ -75,7 +75,7 @@ export interface JournalEntry {
   dailyChallenge?:boolean;
 }
 export interface SpeedRun { active:boolean; round:number; totalRounds:number; correct:number; processMatch:number; rSum:number; startedAt:number; deadlineAt:number; lastDurationMs:number|null; }
-export interface PuzzleData { history:Bar[]; future:Bar[]; macroEvents:MacroEvent[]; }
+export interface PuzzleData { history:Bar[]; future:Bar[]; macroEvents:MacroEvent[]; dataSource?:'historical'|'synthetic'; historicalSessionId?:string; historicalTradeDate?:string; historicalContract?:string; }
 export interface AppState {
   lang:Language;
   soundEnabled:boolean;
