@@ -46,7 +46,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'CLOSE_SKIP': return { ...state, skipModalOpen: false, skipReasonDraft: '' };
     case 'SET_SKIP_REASON': return { ...state, skipReason: action.reason, skipReasonMatch: action.match, aiSkipReason: action.aiReason };
     case 'SET_REPLAY': return { ...state, replayData: action.data, playbackIdx: action.idx, phase: 'REPLAY', isPlaying: false };
-    case 'TICK_REPLAY': return { ...state, playbackIdx: action.idx, replayData: action.data };
+    case 'TICK_REPLAY': return { ...state, playbackIdx: action.idx, replayData: action.data, phase: state.phase === 'DECISION' ? 'REPLAY' : state.phase };
     case 'SET_PLAYING': return { ...state, isPlaying: action.playing };
     case 'SET_SPEED': return { ...state, speed: action.speed };
     case 'SET_BRACKET': return { ...state, slOffset: action.slOffset ?? state.slOffset, tpOffset: action.tpOffset ?? state.tpOffset };
@@ -82,7 +82,7 @@ export function reducer(state: AppState, action: Action): AppState {
         speedRun: {
           ...state.speedRun,
           active: !done,
-          round: nextRound,
+          round: done ? state.speedRun.round : nextRound,
           correct: state.speedRun.correct + (action.correct ? 1 : 0),
           processMatch: state.speedRun.processMatch + (action.processMatch ? 1 : 0),
           rSum: +(state.speedRun.rSum + action.r).toFixed(2),
@@ -113,16 +113,18 @@ export function buildNextStats(current: Stats, decision: Decision, aiDecision: D
   let freezeUsedAt = current.freezeUsedAt ?? 0;
   let freezeUsed = false;
   let freezeStreak = 0;
-  const freezeReady = freezeAvailable > 0 || (freezeUsedAt > 0 && Date.now() - freezeUsedAt > FREEZE_WINDOW_MS);
+  const expired = freezeAvailable === 0 && freezeUsedAt > 0 && Date.now() - freezeUsedAt > FREEZE_WINDOW_MS;
+  if (expired) {
+    freezeAvailable = 1;
+    freezeUsedAt = 0;
+  }
+  const freezeReady = freezeAvailable > 0;
   if (delta < 0 && current.streak > 0 && freezeReady) {
     streak = current.streak;
     freezeAvailable = 0;
     freezeUsedAt = Date.now();
     freezeUsed = true;
     freezeStreak = current.streak;
-  } else if (freezeAvailable === 0 && freezeUsedAt > 0 && Date.now() - freezeUsedAt > FREEZE_WINDOW_MS) {
-    freezeAvailable = 1;
-    freezeUsedAt = 0;
   }
 
   const breakdown = cloneBreakdown(current.breakdown);
