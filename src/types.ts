@@ -1,6 +1,6 @@
 export type Language = 'en' | 'pt';
 export type Decision = 'LONG' | 'SHORT' | 'SKIP';
-export type Phase = 'HOME' | 'DECISION' | 'REPLAY' | 'RESULT' | 'SPEED_RESULT' | 'SPEED_SUMMARY';
+export type Phase = 'HOME' | 'DECISION' | 'REPLAY' | 'RESULT' | 'REVERSE_REPLAY' | 'SPEED_RESULT' | 'SPEED_SUMMARY';
 export type Mode = 'standard' | 'blind' | 'speed';
 export type TradeResult = 'WIN' | 'LOSS' | 'TIMEOUT' | 'FLATTEN' | 'SKIP' | null;
 
