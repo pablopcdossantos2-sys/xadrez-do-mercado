@@ -2,8 +2,8 @@ import { access, readFile } from 'node:fs/promises';
 
 const expected=[
   'index.html','package.json','vite.config.ts','tsconfig.json','tsconfig.app.json',
-  'src/main.tsx','src/App.tsx','src/TapeChart.tsx','src/types.ts','src/data.ts','src/difficulty.ts','src/analytics.ts','src/reducer.ts','src/rating.ts','src/cards.ts',
-  'src/storage.ts','src/translations.ts','src/styles.css','tests/pure.test.ts','public/sw.js','public/manifest.webmanifest','public/icon.svg'
+  'src/main.tsx','src/App.tsx','src/TapeChart.tsx','src/types.ts','src/data.ts','src/difficulty.ts','src/analytics.ts','src/reducer.ts','src/rating.ts','src/cards.ts','src/assets.ts','src/realData.ts',
+  'src/storage.ts','src/translations.ts','src/styles.css','tests/pure.test.ts','public/sw.js','public/manifest.webmanifest','public/icon.svg','docs/real-market-data-plan.pt-BR.md','docs/real-market-data-plan.en.md'
 ];
 for(const f of expected)await access(f);
 
@@ -36,6 +36,10 @@ const checks=[
  ['Daily challenge deterministic seed', app.includes('startDaily') && await readFile('src/data.ts','utf8').then(x=>x.includes('getDailyChallengeSeed'))],
  ['Collectible pattern cards', await readFile('src/cards.ts','utf8').then(x=>x.includes('PATTERN_CARDS')) && app.includes('collectedCards')],
  ['Offline PWA shell', index.includes('manifest.webmanifest') && await readFile('src/main.tsx','utf8').then(x=>x.includes("serviceWorker.register('/sw.js')")) && await readFile('public/sw.js','utf8').then(x=>x.includes("caches.open(CACHE)"))],
+ ['Multi-asset catalog', await readFile('src/assets.ts','utf8').then(x=>x.includes('WINFUT')&&x.includes('WDOFUT')&&x.includes('BIT'))],
+ ['Real OHLCV adapter', await readFile('src/realData.ts','utf8').then(x=>x.includes('parseOhlcvCsv')&&x.includes('parseOhlcvJson')&&x.includes('loadRealDataset'))],
+ ['Real-data migration plan', await readFile('docs/real-market-data-plan.pt-BR.md','utf8').then(x=>x.includes('Etapa 2')&&x.includes('Etapa 3')&&x.includes('Etapa 5'))],
+ ['Project branding', pkg.name==='xadrez-do-mercado' && index.includes('<title>Xadrez do Mercado</title>') && translations.includes("appName:'Xadrez do Mercado'")],
  ['Speed run 10 rounds / 15 min', app.includes('SPEED_TOTAL_ROUNDS=10') && app.includes('SPEED_SESSION_MS=15*60*1000') && reducer.includes('15 * 60 * 1000')],
  ['Speed run has no debrief', app.includes("state.phase==='SPEED_RESULT'&&<div className=\"speed-feedback\"") && !app.includes("state.phase==='SPEED_RESULT'&&<ResultPanel")],
  ['Translation parity guard', translations.includes('Translation dictionaries are out of sync')],
