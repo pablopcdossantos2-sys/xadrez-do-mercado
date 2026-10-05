@@ -63,10 +63,6 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 - A avaliação do analista usa regras e a janela futura simulada. Isso não constitui validação de estratégia nem demonstra capacidade preditiva.
 - O projeto é uma ferramenta de treinamento e não executa ordens no mercado.
 
-## Roadmap executado nesta versão
-
-Foram implementadas as pendências **10. Dificuldade adaptativa**, **15. Blind tape**, **16. Only structure vs Full context**, **17. Replay reverso pós-resultado**, **18. Session clock visual**, **19. Speed run**, **20. Revenge trade warning**, **29. Migrar para Vite + React + TypeScript**, **30. Testes para funções puras** e **32. Estado com useReducer**. Detalhes: [notas de implementação](docs/roadmap-implementation.md).
-
 ## Documentação
 
 - [Roadmap em português](docs/roadmap.pt-BR.md)
