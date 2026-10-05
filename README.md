@@ -6,53 +6,72 @@
 
 > Enigmas de xadrez, mas para day traders de futuros.
 
-Ferramenta de treinamento baseada em navegador para exercício de tomada de decisão em futuros, com foco em leitura de price action e escolhas Long, Short ou Skip.
+Ferramenta web de treinamento interativo para tomada de decisão em futuros, focada em leitura de price action e escolhas Long, Short ou Skip.
 
 ## Início rápido
 
-Abra `index.html` em um navegador moderno. Não há etapa local de build ou instalação.
+```bash
+npm install
+npm run dev
+```
 
-O projeto é executado no navegador e carrega suas dependências de interface a partir de CDNs. Não há backend, conta de usuário ou integração com corretora.
+Para produção:
+
+```bash
+npm run build
+```
 
 ## Como funciona
 
-### 1. Decisão
+Cada puzzle apresenta 82 barras de histórico e solicita uma decisão. No modo Padrão, as 38 barras futuras podem ser reproduzidas barra a barra, com bracket ajustável e Flatten. O resultado inclui avaliação baseada em regras, ELO, resultado em R, debrief e contrafactuais.
 
-O sistema apresenta uma janela de histórico com 82 barras e solicita uma única decisão: Long, Short ou Skip. O painel de contexto exibe informações como VWAP, ATR, médias móveis, níveis da sessão, instrumento, timeframe e playbook identificado.
+## Modos de treinamento
 
-### 2. Replay
+- **Padrão:** decisão + bracket ajustável + replay manual/automático.
+- **Blind tape:** durante a decisão, oculta contexto, playbook, indicadores, volume e rótulos explícitos de preço/tempo; esses elementos voltam após a escolha.
+- **Speed run:** 10 decisões dentro de uma janela global de 15 minutos, sem debrief intermediário; cada rodada é avaliada automaticamente e a próxima é carregada sem replay manual.
 
-Após a decisão, as 38 barras futuras são reproduzidas uma a uma. É possível ajustar stop loss e take profit, reproduzir automaticamente, avançar barra a barra, alterar a velocidade e encerrar a operação com Flatten.
+## Recursos
 
-### 3. Resultado e debrief
+- Geração procedural de séries OHLCV sintéticas.
+- MES e MNQ nos timeframes 1m, 5m, 15m e 1h.
+- Candles, volume, VWAP, EMA 20, DEMA e níveis de sessão.
+- Classificador de setups: Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push e Consolidation.
+- Analista baseado em regras com bracket de referência de 12 pontos de stop por 24 pontos de alvo.
+- Debrief contrafactual, detecção de armadilhas, Skip justificado e Freeze de sequência.
+- ELO, precisão, score de processo, streak e breakdown por setup, direção, timeframe e instrumento.
+- Journal local com até 200 decisões e exportação em JSON/CSV.
+- Interface bilíngue EN/PT-BR, som opcional e atalhos de teclado.
 
-A etapa final apresenta o resultado da operação, variação de ELO, score de processo, debrief e os resultados contrafactuais das alternativas Long, Short e Skip. Para decisões Skip, o sistema também registra e compara o motivo informado.
+## Arquitetura
 
-## Recursos implementados
+O projeto foi migrado da implementação monolítica para **Vite + React + TypeScript**. A interface está em `src/App.tsx`; análise em `src/analytics.ts`; geração de dados em `src/data.ts`; persistência em `src/storage.ts`; traduções em `src/translations.ts`; estado em `src/reducer.ts`; tipos em `src/types.ts`; e entrada React em `src/main.tsx`.
 
-- Geração procedural de séries intradiárias sintéticas em OHLCV.
-- Suporte aos instrumentos MES e MNQ e aos timeframes 1m, 5m, 15m e 1h.
-- Gráficos de candles com volume, VWAP, EMA, DEMA, níveis de sessão e linhas de entrada, stop e alvo.
-- Classificador de setups, incluindo Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push e Consolidation.
-- Analista baseado em regras para comparar Long, Short e Skip, usando um bracket de referência de 12 pontos de stop e 24 pontos de alvo.
-- Debrief contrafactual e leitura por quatro eixos: estrutura, volume, localização e confluência.
-- Detecção de algumas armadilhas de tape, justificativa para Skip e mecânica de proteção de streak por Freeze.
-- Estatísticas persistentes no navegador, incluindo ELO, acurácia, streak, resultado em R e breakdown por setup, direção, timeframe e instrumento.
-- Journal local das decisões, mantido em até 200 entradas, com exportação para JSON e CSV.
-- Interface bilíngue EN/PT-BR, feedback sonoro e atalhos de teclado.
+O estado interativo é centralizado em `useReducer`, evitando uma coleção de estados locais interdependentes.
 
-## Escopo atual e limitações
+## Verificação
 
-- As séries utilizadas pelo gerador atual são sintéticas e geradas proceduralmente; o projeto não usa, nesta implementação, um feed histórico real de MES/MNQ.
-- A classificação do analista é baseada em regras e nos resultados da janela futura simulada. Ela não constitui, por si só, validação de uma estratégia de trading nem demonstra capacidade preditiva.
-- O projeto é uma ferramenta de treinamento e não envia ordens ao mercado nem se conecta a uma corretora.
+- `npm run typecheck` — checagem TypeScript.
+- `npm run build` — checagem e build de produção.
+- `npm run audit` — auditoria estrutural da migração, modos, runtime e traduções.
+
+## Escopo e limitações
+
+- Os dados atuais são sintéticos e gerados proceduralmente; não há feed histórico real de MES/MNQ.
+- A avaliação do analista usa regras e a janela futura simulada. Isso não constitui validação de estratégia nem demonstra capacidade preditiva.
+- O projeto é uma ferramenta de treinamento e não executa ordens no mercado.
+
+## Roadmap executado nesta versão
+
+Foram implementadas as pendências **15. Blind tape**, **19. Speed run**, **29. Migrar para Vite + React + TypeScript** e **32. Estado com useReducer**. Detalhes: [notas de implementação](docs/roadmap-implementation.md).
 
 ## Documentação
 
 - [Roadmap em português](docs/roadmap.pt-BR.md)
 - [Roadmap em inglês](docs/roadmap.en.md)
+- [Notas de implementação](docs/roadmap-implementation.md)
 - [Tutorial para criação de puzzles — português](docs/tutorial-create-puzzles.pt-BR.md)
-- [Tutorial para criação de puzzles — inglês](docs/tutorial-create-puzzles.md)
+- [Puzzle creation tutorial — English](docs/tutorial-create-puzzles.md)
 
 ## 👤 Autoria e desenvolvimento
 
