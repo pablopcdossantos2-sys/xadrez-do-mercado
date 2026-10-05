@@ -36,7 +36,7 @@ Windows can come from real historical market data or the synthetic generator. **
 ## Features
 
 - Replay of real historical windows and procedural synthetic generation.
-- MES, MNQ, WINFUT, WDOFUT, and BIT across 1m, 5m, 15m, and 1h timeframes.
+- MES, MNQ, WINFUT, and WDOFUT across 1m, 5m, 15m, and 1h timeframes.
 - Candles, volume, VWAP, EMA 20, DEMA, and session levels.
 - Setup classifier covering Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push, and Consolidation.
 - Rule-based analyst with a 12-point stop / 24-point target reference bracket.
@@ -66,9 +66,9 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 - Synthetic generation remains available as a fallback.
 - Real-data integration is being designed around **historical datasets**, not real-time streaming.
-- The historical priority is WINFUT, WDOFUT, and BIT.
+- The historical priority is WINFUT and WDOFUT.
 - Raw historical market files may have their own usage/redistribution terms; the project should keep application code and market files separate when necessary.
-- WINFUT, WDOFUT, and BIT use the B3 product codes WIN, WDO, and BIT respectively.
+- WINFUT and WDOFUT use the B3 product codes WIN and WDO respectively.
 - Analyst grading uses only information available up to the decision point. This does not validate a trading strategy or demonstrate predictive capability.
 - The project is a training tool and does not place market orders.
 
