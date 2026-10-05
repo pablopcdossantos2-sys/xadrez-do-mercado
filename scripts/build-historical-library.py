@@ -334,6 +334,12 @@ def main() -> int:
             day_candidates = build_day(trade_date, read_derivative_rows(blob, trade_date))
             print(f"  candidate-assets={len(day_candidates)}")
             candidates.extend(day_candidates)
+            if all(
+                sum(1 for c in candidates if c["asset"] == asset) >= args.max_sessions
+                for asset in ASSETS
+            ):
+                print("ENOUGH: reached the requested session count for all assets")
+                break
         except (ValueError, zipfile.BadZipFile) as exc:
             print(f"  FAIL {trade_date}: {exc}", file=sys.stderr)
 
