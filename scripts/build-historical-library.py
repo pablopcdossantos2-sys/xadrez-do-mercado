@@ -31,9 +31,9 @@ OUT_ROOT = ROOT / "public" / "data" / "historical"
 MANIFEST = OUT_ROOT / "manifest.json"
 B3_URL = "https://drp.b3.com.br/rapinegocios/tickercsv/{date}?type=1"
 BRT = ZoneInfo("America/Sao_Paulo")
-ASSETS = {"WINFUT": "WIN", "WDOFUT": "WDO", "BIT": "BIT"}
+ASSETS = {"WINFUT": "WIN", "WDOFUT": "WDO"}
 TIMEFRAMES = {"1m": 60, "5m": 300, "15m": 900, "1h": 3600}
-CONTRACT_RE = re.compile(r"^(WIN|WDO|BIT)[A-Z]\d{2}$")
+CONTRACT_RE = re.compile(r"^(WIN|WDO)[A-Z]\d{2}$")
 RAW_COLUMNS = (
     "DataReferencia",
     "CodigoInstrumento",
@@ -368,7 +368,7 @@ def main() -> int:
         selected.extend(picked)
 
     if not selected:
-        raise RuntimeError("No historical WINFUT/WDOFUT/BIT sessions were produced.")
+        raise RuntimeError("No historical WINFUT/WDOFUT sessions were produced.")
 
     for old in OUT_ROOT.glob("*/*/*/*.json"):
         old.unlink()
