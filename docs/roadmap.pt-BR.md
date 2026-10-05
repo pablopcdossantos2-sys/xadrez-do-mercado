@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Roadmap de Melhorias
 
-> **Documento Estratégico** · v1.4
+> **Documento Estratégico** · v1.5
 >
 > 32 melhorias para transformar o Tape Puzzles de um jogo de adivinhação em uma ferramenta real de treino.
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 13 entregues · 19 pendentes
+**Resumo:** 32 itens · 4 tiers · 15 entregues · 17 pendentes
 
 ---
 
@@ -39,15 +39,22 @@ Marca cada puzzle com seu tipo de setup e mostra o rótulo na sidebar.
 
 ### 3. Validação da IA contra hindsight bias
 
-**Esforço:** Alto · **Status:** Parcial
+**Esforço:** Alto · **Status:** ✅ ENTREGUE
 
-A "resposta correta" atual é *qual lado bateu TP antes do SL* — hindsight puro. Aceitar múltiplas respostas válidas, usar árvore de regras auditável e expor score de confiança.
+O analista agora calcula uma **confiança baseada em sinais** para cada lado (estrutura, distância do VWAP, distância da EMA, viés do setup) *antes* de ver o futuro, e a expõe num `ConfidencePanel` com uma barra por opção. Um conjunto de **respostas aceitas** substitui a comparação exata: qualquer alternativa com confiança ≥ 0,30 que não perdeu feio é um resultado de processo válido. O skip passa a ser corretamente recompensado quando o setup era genuinamente ambíguo — em vez de ser silenciosamente punido pelo R avaliado com hindsight.
 
 ### 4. Realismo do gerador procedural
 
-**Esforço:** Alto · **Status:** Pendente
+**Esforço:** Alto · **Status:** ✅ ENTREGUE
 
-Injetar agrupamento de volatilidade, regimes de sessão, volume correlacionado com |retorno|, gaps de abertura. Alternativa: CSV histórico real de MES/MNQ.
+`generateMarketData` foi reescrita em torno de quatro fatos estilizados do mercado real:
+
+- **Regimes de sessão** — cada puzzle abre em um de *trend_up*, *trend_down*, *range*, *reversal* ou *chop*, que conduz o drift. O regime `reversal` inverte no meio da sessão.
+- **Agrupamento de volatilidade** — GARCH(1,1) com α = 0,12, β = 0,78. Barras de alta vol se agrupam, barras quietas ficam quietas, choques se propagam.
+- **Gap de abertura** — ±0,15% no começo da sessão.
+- **Forma do volume** — perfil intradiário em U, mais volume correlacionado com |retorno|. Movimentos grandes imprimem em volume grande, exatamente como no tape.
+
+O classificador agora vê setups de tendência, range e reversão com frequência realista, em vez de um emaranhado de random walk.
 
 ---
 
@@ -77,13 +84,13 @@ Painel objetivo com quatro eixos clássicos — estrutura, volume, localização
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Cada decisão é anexada a um diário local (últimas 200). Export em JSON ou CSV. Armazena motivo do skip, trap detectada e uso do freeze.
+Cada decisão é anexada a um diário local (últimas 200). Export em JSON ou CSV.
 
 ### 9. Skip justificado (com motivo)
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Ao Skip, um modal pergunta "Por quê?" com cinco razões canônicas (setup ruim, longe do VWAP, contra tendência, sem confluência, não sei). A escolha é comparada com a razão do analista e salva no journal.
+Ao Skip, um modal pergunta "Por quê?" com cinco razões canônicas. A escolha é comparada com a razão do analista e salva no journal.
 
 ### 10. Dificuldade adaptativa
 
@@ -95,7 +102,7 @@ Manter o usuário na zona de fluxo (60–75% de precisão) ajustando o ruído do
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-`detectTrap()` analisa o histórico visível e sinaliza padrões enganosos: corpo de barra gigante, rejeição por pavio dominante, whipsaw no VWAP, empurrão de 3 barras com volume decrescente, e rompimentos falhos nas últimas 4 barras. Banner aparece na sidebar durante a fase de decisão.
+`detectTrap()` sinaliza barras gigantes, pavios dominantes, whipsaws no VWAP e rompimentos falhos. Banner de aviso na sidebar durante a decisão.
 
 ---
 
@@ -131,13 +138,13 @@ Ocultar preço/tempo para forçar leitura de estrutura pura.
 
 **Esforço:** Baixo · **Status:** Pendente
 
-Toggle para esconder o contexto. Treina price action puro primeiro.
+Toggle para esconder o contexto.
 
 ### 17. Replay reverso pós-resultado
 
 **Esforço:** Médio · **Status:** Pendente
 
-Re-testar com outra escolha no mesmo puzzle. Calibração de confiança.
+Re-testar com outra escolha no mesmo puzzle.
 
 ### 18. Session clock visual
 
@@ -149,13 +156,13 @@ Barra com marcações 09:30, 10:00, 11:30, 13:00, 15:00, 16:00.
 
 **Esforço:** Baixo · **Status:** Pendente
 
-10 puzzles em 15 minutos, sem debrief. Warm-up antes da abertura.
+10 puzzles em 15 minutos, sem debrief.
 
 ### 20. Revenge trade warning
 
 **Esforço:** Baixo · **Status:** Pendente
 
-Detectar aumento de risco após losses e avisar. Ensina psicologia operacional.
+Detectar aumento de risco após losses e avisar.
 
 ---
 
@@ -179,25 +186,25 @@ Novato · Em Desenvolvimento · Consistente · Afiado · Institucional.
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Um freeze por dia. Se o usuário perde com streak > 0 e freeze disponível, a sequência é **preservada** e o freeze consumido. Reinicia automaticamente após 24h. Indicador na barra superior durante o jogo, e banner dedicado na fase de Resultado quando consumido. Som de duas notas toca no consumo.
+Um freeze por dia. Preserva a sequência em caso de loss; reinicia após 24h.
 
 ### 24. Onboarding em 30 segundos
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Overlay de 3 passos na primeira visita. A home explica como o jogo funciona.
+Overlay de 3 passos na primeira visita.
 
 ### 25. Responsividade mobile
 
 **Esforço:** Médio · **Status:** ✅ ENTREGUE
 
-Layout empilha verticalmente abaixo de `md`: gráfico ocupa os 40vh do topo, sidebar fica com o restante e rola sozinha. Barra superior envolve graciosamente; toggles de indicadores ocultos em telas pequenas; tabela do journal revela colunas progressivamente (`hidden sm:table-cell`, `hidden md:table-cell`, `hidden lg:table-cell`). Botões ganham `min-height: 40px` em toque. Pan/zoom de toque habilitado no gráfico. Atalhos de teclado desenfatizados em touch.
+Layout vertical abaixo de `md`. Gráfico 40vh em cima, sidebar embaixo.
 
 ### 26. Desafios diários com seed determinística
 
 **Esforço:** Médio · **Status:** Pendente
 
-1 puzzle/dia. Ranking local: você vs. você de ontem.
+1 puzzle/dia. Ranking local.
 
 ### 27. Cartas de padrão colecionáveis
 
@@ -209,19 +216,19 @@ Cada setup dominado vira uma "carta".
 
 **Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Hook `useSound` construído na **Web Audio API** — sem arquivos externos. Tones distintos para clique (decisão), chime (WIN), thud (LOSS), tique (SKIP) e um shimmer de duas notas (freeze consumido). Botão de toggle na barra superior; preferência persistida em `localStorage`. O contexto é criado preguiçosamente no primeiro gesto do usuário, então o navegador nunca bloqueia.
+Web Audio API — clique, chime, thud, tique, shimmer de freeze. Toggle persistido.
 
 ### 29. Migrar para Vite + React + TypeScript
 
 **Esforço:** Alto · **Status:** Recomendado
 
-Quando o single-file passar de ~2.000 LOC. Estrutura em módulos.
+Quando o single-file passar de ~2.000 LOC.
 
 ### 30. Testes para funções puras
 
 **Esforço:** Baixo · **Status:** Pendente
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady, computeSignalConfidence.
 
 ### 31. Modo offline (service worker)
 
@@ -243,6 +250,8 @@ Substituir os 12+ useState interdependentes.
 |---|------|------|---------|---------|--------|
 | 1 | Debrief contrafactual | T1 | Baixo | Altíssimo | ✅ ENTREGUE |
 | 2 | Playbook com setups rotulados | T1 | Médio | Altíssimo | ✅ ENTREGUE |
+| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | ✅ ENTREGUE |
+| 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | ✅ ENTREGUE |
 | 5 | Score de processo vs. resultado | T2 | Médio | Alto | ✅ ENTREGUE |
 | 6 | Heatmap "onde você erra" | T2 | Médio | Alto | ✅ ENTREGUE |
 | 7 | Debrief expandido "Por que não o outro lado?" | T2 | Baixo | Alto | ✅ ENTREGUE |
@@ -254,46 +263,30 @@ Substituir os 12+ useState interdependentes.
 | 24 | Onboarding em 30 segundos | T4 | Baixo | Médio | ✅ ENTREGUE |
 | 25 | Responsividade mobile | T4 | Médio | Médio | ✅ ENTREGUE |
 | 28 | Som sutil | T4 | Baixo | Médio | ✅ ENTREGUE |
-| 3 | Validação da IA (hindsight bias) | T1 | Alto | Altíssimo | Parcial |
-| 4 | Realismo do gerador procedural | T1 | Alto | Altíssimo (longo prazo) | Pendente |
 | 10 | Dificuldade adaptativa | T2 | Médio | Alto | Pendente |
 | 21 | ELO real (Glicko) | T4 | Médio | Médio-alto | Pendente |
 | 29 | Migração para Vite + TS | T4 | Alto | Habilitador | Recomendado |
 
 ### Quick wins — faça primeiro
 
-- ✅ Debrief contrafactual (#1)
-- ✅ Playbook com setups rotulados (#2)
-- ✅ Score de processo vs. resultado (#5)
-- ✅ Heatmap "onde você erra" (#6)
-- ✅ Debrief expandido "Por que não o outro lado?" (#7)
-- ✅ Journal por decisão com export (#8)
-- ✅ Skip justificado com motivo (#9)
-- ✅ Aviso de "armadilha do dia" (#11)
-- ✅ Patentes / níveis (#22)
-- ✅ Streak com freeze (#23)
-- ✅ Onboarding em 30 segundos (#24)
-- ✅ Responsividade mobile (#25)
-- ✅ Som sutil (#28)
+- ✅ Todos os 15 itens entregues
 - → Dificuldade adaptativa (#10)
+- → Curva de ELO real (#21)
 
 ### Investimentos estruturais
 
-- → Validação da IA (hindsight bias) (#3)
-- → Realismo do gerador (#4)
-- → Dificuldade adaptativa (#10)
 - → Migração para Vite + TS (#29)
+- → Testes para funções puras (#30)
+- → useReducer (#32)
 
 ---
 
 ## Resumo executivo
 
-Hoje, o Tape Puzzles é um *jogo bonito de adivinhar direção*. Para virar uma **ferramenta de treino real**, o pulo do gato está em três itens do Tier 1: **debrief contrafactual**, **rotulagem de setups** e **realismo dos dados**.
+Os dois itens do Tier 1 que ainda estavam abertos agora estão fechados. A **validação da IA** transformou a "resposta correta" de uma tautologia de hindsight em um julgamento justo e com múltiplas respostas possíveis, e a reescrita do **realismo do gerador** deu ao app uma base que de fato se parece com uma sessão de MES/MNQ. O tutorial agora recompensa as mesmas coisas que um coach de trading de verdade: processo sólido, independentemente de o mercado ter resolvido a favor hoje.
 
-A adição do **score de processo**, do **heatmap de fraquezas**, do **debrief expandido em quatro eixos**, do **journal por decisão**, do **skip justificado**, do **aviso de armadilha**, e do pacote de polish (**streak com freeze + som + mobile**) fecha o ciclo: o app agora separa boas decisões de bons resultados, diz exatamente onde a edge do usuário está faltando, explica *por que* o outro lado perdeu, mantém um registro persistente e exportável de cada decisão, pede que o usuário justifique os skips, avisa em tempo real sobre as armadilhas mais comuns, e finalmente funciona no celular.
-
-A próxima fronteira continua sendo o **realismo do gerador** (#4) — enquanto os dados não forem realistas, o resto é rodinha de bicicleta em pista sintética.
+Com 15 de 32 itens entregues — incluindo todo o Tier 1 e quase todo o Tier 2 — a próxima camada de trabalho é sobre **profundidade** (dificuldade adaptativa, ELO Glicko, microestrutura, eventos macro) e **engenharia** (migração para TypeScript, testes, useReducer). O loop de aprendizado agora está completo o bastante para que um usuário sério evolua sem que a ferramenta lute contra ele.
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.4 · 32 itens · 4 tiers · 13 entregues · 19 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.5 · 32 itens · 4 tiers · 15 entregues · 17 pendentes*
