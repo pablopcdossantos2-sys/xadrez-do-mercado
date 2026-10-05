@@ -63,7 +63,7 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 ## Roadmap completed in this version
 
-The pending items **15. Blind tape**, **19. Speed run**, **29. Migrate to Vite + React + TypeScript**, and **32. State with useReducer** have been implemented. Details: [implementation notes](docs/roadmap-implementation.md).
+The pending items **10. Adaptive difficulty**, **15. Blind tape**, **17. Reverse replay after result**, **19. Speed run**, **29. Migrate to Vite + React + TypeScript**, and **32. State with useReducer** have been implemented. Details: [implementation notes](docs/roadmap-implementation.md).
 
 ## Documentation
 
