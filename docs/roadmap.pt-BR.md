@@ -258,6 +258,8 @@ O estado interativo da aplicação foi centralizado em um React `useReducer` tip
 | 8 | Journal por decisão com export | T2 | Baixo | Alto | ✅ ENTREGUE |
 | 9 | Skip justificado (com motivo) | T2 | Baixo | Alto | ✅ ENTREGUE |
 | 11 | Aviso de "armadilha do dia" | T2 | Médio | Alto | ✅ ENTREGUE |
+| 15 | Modo "Blind tape" | T3 | Baixo | Médio-alto | ✅ ENTREGUE |
+| 19 | Modo "Speed run" | T3 | Baixo | Médio-alto | ✅ ENTREGUE |
 | 22 | Patentes / níveis | T4 | Baixo | Médio | ✅ ENTREGUE |
 | 23 | Streak com freeze | T4 | Baixo | Médio | ✅ ENTREGUE |
 | 24 | Onboarding em 30 segundos | T4 | Baixo | Médio | ✅ ENTREGUE |
@@ -266,6 +268,7 @@ O estado interativo da aplicação foi centralizado em um React `useReducer` tip
 | 10 | Dificuldade adaptativa | T2 | Médio | Alto | Pendente |
 | 21 | ELO real (Glicko) | T4 | Médio | Médio-alto | Pendente |
 | 29 | Migração para Vite + TS | T4 | Alto | Habilitador | ✅ ENTREGUE |
+| 32 | Estado com useReducer | T4 | Baixo | Habilitador | ✅ ENTREGUE |
 
 ### Quick wins — faça primeiro
 
