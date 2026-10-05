@@ -27,6 +27,8 @@
   }
   .fade-in { animation: fadeIn .35s ease-out both; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .bar-track { background: #0E1117; border-radius: 9999px; overflow: hidden; }
+  .bar-fill  { height: 100%; transition: width .4s ease; }
 </style>
 </head>
 <body>
@@ -42,7 +44,7 @@ const TRANSLATIONS = {
   en: {
     appName: 'Tape Puzzles',
     elo: 'ELO', solved: 'Solved', accuracy: 'Accuracy', streak: 'Streak', tradesR: 'Trades R',
-    best: 'best',
+    process: 'Process', best: 'best',
     loading: 'Loading Puzzle',
     headerDecision: 'Decision',
     decisionQ: 'Long, short, or skip?',
@@ -71,7 +73,6 @@ const TRANSLATIONS = {
     bestMove: 'best',
     counterfactualNote: 'Reference bracket 12 / 24 pts (1:2 R) applied to the same future bars.',
     outcomeWin: 'TP hit', outcomeLoss: 'SL hit', outcomeTimeout: 'Timeout', outcomeSkip: 'No trade',
-    barsHeld: 'bars',
     rowSessionMove: 'Session move',
     rowRange: 'Total range',
     rowAtr: 'ATR(14)',
@@ -117,30 +118,38 @@ const TRANSLATIONS = {
     rankSharp: 'Sharp',
     rankInstitutional: 'Institutional',
     noPlayYet: 'Play your first puzzle to see stats here.',
+    processHint: 'Process = decisions matching the analyst. Outcome = accuracy of results.',
+    insightUnlucky: 'Process ahead of outcome. You are making good decisions — the market just isn\'t cooperating. Stay disciplined; variance averages out.',
+    insightLucky: 'Outcomes ahead of process. You\'ve been running hot. Watch out for reinforcing bad habits that got lucky.',
+    insightBalanced: 'Process and outcome are aligned. You\'re on the right track.',
+    whereYouFail: 'Where you fail',
+    whereYouFailSub: 'Process accuracy per bucket — sorted weakest first. Buckets with fewer than 2 samples are hidden.',
+    minSample: 'min sample: 2',
+    notEnoughData: 'Not enough data yet',
+    playToSee: 'Play a few puzzles to see your weak spots here.',
+    catSetup: 'By setup',
+    catDirection: 'By direction',
+    catTimeframe: 'By timeframe',
+    catInstrument: 'By instrument',
+    resetStats: 'Reset stats',
+    confirmReset: 'Reset all stats? This cannot be undone.',
     keyboardShortcuts: 'Keyboard shortcuts',
     kbDecision: 'Decision phase',
     kbReplay: 'Replay phase',
     kbResult: 'Result phase',
-    kbLong: 'Long',
-    kbShort: 'Short',
-    kbSkip: 'Skip',
-    kbPlayPause: 'Play / Pause',
-    kbStep: 'Step one bar',
-    kbFlatten: 'Flatten position',
-    kbNext: 'Next puzzle',
-    kbHome: 'Back to home',
     kbGeneral: 'Anywhere',
+    kbLong: 'Long', kbShort: 'Short', kbSkip: 'Skip',
+    kbPlayPause: 'Play / Pause', kbStep: 'Step one bar',
+    kbFlatten: 'Flatten position', kbNext: 'Next puzzle', kbHome: 'Back to home',
     disclaimerTitle: 'Disclaimer',
     disclaimer: 'Educational tool only. Simulated performance does not guarantee live results. Trading futures involves substantial risk of loss.',
     footerMadeWith: 'Runs entirely in your browser. No account, no backend, no tracking.',
     readyToStart: 'Ready when you are.',
-    resetStats: 'Reset stats',
-    confirmReset: 'Reset all stats? This cannot be undone.',
   },
   pt: {
     appName: 'Tape Puzzles',
     elo: 'ELO', solved: 'Resolvidos', accuracy: 'Precisão', streak: 'Sequência', tradesR: 'R Total',
-    best: 'recorde',
+    process: 'Processo', best: 'recorde',
     loading: 'Carregando Puzzle',
     headerDecision: 'Decisão',
     decisionQ: 'Long, short, ou skip?',
@@ -169,7 +178,6 @@ const TRANSLATIONS = {
     bestMove: 'melhor',
     counterfactualNote: 'Bracket de referência 12 / 24 pts (1:2 R) aplicado às mesmas barras futuras.',
     outcomeWin: 'TP batido', outcomeLoss: 'SL batido', outcomeTimeout: 'Timeout', outcomeSkip: 'Sem trade',
-    barsHeld: 'barras',
     rowSessionMove: 'Variação da sessão',
     rowRange: 'Range total',
     rowAtr: 'ATR(14)',
@@ -214,25 +222,33 @@ const TRANSLATIONS = {
     rankSharp: 'Afiado',
     rankInstitutional: 'Institucional',
     noPlayYet: 'Jogue seu primeiro puzzle para ver as estatísticas aqui.',
+    processHint: 'Processo = decisões que batem com o analista. Resultado = acerto no R final.',
+    insightUnlucky: 'Processo à frente do resultado. Você está tomando boas decisões — o mercado só não está cooperando. Mantenha a disciplina; a variância se equilibra.',
+    insightLucky: 'Resultado à frente do processo. Você está com sorte. Cuidado com vícios reforçados que deram certo por acaso.',
+    insightBalanced: 'Processo e resultado alinhados. Você está no caminho certo.',
+    whereYouFail: 'Onde você erra',
+    whereYouFailSub: 'Precisão de processo por bucket — ordenado do pior para o melhor. Buckets com menos de 2 amostras são ocultados.',
+    minSample: 'amostra mínima: 2',
+    notEnoughData: 'Ainda sem dados suficientes',
+    playToSee: 'Jogue alguns puzzles para ver seus pontos fracos aqui.',
+    catSetup: 'Por setup',
+    catDirection: 'Por direção',
+    catTimeframe: 'Por timeframe',
+    catInstrument: 'Por instrumento',
+    resetStats: 'Resetar estatísticas',
+    confirmReset: 'Resetar todas as estatísticas? Não pode ser desfeito.',
     keyboardShortcuts: 'Atalhos de teclado',
     kbDecision: 'Fase de Decisão',
     kbReplay: 'Fase de Replay',
     kbResult: 'Fase de Resultado',
-    kbLong: 'Long',
-    kbShort: 'Short',
-    kbSkip: 'Skip',
-    kbPlayPause: 'Play / Pause',
-    kbStep: 'Avançar uma barra',
-    kbFlatten: 'Zerar posição',
-    kbNext: 'Próximo puzzle',
-    kbHome: 'Voltar ao início',
     kbGeneral: 'Em qualquer lugar',
+    kbLong: 'Long', kbShort: 'Short', kbSkip: 'Skip',
+    kbPlayPause: 'Play / Pause', kbStep: 'Avançar uma barra',
+    kbFlatten: 'Zerar posição', kbNext: 'Próximo puzzle', kbHome: 'Voltar ao início',
     disclaimerTitle: 'Aviso',
     disclaimer: 'Ferramenta apenas educacional. Desempenho simulado não garante resultados reais. Operar futuros envolve risco substancial de perda.',
     footerMadeWith: 'Roda inteiramente no seu navegador. Sem conta, sem backend, sem rastreamento.',
     readyToStart: 'Quando quiser.',
-    resetStats: 'Resetar estatísticas',
-    confirmReset: 'Resetar todas as estatísticas? Não pode ser desfeito.',
   },
 };
 
@@ -254,6 +270,42 @@ function rankFromElo(elo, t) {
   if (elo < 1600) return { key: 'Consistent',    label: t('rankConsistent'),    color: '#26a69a' };
   if (elo < 1800) return { key: 'Sharp',         label: t('rankSharp'),         color: '#FF9800' };
   return               { key: 'Institutional', label: t('rankInstitutional'), color: '#ef5350' };
+}
+
+/* ============================================================================
+   Stats / breakdown helpers
+============================================================================ */
+function emptyBucket() { return { n: 0, correct: 0, processMatch: 0, rSum: 0 }; }
+function emptyBreakdown() {
+  return { bySetup: {}, byTimeframe: {}, byDirection: {}, byInstrument: {} };
+}
+function recordBucket(obj, key, patch) {
+  if (!obj[key]) obj[key] = emptyBucket();
+  obj[key].n += 1;
+  obj[key].correct += patch.correct ? 1 : 0;
+  obj[key].processMatch += patch.processMatch ? 1 : 0;
+  obj[key].rSum = +(obj[key].rSum + (patch.r || 0)).toFixed(2);
+}
+function cloneBreakdown(b) {
+  const out = emptyBreakdown();
+  for (const k of ['bySetup', 'byTimeframe', 'byDirection', 'byInstrument']) {
+    out[k] = {};
+    for (const key of Object.keys(b?.[k] || {})) {
+      out[k][key] = { ...emptyBucket(), ...b[k][key] };
+    }
+  }
+  return out;
+}
+function migrateStats(s) {
+  const base = {
+    elo: 1236, solved: 0, correct: 0, processMatch: 0,
+    streak: 0, bestStreak: 0, rSum: 0, breakdown: emptyBreakdown(),
+  };
+  if (!s) return base;
+  const merged = { ...base, ...s };
+  if (typeof merged.processMatch !== 'number') merged.processMatch = 0;
+  if (!merged.breakdown) merged.breakdown = emptyBreakdown();
+  return merged;
 }
 
 /* ============================================================================
@@ -304,9 +356,14 @@ const WarningIcon = () => (
     <path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z" />
   </svg>
 );
+const MapIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+    <path d="M228.92,49.69a8,8,0,0,0-6.86-1.45L160.93,63.52,99.58,32.84a8,8,0,0,0-5.52-.6l-64,16A8,8,0,0,0,24,56V200a8,8,0,0,0,9.94,7.76l61.13-15.28,61.35,30.68A8.15,8.15,0,0,0,160,224a8,8,0,0,0,1.94-.24l64-16A8,8,0,0,0,232,200V56A8,8,0,0,0,228.92,49.69Z" />
+  </svg>
+);
 
 /* ============================================================================
-   Hero chart SVG preview
+   Hero chart preview
 ============================================================================ */
 function HeroChartPreview() {
   const bars = [
@@ -330,15 +387,8 @@ function HeroChartPreview() {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto rounded-lg border border-[#2B2B43] bg-[#131722]">
-      <defs>
-        <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2962FF" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#2962FF" stopOpacity="0" />
-        </linearGradient>
-      </defs>
       {[0,1,2,3].map(i => (
-        <line key={i} x1={0} x2={W} y1={pad + i * ((H - pad * 2) / 3)} y2={pad + i * ((H - pad * 2) / 3)}
-          stroke="#1f2430" strokeWidth="1" />
+        <line key={i} x1={0} x2={W} y1={pad + i * ((H - pad * 2) / 3)} y2={pad + i * ((H - pad * 2) / 3)} stroke="#1f2430" strokeWidth="1" />
       ))}
       {bars.map((b, i) => {
         const cx = pad + barW * i + barW / 2;
@@ -348,8 +398,7 @@ function HeroChartPreview() {
         return (
           <g key={i}>
             <line x1={cx} x2={cx} y1={yOf(b.h)} y2={yOf(b.l)} stroke={color} strokeWidth="1.5" />
-            <rect x={cx - barW * 0.28} y={bodyTop} width={barW * 0.56}
-              height={Math.max(1.5, bodyBot - bodyTop)} fill={color} rx="1" />
+            <rect x={cx - barW * 0.28} y={bodyTop} width={barW * 0.56} height={Math.max(1.5, bodyBot - bodyTop)} fill={color} rx="1" />
           </g>
         );
       })}
@@ -700,7 +749,7 @@ function LanguageToggle({ lang, setLang, className = '' }) {
 }
 
 /* ============================================================================
-   Counterfactual
+   Counterfactual panel
 ============================================================================ */
 function CounterfactualPanel({ outcomes, userDecision, tradeResult, userR }) {
   const { t } = useT();
@@ -763,16 +812,116 @@ function CounterfactualPanel({ outcomes, userDecision, tradeResult, userR }) {
 }
 
 /* ============================================================================
+   Weakness Panel (roadmap #6)
+============================================================================ */
+function accColor(p) { return p >= 0.7 ? '#26a69a' : p >= 0.4 ? '#ffa726' : '#ef5350'; }
+
+function BreakdownBar({ value }) {
+  const pct = Math.max(0, Math.min(1, value)) * 100;
+  return (
+    <div className="bar-track h-1.5 w-full">
+      <div className="bar-fill" style={{ width: `${pct}%`, background: accColor(value) }} />
+    </div>
+  );
+}
+
+function BreakdownSection({ title, rows, emptyLabel, subLabel }) {
+  if (rows.length === 0) {
+    return (
+      <div className="bg-[#0E1117]/60 border border-[#2B2B43] rounded-lg p-3">
+        <div className="text-gray-500 text-[10px] uppercase font-mono mb-2">{title}</div>
+        <div className="text-gray-600 text-[11px] italic">{emptyLabel}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="bg-[#0E1117]/60 border border-[#2B2B43] rounded-lg p-3">
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-gray-500 text-[10px] uppercase font-mono">{title}</div>
+        {subLabel && <div className="text-gray-600 text-[9px] font-mono">{subLabel}</div>}
+      </div>
+      <div className="space-y-2">
+        {rows.slice(0, 5).map(r => (
+          <div key={r.key}>
+            <div className="flex items-center justify-between text-[11px] mb-1">
+              <span className="text-gray-300 font-mono truncate pr-2">{r.label}</span>
+              <span className="font-mono shrink-0" style={{ color: accColor(r.processAcc) }}>
+                {Math.round(r.processAcc * 100)}%
+                <span className="text-gray-600 ml-1.5">n={r.n}</span>
+              </span>
+            </div>
+            <BreakdownBar value={r.processAcc} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WeaknessPanel({ breakdown, lang, t }) {
+  const toRows = (obj, labelFn) => {
+    return Object.entries(obj || {})
+      .filter(([_, b]) => b.n >= 2)
+      .map(([k, b]) => ({
+        key: k,
+        label: labelFn(k, b),
+        n: b.n,
+        processAcc: b.n > 0 ? b.processMatch / b.n : 0,
+        outcomeAcc: b.n > 0 ? b.correct / b.n : 0,
+        rSum: b.rSum,
+      }))
+      .sort((a, b) => a.processAcc - b.processAcc);
+  };
+
+  const setupRows = toRows(breakdown.bySetup, (id, b) => lang === 'pt' ? (b.labelPt || id) : (b.labelEn || id));
+  const dirRows   = toRows(breakdown.byDirection, (k) => k);
+  const tfRows    = toRows(breakdown.byTimeframe, (k) => k);
+  const instrRows = toRows(breakdown.byInstrument, (k) => k);
+
+  const anyData = setupRows.length + dirRows.length + tfRows.length + instrRows.length > 0;
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest">
+          {t('whereYouFail')}
+        </div>
+        <div className="text-[9px] text-gray-600 font-mono">{t('minSample')}</div>
+      </div>
+      <p className="text-gray-400 text-xs mb-5 max-w-3xl leading-relaxed">
+        {t('whereYouFailSub')}
+      </p>
+      {!anyData ? (
+        <div className="bg-[#131722] border border-[#2B2B43] rounded-xl p-6 text-center">
+          <p className="text-gray-500 text-xs italic">{t('playToSee')}</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-3">
+          <BreakdownSection title={t('catSetup')} rows={setupRows} emptyLabel={t('notEnoughData')} subLabel="process %" />
+          <BreakdownSection title={t('catDirection')} rows={dirRows} emptyLabel={t('notEnoughData')} subLabel="process %" />
+          <BreakdownSection title={t('catTimeframe')} rows={tfRows} emptyLabel={t('notEnoughData')} subLabel="process %" />
+          <BreakdownSection title={t('catInstrument')} rows={instrRows} emptyLabel={t('notEnoughData')} subLabel="process %" />
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ============================================================================
    Home Screen
 ============================================================================ */
-function HomeScreen({ stats, onStart, lang, setLang }) {
+function HomeScreen({ stats, onStart, lang, setLang, onOpenRoadmap }) {
   const { t } = useT();
   const accuracy = stats.solved === 0 ? 0 : Math.round((stats.correct / stats.solved) * 100);
+  const processAccuracy = stats.solved === 0 ? 0 : Math.round(((stats.processMatch || 0) / stats.solved) * 100);
   const rank = rankFromElo(stats.elo, t);
 
   const handleReset = () => {
     if (window.confirm(t('confirmReset'))) {
-      try { localStorage.removeItem('tape_puzzle_stats_v3'); localStorage.removeItem('tape_puzzle_played'); } catch (e) {}
+      try {
+        localStorage.removeItem('tape_puzzle_stats_v3');
+        localStorage.removeItem('tape_puzzle_played');
+      } catch (e) {}
       window.location.reload();
     }
   };
@@ -800,19 +949,38 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
     { phase: t('kbGeneral'),  keys: [['Esc', t('kbHome')]] },
   ];
 
+  let insight = null;
+  if (stats.solved >= 5) {
+    if (processAccuracy > accuracy + 5) insight = { tone: 'warn', text: t('insightUnlucky') };
+    else if (accuracy > processAccuracy + 5) insight = { tone: 'danger', text: t('insightLucky') };
+    else insight = { tone: 'good', text: t('insightBalanced') };
+  }
+  const insightColor =
+    insight?.tone === 'good' ? '#26a69a' :
+    insight?.tone === 'warn' ? '#ffa726' :
+    insight?.tone === 'danger' ? '#ef5350' : null;
+
   return (
     <div className="flex-1 overflow-y-auto bg-[#0E1117] fade-in">
-      {/* HERO */}
       <div className="grid-bg border-b border-[#2B2B43]">
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex justify-between items-start mb-8">
+          <div className="flex justify-between items-start mb-8 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2962FF] to-[#0d3ab5] flex items-center justify-center">
                 <TrophyIcon />
               </div>
               <div className="text-white font-bold text-lg">{t('appName')}</div>
             </div>
-            <LanguageToggle lang={lang} setLang={setLang} />
+            <div className="flex items-center gap-2">
+              {onOpenRoadmap && (
+                <button onClick={onOpenRoadmap}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-gray-300 hover:text-white bg-[#1A1E29] hover:bg-[#2B2B43] border border-[#2B2B43] rounded-lg transition">
+                  <MapIcon />
+                  Roadmap
+                </button>
+              )}
+              <LanguageToggle lang={lang} setLang={setLang} />
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -829,9 +997,7 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
                   <PlayIcon />
                   {t('startTraining')}
                 </button>
-                <span className="text-gray-600 text-[11px] font-mono">
-                  {t('heroFooter')}
-                </span>
+                <span className="text-gray-600 text-[11px] font-mono">{t('heroFooter')}</span>
               </div>
             </div>
             <div className="hidden md:block">
@@ -843,7 +1009,6 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
 
       <div className="max-w-6xl mx-auto px-6 py-12 space-y-14">
 
-        {/* HOW IT WORKS */}
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">
             {t('howItWorks')}
@@ -863,7 +1028,6 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
           </div>
         </section>
 
-        {/* WHY DIFFERENT */}
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">
             {t('whyDifferent')}
@@ -879,7 +1043,6 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
           </div>
         </section>
 
-        {/* NUMBERS */}
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">
             {t('byTheNumbers')}
@@ -895,7 +1058,7 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
           </div>
         </section>
 
-        {/* YOUR PROGRESS */}
+        {/* YOUR PROGRESS (now with process score + insight) */}
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">
             {t('yourProgress')}
@@ -919,22 +1082,36 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
                 </button>
               )}
             </div>
+
             {stats.solved === 0 ? (
               <p className="text-gray-500 text-xs italic">{t('noPlayYet')}</p>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-3 border-t border-[#2B2B43]">
-                <StatCell label={t('elo')} value={stats.elo} />
-                <StatCell label={t('solved')} value={stats.solved} />
-                <StatCell label={t('accuracy')} value={`${accuracy}%`} />
-                <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
-                <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`}
-                  color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
-              </div>
+              <>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-4 pt-3 border-t border-[#2B2B43]">
+                  <StatCell label={t('elo')} value={stats.elo} />
+                  <StatCell label={t('process')} value={`${processAccuracy}%`}
+                    color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
+                  <StatCell label={t('solved')} value={stats.solved} />
+                  <StatCell label={t('accuracy')} value={`${accuracy}%`} />
+                  <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
+                  <StatCell label={t('tradesR')} value={`${stats.rSum >= 0 ? '+' : ''}${stats.rSum.toFixed(2)}R`}
+                    color={stats.rSum >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'} />
+                </div>
+                <p className="text-[10px] text-gray-600 mt-3 font-mono">{t('processHint')}</p>
+                {insight && (
+                  <div className="mt-3 pt-3 border-t border-[#2B2B43] text-[11px] leading-relaxed flex gap-2">
+                    <div className="w-1 rounded shrink-0" style={{ background: insightColor }} />
+                    <span style={{ color: insightColor }}>{insight.text}</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>
 
-        {/* KEYBOARD SHORTCUTS */}
+        {/* WEAKNESS HEATMAP (roadmap #6) */}
+        <WeaknessPanel breakdown={stats.breakdown || emptyBreakdown()} lang={lang} t={t} />
+
         <section>
           <div className="text-[11px] uppercase text-gray-500 font-bold tracking-widest mb-6">
             {t('keyboardShortcuts')}
@@ -958,11 +1135,8 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
           </div>
         </section>
 
-        {/* DISCLAIMER */}
         <section className="bg-[#131722] border border-[#2B2B43] rounded-xl p-5 border-l-4 border-l-[#ef5350] flex gap-3">
-          <div className="text-[#ef5350] shrink-0 mt-0.5">
-            <WarningIcon />
-          </div>
+          <div className="text-[#ef5350] shrink-0 mt-0.5"><WarningIcon /></div>
           <div>
             <div className="text-[11px] uppercase text-[#ef5350] font-bold tracking-widest mb-2">
               {t('disclaimerTitle')}
@@ -971,7 +1145,6 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
           </div>
         </section>
 
-        {/* FINAL CTA */}
         <section className="text-center pb-4">
           <button onClick={onStart}
             className="px-6 py-3 bg-[#2962FF] hover:bg-blue-500 text-white rounded-lg font-bold shadow-lg transition inline-flex items-center gap-2 text-sm">
@@ -991,7 +1164,6 @@ function HomeScreen({ stats, onStart, lang, setLang }) {
    App
 ============================================================================ */
 function App() {
-  // EN is the default (only switches if user picks PT)
   const [lang, setLang] = useState(() => {
     try { return localStorage.getItem('tape_puzzle_lang') || 'en'; } catch (e) { return 'en'; }
   });
@@ -1002,8 +1174,11 @@ function App() {
   const i18nValue = useMemo(() => ({ lang, t, setLang }), [lang, t]);
 
   const [stats, setStats] = useState(() => {
-    try { const s = localStorage.getItem('tape_puzzle_stats_v3'); if (s) return JSON.parse(s); } catch (e) {}
-    return { elo: 1236, solved: 0, correct: 0, streak: 0, bestStreak: 0, rSum: 0 };
+    try {
+      const s = localStorage.getItem('tape_puzzle_stats_v3');
+      if (s) return migrateStats(JSON.parse(s));
+    } catch (e) {}
+    return migrateStats(null);
   });
   useEffect(() => { try { localStorage.setItem('tape_puzzle_stats_v3', JSON.stringify(stats)); } catch (e) {} }, [stats]);
 
@@ -1051,6 +1226,9 @@ function App() {
 
   const goHome = useCallback(() => { setPhase('HOME'); setIsPlaying(false); }, []);
   const startTraining = useCallback(() => { loadNewPuzzle(timeframe, instrument); }, [loadNewPuzzle, timeframe, instrument]);
+  const openRoadmap = useCallback(() => {
+    window.open('roadmap-en.html', '_blank', 'noopener');
+  }, []);
 
   useEffect(() => {
     if (phase === 'HOME') return;
@@ -1064,30 +1242,55 @@ function App() {
     ? (userDecision === 'LONG' ? entryPrice + tpOffset : entryPrice - tpOffset) : null;
 
   const evaluateResult = useCallback((resultType, rMult) => {
-    setPhase('RESULT'); setTradeResult(resultType);
-    setRMultiple(rMult ?? 0); setIsPlaying(false);
+    setPhase('RESULT');
+    setTradeResult(resultType);
+    setRMultiple(rMult ?? 0);
+    setIsPlaying(false);
+
     const aiDec = aiData ? aiData.decision : 'SKIP';
-    const isCorrect =
-      resultType === 'WIN' ||
-      (resultType === 'SKIP' && userDecision === 'SKIP' && aiDec === 'SKIP') ||
-      (resultType === 'FLATTEN' && (rMult ?? 0) > 0 && aiDec === userDecision);
+    const processMatch = userDecision === aiDec;
+
+    let outcomeCorrect = false;
+    if (resultType === 'WIN') outcomeCorrect = true;
+    else if (resultType === 'SKIP' && userDecision === 'SKIP' && aiDec === 'SKIP') outcomeCorrect = true;
+    else if (resultType === 'FLATTEN' && (rMult ?? 0) > 0 && aiDec === userDecision) outcomeCorrect = true;
+
     let delta = 0;
     if (resultType === 'WIN' || (resultType === 'SKIP' && userDecision === 'SKIP' && aiDec === 'SKIP')) delta = 18;
     else if (resultType === 'FLATTEN' && (rMult ?? 0) > 0) delta = 8;
     else delta = -15;
     setEloDelta(delta);
+
     setStats(prev => {
       const newStreak = delta > 0 ? prev.streak + 1 : 0;
+      const breakdown = cloneBreakdown(prev.breakdown);
+      const patch = { correct: outcomeCorrect, processMatch, r: rMult ?? 0 };
+
+      if (aiData?.setup?.id) {
+        const sid = aiData.setup.id;
+        recordBucket(breakdown.bySetup, sid, patch);
+        if (!breakdown.bySetup[sid].labelEn) {
+          breakdown.bySetup[sid].labelEn = aiData.setup.en;
+          breakdown.bySetup[sid].labelPt = aiData.setup.pt;
+        }
+      }
+      recordBucket(breakdown.byTimeframe, timeframe, patch);
+      recordBucket(breakdown.byDirection, userDecision, patch);
+      recordBucket(breakdown.byInstrument, instrument, patch);
+
       return {
+        ...prev,
         elo: Math.max(0, prev.elo + delta),
         solved: prev.solved + 1,
-        correct: prev.correct + (isCorrect ? 1 : 0),
+        correct: prev.correct + (outcomeCorrect ? 1 : 0),
+        processMatch: (prev.processMatch || 0) + (processMatch ? 1 : 0),
         streak: newStreak,
         bestStreak: Math.max(prev.bestStreak || 0, newStreak),
         rSum: +(prev.rSum + (rMult ?? 0)).toFixed(2),
+        breakdown,
       };
     });
-  }, [aiData, userDecision]);
+  }, [aiData, userDecision, timeframe, instrument]);
 
   const handleDecision = useCallback((decision) => {
     if (phase !== 'DECISION') return;
@@ -1153,6 +1356,7 @@ function App() {
   }, [phase, handleDecision, advancePlayback, handleFlatten, loadNewPuzzle, goHome]);
 
   const accuracy = stats.solved === 0 ? 0 : Math.round((stats.correct / stats.solved) * 100);
+  const processAccuracy = stats.solved === 0 ? 0 : Math.round(((stats.processMatch || 0) / stats.solved) * 100);
 
   const contextRows = useMemo(() => {
     if (!aiData || puzzleData.history.length === 0) return [];
@@ -1218,8 +1422,10 @@ function App() {
                 ))}
               </div>
             </div>
-            <div className="hidden lg:flex items-center space-x-6 font-mono">
+            <div className="hidden lg:flex items-center space-x-5 font-mono">
               <StatCell label={t('elo')} value={stats.elo} />
+              <StatCell label={t('process')} value={`${processAccuracy}%`}
+                color={processAccuracy >= 60 ? 'text-[#26a69a]' : processAccuracy >= 40 ? 'text-[#ffa726]' : 'text-[#ef5350]'} />
               <StatCell label={t('solved')} value={stats.solved} />
               <StatCell label={t('accuracy')} value={`${accuracy}%`} />
               <StatCell label={t('streak')} value={`${stats.streak} (${t('best')} ${stats.bestStreak})`} color="text-[#26a69a]" />
@@ -1248,7 +1454,8 @@ function App() {
         )}
 
         {isHome ? (
-          <HomeScreen stats={{ ...stats, played: puzzlesPlayed }} onStart={startTraining} lang={lang} setLang={setLang} />
+          <HomeScreen stats={{ ...stats, played: puzzlesPlayed }} onStart={startTraining}
+            lang={lang} setLang={setLang} onOpenRoadmap={openRoadmap} />
         ) : (
           <div className="flex flex-1 overflow-hidden relative min-h-0">
             <div className="flex-1 bg-[#131722] relative min-w-0">
