@@ -22,7 +22,3 @@ Open index.html in any modern browser. No build, no install.
 ## Roadmap
 
 See docs/roadmap.html.
-
-## License
-
-MIT — see LICENSE.
