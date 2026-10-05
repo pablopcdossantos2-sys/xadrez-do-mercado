@@ -2,6 +2,7 @@ export type Language = 'en' | 'pt';
 export type Decision = 'LONG' | 'SHORT' | 'SKIP';
 export type Phase = 'HOME' | 'DECISION' | 'REPLAY' | 'RESULT' | 'REVERSE_REPLAY' | 'SPEED_RESULT' | 'SPEED_SUMMARY';
 export type Mode = 'standard' | 'blind' | 'speed';
+export type ContextMode = 'full' | 'structure';
 export type TradeResult = 'WIN' | 'LOSS' | 'TIMEOUT' | 'FLATTEN' | 'SKIP' | null;
 
 export interface Bar { time:number; open:number; high:number; low:number; close:number; volume:number; }
@@ -19,11 +20,12 @@ export type Timeframe = '1m'|'5m'|'15m'|'1h';
 export interface JournalEntry { ts:number; puzzleId:number; instrument:Instrument; timeframe:Timeframe; mode:Mode; setup:{id:string;en:string;pt:string}|null; decision:Decision; aiDecision:Decision; processMatch:boolean; outcome:Exclude<TradeResult,null>; r:number; entry:number|null; slOffset:number; tpOffset:number; skipReason:string|null; skipReasonMatch:boolean|null; trap:string|null; freezeUsed:boolean; speedRunRound:number|null; speedRunDurationMs:number|null; }
 export interface SpeedRun { active:boolean; round:number; totalRounds:number; correct:number; processMatch:number; rSum:number; startedAt:number; deadlineAt:number; lastDurationMs:number|null; }
 export interface PuzzleData { history:Bar[]; future:Bar[]; }
-export interface AppState { lang:Language; soundEnabled:boolean; stats:Stats; journal:JournalEntry[]; timeframe:Timeframe; instrument:Instrument; mode:Mode; showVwap:boolean; showEma:boolean; showDema:boolean; showLevels:boolean; showVol:boolean; phase:Phase; puzzleData:PuzzleData; replayData:Bar[]; aiData:PuzzleAnalysis|null; userDecision:Decision|null; entryPrice:number|null; slOffset:number; tpOffset:number; playbackIdx:number; isPlaying:boolean; speed:number; tradeResult:TradeResult; rMultiple:number; eloDelta:number; debriefAxes:DebriefAxis[]; trap:TrapInfo|null; skipReason:string|null; skipReasonMatch:boolean|null; aiSkipReason:string|null; freezeUsedThisPuzzle:boolean; freezeStreakValue:number; puzzleId:number; speedRun:SpeedRun; skipModalOpen:boolean; skipReasonDraft:string; clockNow:number; }
+export interface AppState { lang:Language; soundEnabled:boolean; stats:Stats; journal:JournalEntry[]; timeframe:Timeframe; instrument:Instrument; mode:Mode; showVwap:boolean; showEma:boolean; showDema:boolean; showLevels:boolean; showVol:boolean; contextMode:ContextMode; phase:Phase; puzzleData:PuzzleData; replayData:Bar[]; aiData:PuzzleAnalysis|null; userDecision:Decision|null; entryPrice:number|null; slOffset:number; tpOffset:number; playbackIdx:number; isPlaying:boolean; speed:number; tradeResult:TradeResult; rMultiple:number; eloDelta:number; debriefAxes:DebriefAxis[]; trap:TrapInfo|null; skipReason:string|null; skipReasonMatch:boolean|null; aiSkipReason:string|null; freezeUsedThisPuzzle:boolean; freezeStreakValue:number; puzzleId:number; speedRun:SpeedRun; skipModalOpen:boolean; skipReasonDraft:string; clockNow:number; reverseDecision:Decision|null; reverseReplayData:Bar[]; reversePlaybackIdx:number; reverseIsPlaying:boolean; reverseResult:TradeResult; reverseEntryPrice:number|null; }
 export type Action =
   | {type:'SET_LANG';lang:Language}
   | {type:'SET_SOUND';enabled:boolean}
   | {type:'SET_MODE';mode:Mode}
+  | {type:'SET_CONTEXT_MODE';contextMode:ContextMode}
   | {type:'SET_TIMEFRAME';timeframe:Timeframe}
   | {type:'SET_INSTRUMENT';instrument:Instrument}
   | {type:'TOGGLE_INDICATOR';key:'showVwap'|'showEma'|'showDema'|'showLevels'|'showVol'}
