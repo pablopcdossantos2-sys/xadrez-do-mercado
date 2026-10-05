@@ -45,7 +45,6 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'SET_SKIP_DRAFT': return { ...state, skipReasonDraft: action.reason };
     case 'CLOSE_SKIP': return { ...state, skipModalOpen: false, skipReasonDraft: '' };
     case 'SET_SKIP_REASON': return { ...state, skipReason: action.reason, skipReasonMatch: action.match, aiSkipReason: action.aiReason };
-    case 'SET_REPLAY': return { ...state, replayData: action.data, playbackIdx: action.idx, phase: 'REPLAY', isPlaying: false };
     case 'TICK_REPLAY': return { ...state, playbackIdx: action.idx, replayData: action.data, phase: state.phase === 'DECISION' ? 'REPLAY' : state.phase };
     case 'SET_PLAYING': return { ...state, isPlaying: action.playing };
     case 'SET_SPEED': return { ...state, speed: action.speed };
