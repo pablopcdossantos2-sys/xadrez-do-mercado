@@ -8,11 +8,15 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: historical-library-bootstrap
+  cancel-in-progress: true
+
 jobs:
   bootstrap:
     if: github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[historical-bootstrap]')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,9 +29,9 @@ jobs:
       - name: Build real historical library
         run: |
           python3 scripts/build-historical-library.py \
-            --start-date 2026-09-15 \
+            --start-date 2026-09-23 \
             --end-date 2026-10-02 \
-            --max-sessions 6
+            --max-sessions 4
 
       - name: Commit generated library
         run: |
