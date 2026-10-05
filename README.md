@@ -36,7 +36,7 @@ As janelas podem vir de dados históricos reais ou do gerador sintético. **O pr
 ## Recursos
 
 - Replay de janelas históricas reais e geração procedural sintética.
-- MES, MNQ, WINFUT, WDOFUT e BIT nos timeframes 1m, 5m, 15m e 1h.
+- MES, MNQ, WINFUT e WDOFUT nos timeframes 1m, 5m, 15m e 1h.
 - Candles, volume, VWAP, EMA 20, DEMA e níveis de sessão.
 - Classificador de setups: Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push e Consolidation.
 - Analista baseado em regras com bracket de referência de 12 pontos de stop por 24 pontos de alvo.
@@ -66,9 +66,9 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 - O gerador sintético continua disponível como fallback.
 - A integração de dados reais está sendo orientada para **datasets históricos**, não para streaming em tempo real.
-- A prioridade histórica é WINFUT, WDOFUT e BIT.
+- A prioridade histórica é WINFUT e WDOFUT.
 - Dados históricos brutos podem ter regras próprias de uso/redistribuição; o projeto deve manter separados o código e os arquivos de mercado quando necessário.
-- WINFUT, WDOFUT e BIT usam os códigos de produto B3 WIN, WDO e BIT, respectivamente.
+- WINFUT e WDOFUT usam os códigos de produto B3 WIN e WDO, respectivamente.
 - A avaliação do analista usa somente o histórico disponível até o ponto de decisão. Isso não valida uma estratégia nem demonstra capacidade preditiva.
 - O projeto é uma ferramenta de treinamento e não executa ordens no mercado.
 
