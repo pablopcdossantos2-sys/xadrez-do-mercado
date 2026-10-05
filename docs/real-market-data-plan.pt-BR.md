@@ -1,79 +1,171 @@
-# Xadrez do Mercado — Plano de dados reais
+# Xadrez do Mercado — Plano de dados históricos reais
 
-Esta etapa migra os exercícios de OHLCV sintético para dados reais de forma incremental, sem colocar credenciais de Market Data no frontend.
+O objetivo desta fase é substituir progressivamente o OHLCV sintético por **pregões históricos reais**, sem qualquer dependência de dados em tempo real.
 
-## Por que não ligar um feed real diretamente agora?
+Para o treinamento, não importa se o pregão aconteceu ontem, há seis meses ou há cinco anos. O que importa é que a sequência de preços, volume e horários seja real e possa ser reproduzida pelo usuário como um exercício.
 
-A B3 informa que o acesso direto ao Market Data em tempo real exige contratação, e que o acesso indireto deve ser feito por distribuidores autorizados. A política também distingue uso interno de distribuição externa e display/non-display.
+## Decisão arquitetural
 
-Por isso, o navegador deve receber apenas dados que o backend/provedor já tenha autorizado para o usuário final. A chave/licença do fornecedor não deve ser embutida no bundle Vite.
+Não teremos feed de mercado em tempo real, websocket, polling contínuo nem chave de Market Data no navegador.
 
-## Etapa 1 — Fundação de ativos e formato ✅
+A arquitetura passa a ser:
 
-Concluída nesta versão.
+1. obter dados históricos reais;
+2. selecionar pregões e janelas pedagógicas;
+3. normalizar contratos e timestamps;
+4. converter negócios/ticks em OHLCV;
+5. armazenar os datasets históricos em um armazenamento estático/autorizado;
+6. carregar uma janela real por puzzle;
+7. manter o gerador sintético como fallback.
+
+A aplicação continua sendo um frontend estático e offline-friendly.
+
+## Fonte prioritária — B3
+
+A B3 disponibiliza no Boletim Diário do Mercado a tabela **Negócio a negócio** para derivativos. A página de pesquisa por pregão informa explicitamente que é possível selecionar uma data retroativa para obter arquivos anteriores.
+
+Isso é especialmente interessante para o projeto porque negócios individuais permitem reconstruir candles intraday reais e preservar o comportamento de cada pregão, em vez de depender apenas de preços de fechamento.
+
+Referências:
+- https://www.b3.com.br/pt_br/market-data-e-indices/servicos-de-dados/market-data/historico/boletins-diarios/pesquisa-por-pregao/pesquisa-por-pregao/
+- https://arquivos.b3.com.br/bdi/
+
+## Etapa 1 — Fundação de ativos e parser ✅
+
+Concluída.
 
 - Ativos: MES, MNQ, WINFUT, WDOFUT e BIT.
-- Metadados por ativo em `src/assets.ts`.
 - Códigos B3 dos ativos brasileiros: WIN, WDO e BIT.
+- Metadados por ativo em `src/assets.ts`.
 - Parser real de OHLCV em CSV/JSON em `src/realData.ts`.
-- Separação de histórico e futuro preserva a mecânica atual de 82 barras históricas.
-- O gerador sintético continua como fallback de desenvolvimento.
+- Separação entre histórico visível e futuro do puzzle.
+- Gerador sintético mantido como fallback.
 
-## Etapa 2 — Dataset histórico real
+## Etapa 2 — Aquisição de pregões históricos reais
 
-Próximo passo recomendado.
+Prioridade imediata.
 
-1. Escolher um distribuidor/licença compatível com uso dos dados no Xadrez do Mercado.
-2. Obter histórico intraday suficiente para exercícios de 1m, 5m e 15m.
-3. Normalizar contratos por vencimento antes de montar séries contínuas.
-4. Salvar snapshots/arquivos versionados no backend ou storage autorizado.
-5. Transformar cada janela histórica em um puzzle sem usar barras posteriores para gerar a resposta do analista.
+Começaremos pelos ativos brasileiros:
 
-Nesta etapa, o frontend consumirá somente um endpoint autorizado, por exemplo um manifest por ativo/timeframe.
+- WINFUT;
+- WDOFUT;
+- BIT.
 
-## Etapa 3 — Feed real no runtime
+A primeira coleção não precisa representar anos inteiros. Um conjunto pequeno, porém diversificado, já é suficiente para validar a experiência:
 
-Criar um pequeno backend/proxy:
+- pregões de tendência;
+- rompimentos e falhas;
+- abertura com gap;
+- reversões;
+- consolidação;
+- sessões de alta volatilidade;
+- sessões de baixa volatilidade;
+- eventos macro relevantes.
 
-`GET /api/market-data/{asset}/{timeframe}?date=YYYY-MM-DD`
+Os pregões serão escolhidos como **fontes reais de exercícios**, e não como um simples histórico financeiro exposto ao usuário.
 
-O backend será responsável por autenticação, rate limiting, cache e tradução do fornecedor para o formato OHLCV do app.
+## Etapa 3 — Pipeline histórico
 
-O frontend continuará usando `loadRealDataset()`; nenhuma API key será exposta no JavaScript público.
+O pipeline deverá:
 
-## Etapa 4 — Replay profissional
+1. importar o arquivo bruto;
+2. identificar contrato/ticker;
+3. normalizar data e hora para Unix timestamp;
+4. normalizar preço e quantidade;
+5. ordenar e deduplicar negócios;
+6. agregar negócio a negócio em candles de 1 minuto;
+7. derivar 5m, 15m e 1h a partir do 1m;
+8. preservar volume real;
+9. identificar sessões e gaps;
+10. separar cada janela em histórico + futuro sem vazamento.
 
-Depois de termos dados reais suficientes:
+A regra é: **nenhum dado posterior ao ponto de decisão pode participar da recomendação do analista**.
 
-- detectar sessão RTH/ETH com base no timestamp do dataset;
-- preservar gaps reais;
-- usar volume real;
-- adicionar rollover/continuação de contratos;
-- exibir data, vencimento e origem do dataset;
-- impedir puzzles quebrados por baixa liquidez, feriados ou falhas de feed.
+## Etapa 4 — Continuidade dos contratos
 
-## Etapa 5 — Microestrutura real
+WINFUT e WDOFUT são negociados em contratos com vencimentos específicos. Portanto, os datasets não devem simplesmente concatenar códigos diferentes como se fossem um único ativo.
 
-Somente depois do OHLCV estável.
+A camada histórica deverá guardar:
 
-Adicionar trades/market-by-trade e, quando a licença permitir, book/imbalance real. A microestrutura sintética atual deve continuar disponível como modo de fallback.
+- contrato;
+- ativo-base;
+- vencimento;
+- primeiro/último timestamp;
+- origem;
+- timezone;
+- timeframe-base.
 
-## Etapa 6 — Curadoria dos exercícios
+Uma série contínua poderá ser criada apenas quando a regra de rollover estiver explícita.
 
-A camada de puzzle deve selecionar janelas reais por critérios pedagógicos:
+## Etapa 5 — Banco de exercícios históricos
 
-- rompimento e falha;
-- reclaim/rejection de VWAP;
-- expansão de volatilidade;
-- abertura/gap;
-- reversão;
-- tendência;
-- consolidação.
+Depois da normalização, cada janela poderá receber metadados pedagógicos:
 
-O analista continuará sendo calculado apenas com dados anteriores ao ponto de decisão.
+- setup predominante;
+- regime de volatilidade;
+- período do pregão;
+- presença de gap;
+- presença de evento;
+- dificuldade;
+- qualidade dos dados;
+- ativo e contrato;
+- data real do pregão.
 
-## Critério de conclusão da migração
+O usuário não precisa conhecer a data durante a decisão. A data pode ser revelada apenas no resultado/debrief, para preservar a experiência de puzzle.
 
-Consideraremos o modo real pronto quando existirem pelo menos um dataset histórico autorizado para cada ativo brasileiro (WINFUT, WDOFUT e BIT), replay intraday estável, metadados de contrato/sessão e testes que comprovem ausência de vazamento do futuro.
+## Etapa 6 — Microestrutura real
 
-O objetivo é trocar a fonte dos dados sem desmontar a lógica pedagógica já existente.
+Como os dados de negócio a negócio carregam informação muito mais detalhada que OHLCV, poderemos posteriormente calcular:
+
+- volume por direção, quando inferível;
+- delta;
+- concentração de negócios;
+- aceleração de volume;
+- agressão estimada;
+- comportamento antes/depois de rompimentos.
+
+Esses recursos entram **depois** de a camada OHLCV estar estável.
+
+## Armazenamento e licenciamento
+
+Os dados brutos podem ser grandes e não devem entrar automaticamente no bundle do navegador.
+
+A primeira implementação deve separar:
+
+- código do aplicativo;
+- manifesto/metadados dos datasets;
+- arquivos históricos autorizados.
+
+Quando as condições de uso permitirem redistribuição, os datasets podem ser versionados no projeto ou em um storage estático. Quando não permitirem, o aplicativo deve continuar capaz de trabalhar com arquivos importados/localmente disponibilizados.
+
+O fato de um dado ser histórico e público não elimina a necessidade de verificar as condições aplicáveis ao seu uso e redistribuição.
+
+## Etapa 7 — Curadoria dos puzzles
+
+Com os dados reais disponíveis, o gerador de puzzles passa a ter dois caminhos:
+
+### Real histórico
+
+Seleciona uma janela de um pregão real e faz o replay da sequência observada.
+
+### Sintético
+
+Gera uma sequência procedural para completar casos raros, testes e treinamento controlado.
+
+A experiência do usuário permanece a mesma. A diferença fica na origem dos dados.
+
+## Critério de conclusão
+
+Consideraremos a migração histórica bem-sucedida quando houver:
+
+- pelo menos um conjunto histórico real funcional para WINFUT;
+- pelo menos um para WDOFUT;
+- pelo menos um para BIT;
+- suporte a 1m, 5m e 15m;
+- volume real;
+- metadados de contrato/sessão;
+- seleção de janelas sem vazamento do futuro;
+- fallback sintético preservado;
+- replay indistinguível, do ponto de vista da interface, entre uma janela real e uma janela sintética.
+
+**Não existe requisito de dados em tempo real nesta arquitetura.**
