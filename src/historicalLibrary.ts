@@ -47,7 +47,7 @@ export function selectHistoricalSessions(manifest:HistoricalLibraryManifest,asse
   return manifest.sessions.filter(session=>session.asset===asset&&Boolean(session.bars[timeframe]));
 }
 
-export function selectHistoricalWindow(
+export function selectHistoricalContractSessions(\n  manifest:HistoricalLibraryManifest,\n  asset:Instrument,\n  timeframe:Timeframe,\n):HistoricalSession[]{\n  const sessions=selectHistoricalSessions(manifest,asset,timeframe);\n  const byContract=new Map<string,HistoricalSession[]>();\n  for(const session of sessions){\n    const group=byContract.get(session.contract)??[];\n    group.push(session);\n    byContract.set(session.contract,group);\n  }\n  return [...byContract.values()]\n    .sort((a,b)=>b.length-a.length||b.reduce((n,s)=>n+s.tickCount,0)-a.reduce((n,s)=>n+s.tickCount,0))\n    .at(0)?.sort((a,b)=>a.tradeDate.localeCompare(b.tradeDate))??[];\n}\n\nexport function selectHistoricalWindow(
   bars:Bar[],
   seed:number,
   historyBars=82,
