@@ -2,7 +2,7 @@ import { access, readFile } from 'node:fs/promises';
 
 const expected=[
   'index.html','package.json','vite.config.ts','tsconfig.json','tsconfig.app.json',
-  'src/main.tsx','src/App.tsx','src/types.ts','src/data.ts','src/analytics.ts','src/reducer.ts',
+  'src/main.tsx','src/App.tsx','src/TapeChart.tsx','src/types.ts','src/data.ts','src/difficulty.ts','src/analytics.ts','src/reducer.ts',
   'src/storage.ts','src/translations.ts','src/styles.css'
 ];
 for(const f of expected)await access(f);
@@ -22,11 +22,13 @@ const checks=[
  ['React entry', await readFile('src/main.tsx','utf8').then(x=>x.includes('createRoot'))],
  ['useReducer only', app.includes('useReducer') && !app.includes('useState')],
  ['Blind tape implemented', app.includes("mode==='blind'") && translations.includes("blindHint")],
+ ['Adaptive difficulty implemented', app.includes('getAdaptiveDifficulty') && app.includes('difficulty-badge')],
+ ['Reverse replay implemented', app.includes('REVERSE_REPLAY') && app.includes("onReverse('LONG')") && app.includes("onReverse('SHORT')") && app.includes("onReverse('SKIP')") && app.includes('reverseNotCounted')],
  ['Speed run 10 rounds / 15 min', app.includes('SPEED_TOTAL_ROUNDS=10') && app.includes('SPEED_SESSION_MS=15*60*1000') && reducer.includes('15 * 60 * 1000')],
  ['Speed run has no debrief', app.includes("state.phase==='SPEED_RESULT'&&<div className=\"speed-feedback\"") && !app.includes("state.phase==='SPEED_RESULT'&&<ResultPanel")],
  ['Translation parity guard', translations.includes('Translation dictionaries are out of sync')],
  ['README language links', readme.includes('(README-en.md)') && readmeEn.includes('(README.md)')],
- ['Roadmap implementation notes', roadmap.includes('15. Blind tape') && roadmap.includes('19. Speed run') && roadmap.includes('29. Migrate') && roadmap.includes('32. Estado')],
+ ['Roadmap implementation notes', roadmap.includes('15. Blind tape') && roadmap.includes('19. Speed run') && roadmap.includes('29. Migrate') && roadmap.includes('32. Estado') && roadmap.includes('Adaptive difficulty') && roadmap.includes('Reverse replay')],
  ['Build scripts', pkg.scripts?.dev==='vite' && pkg.scripts?.build?.includes('vite build') && pkg.scripts?.typecheck?.includes('tsc')],
  ['No legacy JSX runtime', !app.includes('ReactDOM') && !app.includes('LightweightCharts')],
 ];
