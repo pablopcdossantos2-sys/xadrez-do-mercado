@@ -6,7 +6,7 @@
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 19 shipped · 13 pending
+**Summary:** 32 items · 4 tiers · 17 shipped · 15 pending
 
 ---
 
@@ -39,22 +39,15 @@ Tag every puzzle with its setup type and show the label in the sidebar.
 
 ### 3. AI validation against hindsight bias
 
-**Effort:** High · **Status:** ✅ SHIPPED
+**Effort:** High · **Status:** Pending
 
-The analyst now computes a **signal-based confidence** for each side (structure, VWAP distance, EMA distance, setup bias) *before* seeing the future, then exposes it in a `ConfidencePanel` with one bar per option. A set of **accepted answers** replaces exact matching: any alternative with confidence ≥ 0.30 that did not lose badly is a valid process outcome. Skipping becomes correctly rewarded when the setup was genuinely ambiguous — instead of being silently punished by the hindsight-graded R.
+The current analyst still selects the decision primarily from the simulated future outcomes. The documented signal-confidence panel and multi-answer acceptance rules are not implemented in the current application.
 
 ### 4. Realism of the procedural generator
 
-**Effort:** High · **Status:** ✅ SHIPPED
+**Effort:** High · **Status:** Pending
 
-`generateMarketData` was rewritten around four real-market stylized facts:
-
-- **Session regimes** — each puzzle opens in one of *trend_up*, *trend_down*, *range*, *reversal*, or *chop*, which drives drift. `reversal` regime flips mid-session.
-- **Volatility clustering** — GARCH(1,1) with α = 0.12, β = 0.78. High-vol bars cluster, quiet bars stay quiet, shocks propagate.
-- **Opening gap** — ±0.15% at session start.
-- **Volume shape** — U-shaped intraday profile, plus volume correlated with |return|. Big moves print on big volume, exactly like the tape.
-
-The classifier now sees trend, range, and reversal setups with realistic frequency instead of a random-walk soup.
+The current generator produces procedural OHLCV series, but the session-regime, volatility-clustering, opening-gap, and U-shaped-volume model described here is not fully implemented.
 
 ---
 
@@ -250,8 +243,8 @@ Interactive application state is centralized in a typed React `useReducer`, with
 |---|------|------|--------|--------|--------|
 | 1 | Counterfactual debrief | T1 | Low | Very high | ✅ SHIPPED |
 | 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ SHIPPED |
-| 3 | AI validation (hindsight bias) | T1 | High | Very high | ✅ SHIPPED |
-| 4 | Realism of procedural generator | T1 | High | Very high (long term) | ✅ SHIPPED |
+| 3 | AI validation (hindsight bias) | T1 | High | Very high | Pending |
+| 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
 | 5 | Process score vs. outcome score | T2 | Medium | High | ✅ SHIPPED |
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ SHIPPED |
 | 7 | Expanded debrief "Why not the other side?" | T2 | Low | High | ✅ SHIPPED |
@@ -272,7 +265,7 @@ Interactive application state is centralized in a typed React `useReducer`, with
 
 ### Quick wins — do first
 
-- ✅ All 19 shipped items
+- ✅ All 17 currently shipped items
 - → Adaptive difficulty (#10)
 - → Real ELO curve (#21)
 
@@ -286,10 +279,10 @@ Interactive application state is centralized in a typed React `useReducer`, with
 
 ## Executive summary
 
-The two Tier 1 items that were still open are now closed. **AI validation** turned the "correct answer" from a hindsight tautology into a fair, multi-answer judgment, and the **generator realism** rewrite gave the app a foundation that actually resembles an MES/MNQ session. The tutorial now rewards the same things a real trading coach would: sound process, regardless of whether the market resolved it in your favor today.
+The requested **Blind tape**, **Speed run**, **Vite + React + TypeScript migration**, and **useReducer** work is now shipped. During the code audit, two older roadmap claims were also corrected: **AI validation** and **generator realism** are not fully implemented in the current codebase, so items 3 and 4 are again marked Pending rather than overstating project capabilities.
 
-With 19 of 32 items shipped — including every Tier 1 and most of Tier 2 plus the requested structural investments — the remaining work is primarily about **depth** (adaptive difficulty, Glicko ELO, microstructure, macro events) and **infra** (tests, offline/PWA support, richer session features).
+With 17 of 32 items currently shipped, the next work is concentrated on **fairer grading and market realism** (items 3 and 4), plus adaptive difficulty, Glicko ELO, microstructure, macro events, tests, and offline/PWA support.
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.5 · 32 items · 4 tiers · 19 shipped · 13 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.5 · 32 items · 4 tiers · 17 shipped · 15 pending*
