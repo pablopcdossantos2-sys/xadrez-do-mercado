@@ -210,7 +210,7 @@ O roadmap foi concluído; novos trabalhos devem ser acompanhados como novos iten
 
 ## Resumo executivo
 
-**Todos os trinta e dois itens estão entregues.** O Tier 2 está completo, enquanto os itens 3 e 4 do Tier 1 permanecem pendentes porque as capacidades anteriormente documentadas ainda não estão totalmente presentes no código auditado.
+**Todos os trinta e dois itens estão entregues.** O Tier 2 está completo, e os demais recursos do Tier 1 agora também estão implementados no código auditado.
 
 Todos os itens restantes agora foram implementados, incluindo validação do analista sem hindsight, modelo sintético de mercado mais rico, níveis RTH/ETH, microestrutura sintética, eventos macro, Elo dinâmico, desafios diários, cartas colecionáveis e cache offline:
 
@@ -222,7 +222,7 @@ Todos os itens restantes agora foram implementados, incluindo validação do ana
 - **Cartas de padrão** são coletadas e persistidas por setup.
 - **Modo offline** mantém o app disponível via cache após um carregamento online.
 
-O roadmap foi concluído; novos trabalhos devem ser acompanhados como novos itens.\n\n<!-- roadmap-complete -->\n<!-- em **profundidade** (níveis reais, microestrutura, eventos macro), **meta-progressão** (ELO Glicko, desafios diários, cartas) e **engenharia** (PWA offline).
+O roadmap foi concluído; novos trabalhos devem ser acompanhados como novos itens.
 
 ---
 
