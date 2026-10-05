@@ -7,14 +7,17 @@ export interface RealDataset{
   bars:Bar[];
 }
 
-function toNumber(value:string){
-  const n=Number(value.replace(',','.').trim());
+function toNumber(value:string|undefined){
+  if(value===undefined)return null;
+  const normalized=value.trim().includes(',')&&value.trim().includes('.')?value.trim().replace(/\./g,'').replace(',','.'):value.trim().replace(',','.');
+  const n=Number(normalized);
   return Number.isFinite(n)?n:null;
 }
 
-function parseTime(value:string){
+function parseTime(value:string|undefined){
+  if(value===undefined)return null;
   const trimmed=value.trim();
-  if(/^\\d{10,13}$/.test(trimmed)){
+  if(/^\d{10,13}$/.test(trimmed)){
     const numeric=Number(trimmed);
     return numeric>1e12?Math.floor(numeric/1000):numeric;
   }
@@ -23,17 +26,18 @@ function parseTime(value:string){
 }
 
 export function parseOhlcvCsv(csv:string):Bar[]{
-  const lines=csv.trim().split(/\\r?\\n/).filter(Boolean);
+  const lines=csv.trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   if(lines.length<2)return[];
-  const rows=lines.slice(1);
+  const separator=lines[0]!.includes(';')?';':',';
   const bars:Bar[]=[];
-  for(const line of rows){
-    const fields=line.split(',').map(x=>x.trim());
+  for(const line of lines.slice(1)){
+    const fields=line.split(separator).map(x=>x.trim());
     if(fields.length<6)continue;
     const [time,open,high,low,close,volume]=fields;
-    const parsed=[toNumber(open),toNumber(high),toNumber(low),toNumber(close),toNumber(volume),parseTime(time)];
-    if(parsed.some(x=>x===null))continue;
-    bars.push({time:parsed[5]!,open:parsed[1]!,high:parsed[2]!,low:parsed[3]!,close:parsed[4]!,volume:Math.max(0,parsed[4]!)});
+    const parsedTime=parseTime(time);
+    const parsedOpen=toNumber(open),parsedHigh=toNumber(high),parsedLow=toNumber(low),parsedClose=toNumber(close),parsedVolume=toNumber(volume);
+    if(parsedTime===null||parsedOpen===null||parsedHigh===null||parsedLow===null||parsedClose===null||parsedVolume===null)continue;
+    bars.push({time:parsedTime,open:parsedOpen,high:parsedHigh,low:parsedLow,close:parsedClose,volume:Math.max(0,parsedVolume)});
   }
   return bars.sort((a,b)=>a.time-b.time);
 }
