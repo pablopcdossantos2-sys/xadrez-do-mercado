@@ -1,77 +1,171 @@
-# Xadrez do Mercado — Real Market Data Plan
+# Xadrez do Mercado — Real historical data plan
 
-This phase migrates exercises from synthetic OHLCV to real market data incrementally, without putting Market Data credentials in the frontend.
+The goal of this phase is to progressively replace synthetic OHLCV with **real historical trading sessions**, with no dependency on real-time market data.
 
-## Why not connect a real feed directly now?
+For training, it does not matter whether a session happened yesterday, six months ago, or five years ago. What matters is that the price, volume, and timestamp sequence is real and can be replayed as an exercise.
 
-B3 states that direct real-time Market Data access requires contracting, while indirect access is obtained through authorized distributors. Its policies also distinguish internal use from external distribution and display/non-display use.
+## Architectural decision
 
-Therefore the browser should receive only data that the backend/provider is licensed to expose to the end user. Provider credentials must never be embedded in the public Vite bundle.
+We will not use a real-time market feed, websocket, continuous polling, or Market Data key in the browser.
 
-## Stage 1 — Asset and format foundation ✅
+The architecture becomes:
 
-Completed in this version.
+1. obtain real historical data;
+2. select trading sessions and pedagogical windows;
+3. normalize contracts and timestamps;
+4. convert trades/ticks into OHLCV;
+5. store historical datasets in authorized/static storage;
+6. load one real window per puzzle;
+7. keep the synthetic generator as a fallback.
+
+The application remains a static, offline-friendly frontend.
+
+## Priority source — B3
+
+B3 publishes a **Tick by tick / Negócio a negócio** table for derivatives in the Daily Market Bulletin. The trading-session search page explicitly says that a previous date can be selected to retrieve retroactive files.
+
+This is particularly useful because individual trades let us reconstruct real intraday candles and preserve the behavior of a real session instead of relying only on closing prices.
+
+References:
+- https://www.b3.com.br/en_us/market-data-and-indices/data-services/market-data/historical-data/newsletters/search-by-trading-session/
+- https://arquivos.b3.com.br/bdi/
+
+## Phase 1 — Asset and parser foundation ✅
+
+Completed.
 
 - Assets: MES, MNQ, WINFUT, WDOFUT, and BIT.
+- Brazilian B3 product codes: WIN, WDO, and BIT.
 - Per-asset metadata in `src/assets.ts`.
-- B3 product codes for the Brazilian futures: WIN, WDO, and BIT.
 - Real OHLCV CSV/JSON parser in `src/realData.ts`.
-- History/future splitting preserves the current 82-bar puzzle model.
-- Synthetic generation remains the development fallback.
+- History/future puzzle split.
+- Synthetic generator retained as a fallback.
 
-## Stage 2 — Licensed historical dataset
+## Phase 2 — Acquire real historical sessions
 
-Recommended next step.
+Immediate priority.
 
-1. Select a distributor/license compatible with Xadrez do Mercado's intended data use.
-2. Obtain enough intraday history for 1m, 5m, and 15m exercises.
-3. Normalize contracts by expiration before building continuous series.
-4. Store authorized snapshots/files in backend storage.
-5. Build each puzzle so the analyst answer only uses data before the decision point.
+Start with Brazilian instruments:
 
-## Stage 3 — Real feed at runtime
+- WINFUT;
+- WDOFUT;
+- BIT.
 
-Add a small backend/proxy:
+The first collection does not need to cover entire years. A small but diverse collection is enough to validate the experience:
 
-`GET /api/market-data/{asset}/{timeframe}?date=YYYY-MM-DD`
-
-The backend owns authentication, rate limiting, caching, and provider-specific translation into the app's OHLCV format.
-
-The frontend can already consume `loadRealDataset()`; no API key needs to be exposed in public JavaScript.
-
-## Stage 4 — Professional replay
-
-Once enough real data exists:
-
-- derive RTH/ETH sessions from dataset timestamps;
-- preserve real gaps;
-- use real volume;
-- add contract rollover/continuation handling;
-- show date, expiry, and dataset source;
-- reject windows damaged by low liquidity, holidays, or feed gaps.
-
-## Stage 5 — Real microstructure
-
-Only after OHLCV is stable.
-
-Add trade/market-by-trade data and, when licensing permits, real book/imbalance data. Keep the current synthetic microstructure as a fallback mode.
-
-## Stage 6 — Exercise curation
-
-The puzzle layer should select real windows by teaching pattern:
-
-- breakouts and failures;
-- VWAP reclaim/rejection;
-- volatility expansion;
-- openings/gaps;
-- reversals;
 - trends;
-- consolidations.
+- breakouts and failures;
+- opening gaps;
+- reversals;
+- consolidation;
+- high-volatility sessions;
+- low-volatility sessions;
+- sessions around relevant macro events.
 
-The analyst must continue to use only data available before the decision point.
+These sessions are treated as **real exercise sources**, not as a generic financial-history viewer.
 
-## Migration completion criteria
+## Phase 3 — Historical data pipeline
 
-The real-data mode is complete when there is at least one authorized historical dataset for each Brazilian asset (WINFUT, WDOFUT, and BIT), stable intraday replay, contract/session metadata, and automated tests proving no future leakage.
+The pipeline should:
 
-The goal is to replace the data source without dismantling the existing training logic.
+1. import the raw file;
+2. identify contract/ticker;
+3. normalize date/time to Unix timestamp;
+4. normalize price and quantity;
+5. sort and deduplicate trades;
+6. aggregate trades into 1-minute candles;
+7. derive 5m, 15m, and 1h from 1m;
+8. preserve real volume;
+9. identify sessions and gaps;
+10. split each exercise into history + future without leakage.
+
+Rule: **no data after the decision point may participate in the analyst recommendation**.
+
+## Phase 4 — Contract continuity
+
+WINFUT and WDOFUT trade specific expiring contracts. Therefore, datasets should not simply concatenate different contract codes as though they were a single instrument.
+
+The historical layer should retain:
+
+- contract;
+- underlying family;
+- expiration;
+- first/last timestamp;
+- source;
+- timezone;
+- base timeframe.
+
+A continuous series should only be created when the rollover rule is explicit.
+
+## Phase 5 — Historical exercise library
+
+After normalization, each window can receive pedagogical metadata:
+
+- dominant setup;
+- volatility regime;
+- session period;
+- opening gap;
+- event presence;
+- difficulty;
+- data quality;
+- instrument and contract;
+- real trading-session date.
+
+The user does not need to know the date during the decision. The date can be revealed only in the result/debrief to preserve the puzzle experience.
+
+## Phase 6 — Real microstructure
+
+Because trade-by-trade data is much richer than OHLCV, we can later calculate:
+
+- directional volume when inferable;
+- delta;
+- trade concentration;
+- volume acceleration;
+- estimated aggression;
+- pre/post-breakout behavior.
+
+These features come **after** the OHLCV layer is stable.
+
+## Storage and licensing
+
+Raw data can be large and should not automatically become part of the browser bundle.
+
+The first implementation should separate:
+
+- application code;
+- dataset manifest/metadata;
+- authorized historical files.
+
+When usage terms allow redistribution, datasets can be versioned in the project or static storage. When they do not, the application should remain capable of working with locally supplied/imported files.
+
+Historical and public does not automatically mean unrestricted redistribution; applicable terms still need to be checked.
+
+## Phase 7 — Puzzle curation
+
+With real data available, the puzzle engine has two paths:
+
+### Real historical
+
+Select a window from a real trading session and replay the observed sequence.
+
+### Synthetic
+
+Generate a procedural sequence for rare cases, tests, and controlled training.
+
+The user experience remains the same. Only the data source differs.
+
+## Completion criteria
+
+The historical migration is complete when there is:
+
+- at least one working real historical dataset for WINFUT;
+- at least one for WDOFUT;
+- at least one for BIT;
+- 1m, 5m, and 15m support;
+- real volume;
+- contract/session metadata;
+- window selection without future leakage;
+- synthetic fallback preserved;
+- replay indistinguishable at the UI level between a real and synthetic window.
+
+**This architecture has no real-time data requirement.**
