@@ -76,16 +76,19 @@ function Home({state,t,dispatch,start,startDaily}:{state:AppState;t:T;dispatch:(
 function Stat({label,value}:{label:string;value:string}){return <div><span>{label}</span><strong>{value}</strong></div>;}
 
 function ResultPanel({state,t,onNext,onReverse}:{state:AppState;t:T;onNext:()=>void;onReverse:(decision:Decision)=>void}){
-  if(!state.aiData)return null;const user=state.userDecision??'SKIP';
+  if(!state.aiData)return null;
+  const user=state.userDecision??'SKIP';
+  const accepted=state.aiData.acceptedDecisions;
   return <div className="result-box"><div className="result-head"><div><div className="eyebrow">{t('result')}</div><h2>{resultText(t,state.tradeResult)}</h2></div><strong className={state.eloDelta>=0?'good':'bad'}>{state.eloDelta>=0?'+':''}{state.eloDelta} ELO</strong></div>
   <div className="result-meta"><span>{t('yourTrade')}: <b>{user}</b></span><span>{t('correctMove')}: <b>{state.aiData.decision}</b></span><span>{fmtR(state.rMultiple)}</span></div>
+  <div className="validation-box"><div className="section-title">{t('analystValidation')}</div><div className="validation-grid"><div><span>{t('signalConfidence')}</span><b>{formatPct(state.aiData.signalConfidence)}</b></div><div><span>{t('acceptedDecisions')}</span><b>{accepted.join(' / ')}</b></div></div><p>{t('hindsightGuard')}</p></div>
   <div className="counterfactual"><div className="section-title">{t('counterfactual')}</div>{(['LONG','SHORT','SKIP'] as Decision[]).map(d=><div className={'cf-row '+(d===user?'selected':'')} key={d}><span>{d}</span><b>{d==='SKIP'?'0.00R':fmtR(state.aiData!.outcomes[d].r)}</b><small>{state.aiData!.outcomes[d].result}</small></div>)}</div>
   <div className="debrief"><div className="section-title">{t('whyNotOther')}</div>{state.debriefAxes.map(a=><div className="axis" key={a.axis}><div className="axis-label"><span>{t(('axis'+a.axis.charAt(0).toUpperCase()+a.axis.slice(1)) as TranslationKey)}</span><i className={a.bias==='long'?'long-dot':a.bias==='short'?'short-dot':'neutral'}></i></div><p>{state.lang==='pt'?a.textPt:a.textEn}</p></div>)}</div>
   {state.trap&&<div className="trap-box"><strong>{t('trapOfDay')}</strong><p>{state.lang==='pt'?state.trap.messagePt:state.trap.messageEn}</p></div>}
   {state.skipReason&&<div className="trap-box"><strong>{t('skipReasonLabel')}</strong><p>{({'bad-setup':t('skipBadSetup'),'far-vwap':t('skipFarFromVwap'),'against-trend':t('skipAgainstTrend'),'no-confluence':t('skipNoConfluence'),'unsure':t('skipUnsure')} as Record<string,string>)[state.skipReason] ?? state.skipReason} · {state.skipReasonMatch?'✓':'—'}</p></div>}
   {state.freezeUsedThisPuzzle&&<div className="freeze-banner">❄ {t('freezeUsed')}</div>}
   <div className="reverse-explore"><div className="section-title">{t('reverseExplore')}</div><p>{t('reverseExploreHint')}</p><div className="reverse-buttons"><button className="ghost" onClick={()=>onReverse('LONG')}>{t('exploreLong')}</button><button className="ghost" onClick={()=>onReverse('SHORT')}>{t('exploreShort')}</button><button className="ghost" onClick={()=>onReverse('SKIP')}>{t('exploreSkip')}</button></div></div>
-  <button className="primary full" onClick={onNext}>{t('nextPuzzle')} →</button></div>;
+  <button className="primary full" onClick={onNext}>{state.dailyChallenge?t('finishDaily'):t('nextPuzzle')} {state.dailyChallenge?'':'→'}</button></div>;
 }
 
 
