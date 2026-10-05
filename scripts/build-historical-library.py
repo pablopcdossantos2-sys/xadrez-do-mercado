@@ -3,7 +3,7 @@
 Build the first Xadrez do Mercado historical market library from B3's
 derivatives tick-by-tick public distribution endpoint.
 
-The generated library keeps only filtered futures trades for WIN/WDO/BIT,
+The generated library keeps only filtered futures trades for WIN/WDO,
 aggregates them to 1m, and derives 5m/15m/1h. Raw B3 ZIP files are not
 committed to the repository.
 """
