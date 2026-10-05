@@ -65,6 +65,7 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 ## Escopo e limitações
 
 - O gerador sintético continua disponível como fallback.
+- **MES e MNQ já estão disponíveis no catálogo, mas ainda usam dados sintéticos; a biblioteca histórica real atual é somente WINFUT e WDOFUT.**
 - A integração de dados reais está sendo orientada para **datasets históricos**, não para streaming em tempo real.
 - A prioridade histórica é WINFUT e WDOFUT.
 - Dados históricos brutos podem ter regras próprias de uso/redistribuição; o projeto deve manter separados o código e os arquivos de mercado quando necessário.
