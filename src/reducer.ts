@@ -34,7 +34,7 @@ export function reducer(state: AppState, action: Action): AppState {
         aiSkipReason: action.analysis.setup.bias === 'skip' ? 'No clean directional edge.' : 'The setup lacked a clean directional edge.',
         freezeUsedThisPuzzle: false,
         freezeStreakValue: 0,
-        speedRun: action.speedNow && state.speedRun.active ? { ...state.speedRun, startedAt: action.speedNow, deadlineAt: action.speedNow + 12000 } : state.speedRun,
+        speedRun: action.speedNow && state.speedRun.active ? { ...state.speedRun, startedAt: action.speedNow, deadlineAt: state.speedRun.deadlineAt } : state.speedRun,
         skipModalOpen: false,
         skipReasonDraft: '',
         clockNow: action.speedNow ?? Date.now(),
@@ -71,7 +71,7 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         mode: 'speed',
         phase: 'DECISION',
-        speedRun: { active: true, round: 1, totalRounds: action.totalRounds, correct: 0, processMatch: 0, rSum: 0, startedAt: action.now, deadlineAt: action.now + 12000, lastDurationMs: null },
+        speedRun: { active: true, round: 1, totalRounds: action.totalRounds, correct: 0, processMatch: 0, rSum: 0, startedAt: action.now, deadlineAt: action.now + 15 * 60 * 1000, lastDurationMs: null },
         clockNow: action.now,
       };
     case 'SPEED_ROUND_RESULT': {
@@ -87,7 +87,7 @@ export function reducer(state: AppState, action: Action): AppState {
           processMatch: state.speedRun.processMatch + (action.processMatch ? 1 : 0),
           rSum: +(state.speedRun.rSum + action.r).toFixed(2),
           startedAt: done ? state.speedRun.startedAt : action.now,
-          deadlineAt: action.now + 12000,
+          deadlineAt: state.speedRun.deadlineAt,
           lastDurationMs: action.durationMs,
         },
         phase: done ? 'SPEED_SUMMARY' : 'SPEED_RESULT',
