@@ -44,6 +44,9 @@ Each puzzle presents 82 historical bars and asks for one decision. In Standard m
 - Bilingual EN/PT-BR interface, optional sound, and keyboard shortcuts.
 - Adaptive difficulty, Only structure vs Full context mode, a visual session clock, and a revenge-trade warning.
 - Pure-function tests with Vitest.
+- Hindsight-safe analyst validation, signal confidence, and accepted answers.
+- RTH/ETH references, synthetic microstructure, and simulated macro events in replay.
+- Dynamic Elo, deterministic daily challenge, pattern cards, and offline PWA support.
 
 ## Architecture
 
