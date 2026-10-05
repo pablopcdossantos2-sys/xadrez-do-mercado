@@ -107,7 +107,7 @@ The next phase is explicitly **historical-first**. There is no real-time feed re
 The preferred initial source is B3's public Daily Market Bulletin / historical session files, especially the derivatives **Negócio a negócio** table, which can be queried retroactively by trading date.
 
 The implementation path is:
-1. acquire a curated set of real sessions for WINFUT, WDOFUT, and BIT;
+1. acquire a curated set of real sessions for WINFUT and WDOFUT;
 2. normalize trades and contract metadata;
 3. aggregate to 1m and derive 5m/15m/1h;
 4. build a historical exercise library with pedagogical metadata;
