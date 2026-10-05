@@ -6,7 +6,7 @@
 
 Cada item é classificado por **impacto no aprendizado do usuário**, considerando também esforço de implementação, dependências técnicas e alinhamento com o objetivo declarado do projeto: *"enigmas de xadrez para day traders de futuros"*.
 
-**Resumo:** 32 itens · 4 tiers · 15 entregues · 17 pendentes
+**Resumo:** 32 itens · 4 tiers · 19 entregues · 13 pendentes
 
 ---
 
@@ -130,9 +130,9 @@ Injetar eventos plausíveis para ensinar gestão de risco em eventos.
 
 ### 15. Modo "Blind tape"
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Ocultar preço/tempo para forçar leitura de estrutura pura.
+Durante a fase de decisão, oculta contexto, rótulos do playbook, indicadores e escalas de preço/tempo do gráfico, forçando a leitura do tape sem overlays de contexto. O contexto ocultado retorna após a decisão.
 
 ### 16. Modo "Only structure" vs "Full context"
 
@@ -154,9 +154,9 @@ Barra com marcações 09:30, 10:00, 11:30, 13:00, 15:00, 16:00.
 
 ### 19. Modo "Speed run"
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-10 puzzles em 15 minutos, sem debrief.
+10 decisões rápidas em até 15 minutos, sem debrief intermediário. Cada rodada é avaliada automaticamente e o próximo puzzle é carregado sem replay manual.
 
 ### 20. Revenge trade warning
 
@@ -220,9 +220,9 @@ Web Audio API — clique, chime, thud, tique, shimmer de freeze. Toggle persisti
 
 ### 29. Migrar para Vite + React + TypeScript
 
-**Esforço:** Alto · **Status:** Recomendado
+**Esforço:** Alto · **Status:** ✅ ENTREGUE
 
-Quando o single-file passar de ~2.000 LOC.
+A implementação monolítica foi migrada para uma aplicação Vite com React e TypeScript, separando interface, análise, geração de dados, persistência, traduções e gerenciamento de estado em módulos tipados.
 
 ### 30. Testes para funções puras
 
@@ -238,9 +238,9 @@ PWA com cache.
 
 ### 32. Estado com useReducer
 
-**Esforço:** Baixo · **Status:** Pendente
+**Esforço:** Baixo · **Status:** ✅ ENTREGUE
 
-Substituir os 12+ useState interdependentes.
+O estado interativo da aplicação foi centralizado em um React `useReducer` tipado, com ações explícitas para fluxo dos puzzles, replay, modos, estado da interface, avaliação dos resultados e progressão do Speed Run.
 
 ---
 
@@ -265,19 +265,19 @@ Substituir os 12+ useState interdependentes.
 | 28 | Som sutil | T4 | Baixo | Médio | ✅ ENTREGUE |
 | 10 | Dificuldade adaptativa | T2 | Médio | Alto | Pendente |
 | 21 | ELO real (Glicko) | T4 | Médio | Médio-alto | Pendente |
-| 29 | Migração para Vite + TS | T4 | Alto | Habilitador | Recomendado |
+| 29 | Migração para Vite + TS | T4 | Alto | Habilitador | ✅ ENTREGUE |
 
 ### Quick wins — faça primeiro
 
-- ✅ Todos os 15 itens entregues
+- ✅ Todos os 19 itens entregues
 - → Dificuldade adaptativa (#10)
 - → Curva de ELO real (#21)
 
 ### Investimentos estruturais
 
-- → Migração para Vite + TS (#29)
+- ✅ Migração para Vite + TS (#29)
 - → Testes para funções puras (#30)
-- → useReducer (#32)
+- ✅ useReducer (#32)
 
 ---
 
@@ -285,8 +285,8 @@ Substituir os 12+ useState interdependentes.
 
 Os dois itens do Tier 1 que ainda estavam abertos agora estão fechados. A **validação da IA** transformou a "resposta correta" de uma tautologia de hindsight em um julgamento justo e com múltiplas respostas possíveis, e a reescrita do **realismo do gerador** deu ao app uma base que de fato se parece com uma sessão de MES/MNQ. O tutorial agora recompensa as mesmas coisas que um coach de trading de verdade: processo sólido, independentemente de o mercado ter resolvido a favor hoje.
 
-Com 15 de 32 itens entregues — incluindo todo o Tier 1 e quase todo o Tier 2 — a próxima camada de trabalho é sobre **profundidade** (dificuldade adaptativa, ELO Glicko, microestrutura, eventos macro) e **engenharia** (migração para TypeScript, testes, useReducer). O loop de aprendizado agora está completo o bastante para que um usuário sério evolua sem que a ferramenta lute contra ele.
+Com 19 de 32 itens entregues — incluindo todo o Tier 1, a maior parte do Tier 2 e os investimentos estruturais solicitados — o trabalho restante está concentrado em **profundidade** (dificuldade adaptativa, ELO Glicko, microestrutura, eventos macro) e **infraestrutura** (testes, suporte offline/PWA e recursos adicionais de sessão).
 
 ---
 
-*Trading Tape Puzzles · Roadmap de Melhorias · v1.5 · 32 itens · 4 tiers · 15 entregues · 17 pendentes*
+*Trading Tape Puzzles · Roadmap de Melhorias · v1.5 · 32 itens · 4 tiers · 19 entregues · 13 pendentes*
