@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.1
+> **Strategic Document** · v1.2
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 4 shipped · 28 pending
+**Summary:** 32 items · 4 tiers · 8 shipped · 24 pending
 
 ---
 
@@ -71,19 +71,19 @@ A second score that rewards good decisions even when the market doesn't cooperat
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-Stats aggregated by setup, timeframe, time of day, direction, and instrument. The user learns where they're weak. Buckets with fewer than 2 samples are hidden.
+Stats aggregated by setup, timeframe, direction, and instrument. The user learns where they're weak. Buckets with fewer than 2 samples are hidden.
 
 ### 7. Expanded debrief "Why not the other side?"
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-After a loss, objective bullets: structure, volume, location, confluence.
+After every decision, an objective panel lists **four classic axes** — structure, volume, location, confluence — each with a colored dot indicating whether the axis *supports* or *contradicts* the analyst's call. Every axis is computed from the visible history (HH/LL count, up/down volume split, distance to nearest level, and agreement across VWAP, EMA, structure, and volume).
 
 ### 8. Per-decision journal with export
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-Chart snapshot, context, decisions, final R. Export as JSON/CSV.
+Every decision is appended to a local journal (`localStorage`, last 200 kept). The home screen shows the last 20 entries in a compact table with **Export JSON**, **Export CSV**, and **Clear journal** buttons. Ideal for offline study and for feeding external analysis tools.
 
 ### 9. Justified skip (with reason)
 
@@ -227,7 +227,7 @@ When single-file exceeds ~2,000 LOC. Modular structure.
 
 **Effort:** Low · **Status:** Pending
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief.
 
 ### 31. Offline mode (service worker)
 
@@ -253,28 +253,31 @@ Compact view to decide implementation order. **Start with the green quadrant.**
 | 2 | Playbook with labeled setups | T1 | Medium | Very high | ✅ SHIPPED |
 | 5 | Process score vs. outcome score | T2 | Medium | High | ✅ SHIPPED |
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ SHIPPED |
-| 8 | Per-decision journal with export | T2 | Low | High | Pending |
+| 7 | Expanded debrief "Why not the other side?" | T2 | Low | High | ✅ SHIPPED |
+| 8 | Per-decision journal with export | T2 | Low | High | ✅ SHIPPED |
 | 3 | AI validation (hindsight bias) | T1 | High | Very high | Partial |
 | 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
+| 9 | Justified skip (with reason) | T2 | Low | High | Pending |
 | 10 | Adaptive difficulty | T2 | Medium | High | Pending |
 | 21 | Real ELO (Glicko) | T4 | Medium | Medium-high | Pending |
 | 29 | Migration to Vite + TS | T4 | High | Enabler | Recommended |
 
 ### Quick wins — do first
 
-- ✅ Counterfactual debrief
-- ✅ Playbook with labeled setups
-- ✅ Process score vs. outcome score
-- ✅ Heatmap of "where you fail"
-- ✅ Ranks / tiers
-- ✅ 30-second onboarding
-- → Justified skip (#9)
-- → Expanded debrief (#7)
-- → Exportable journal (#8)
+- ✅ Counterfactual debrief (#1)
+- ✅ Playbook with labeled setups (#2)
+- ✅ Process score vs. outcome score (#5)
+- ✅ Heatmap of "where you fail" (#6)
+- ✅ Expanded debrief "Why not the other side?" (#7)
+- ✅ Per-decision journal with export (#8)
+- ✅ Ranks / tiers (#22)
+- ✅ 30-second onboarding (#24)
+- → Justified skip with reason (#9)
+- → Trap of the day warning (#11)
 
 ### Structural investments
 
-- → AI validation (#3)
+- → AI validation (hindsight bias) (#3)
 - → Generator realism (#4)
 - → Adaptive difficulty (#10)
 - → Vite + TS migration (#29)
@@ -287,8 +290,8 @@ Today, Tape Puzzles is a *beautiful direction-guessing game*. To become a **real
 
 With those three, the user leaves every puzzle knowing *what* they missed, *why*, and *what the market would have done* in any direction — which is exactly what *"chess puzzles for traders"* should deliver.
 
-The addition of **process score** and the **weakness heatmap** (Tier 2, #5 and #6) closes the loop: the app now separates good decisions from good outcomes, and tells the user exactly where their edge is missing.
+The addition of **process score**, the **weakness heatmap**, the **four-axis expanded debrief**, and the **per-decision journal** (Tier 2, #5, #6, #7, #8) closes the loop: the app now separates good decisions from good outcomes, tells the user exactly where their edge is missing, explains *why* the other side lost, and keeps a persistent, exportable record of every decision.
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.1 · 32 items · 4 tiers · 6 shipped · 26 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.2 · 32 items · 4 tiers · 8 shipped · 24 pending*
