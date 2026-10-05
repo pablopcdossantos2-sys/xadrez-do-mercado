@@ -33,7 +33,7 @@ export function parseOhlcvCsv(csv:string):Bar[]{
     const [time,open,high,low,close,volume]=fields;
     const parsed=[toNumber(open),toNumber(high),toNumber(low),toNumber(close),toNumber(volume),parseTime(time)];
     if(parsed.some(x=>x===null))continue;
-    bars.push({time:parsed[5]!,open:parsed[1]!,high:parsed[2]!,low:parsed[3]!,close:parsed[4]!,volume:Math.max(0,parsed[4+1]!)});
+    bars.push({time:parsed[5]!,open:parsed[1]!,high:parsed[2]!,low:parsed[3]!,close:parsed[4]!,volume:Math.max(0,parsed[4]!)});
   }
   return bars.sort((a,b)=>a.time-b.time);
 }
