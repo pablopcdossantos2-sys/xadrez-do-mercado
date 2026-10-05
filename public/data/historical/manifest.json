@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-05T20:11:34.209643-03:00",
+  "generatedAt": "2026-10-05T20:21:27.783638-03:00",
   "source": {
     "provider": "B3",
     "feed": "derivatives tick-by-tick",
@@ -96,33 +96,33 @@
       "barCount1m": 564
     },
     {
-      "id": "WINFUT-2026-09-28-WINV26",
+      "id": "WINFUT-2026-09-30-WINV26",
       "asset": "WINFUT",
       "contract": "WINV26",
-      "tradeDate": "2026-09-28",
+      "tradeDate": "2026-09-30",
       "timezone": "America/Sao_Paulo",
       "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-28?type=1",
-      "tickCount": 5581733,
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-30?type=1",
+      "tickCount": 6696260,
       "stats": {
-        "first": 183500.0,
-        "last": 183855.0,
-        "high": 185195.0,
-        "low": 182735.0,
-        "rangePct": 0.013406,
-        "trendPct": 0.001935,
-        "volume": 17478107.0,
+        "first": 184700.0,
+        "last": 187700.0,
+        "high": 188860.0,
+        "low": 184500.0,
+        "rangePct": 0.023606,
+        "trendPct": 0.016243,
+        "volume": 20833410.0,
         "tags": [
-          "balanced"
+          "trend-up"
         ]
       },
       "bars": {
-        "1m": "/data/historical/WINFUT/WINV26/2026-09-28/1m.json",
-        "5m": "/data/historical/WINFUT/WINV26/2026-09-28/5m.json",
-        "15m": "/data/historical/WINFUT/WINV26/2026-09-28/15m.json",
-        "1h": "/data/historical/WINFUT/WINV26/2026-09-28/1h.json"
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-30/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-30/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-30/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-30/1h.json"
       },
-      "barCount1m": 564
+      "barCount1m": 563
     },
     {
       "id": "WDOFUT-2026-09-23-WDOV26",
@@ -212,91 +212,33 @@
       "barCount1m": 570
     },
     {
-      "id": "WDOFUT-2026-09-28-WDOV26",
+      "id": "WDOFUT-2026-09-29-WDOV26",
       "asset": "WDOFUT",
       "contract": "WDOV26",
-      "tradeDate": "2026-09-28",
+      "tradeDate": "2026-09-29",
       "timezone": "America/Sao_Paulo",
       "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-28?type=1",
-      "tickCount": 572815,
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-29?type=1",
+      "tickCount": 556507,
       "stats": {
-        "first": 5206.0,
-        "last": 5225.5,
-        "high": 5234.0,
-        "low": 5194.5,
-        "rangePct": 0.007587,
-        "trendPct": 0.003746,
-        "volume": 2567790.0,
-        "tags": [
-          "trend-up"
-        ]
-      },
-      "bars": {
-        "1m": "/data/historical/WDOFUT/WDOV26/2026-09-28/1m.json",
-        "5m": "/data/historical/WDOFUT/WDOV26/2026-09-28/5m.json",
-        "15m": "/data/historical/WDOFUT/WDOV26/2026-09-28/15m.json",
-        "1h": "/data/historical/WDOFUT/WDOV26/2026-09-28/1h.json"
-      },
-      "barCount1m": 570
-    },
-    {
-      "id": "BIT-2026-09-23-BITU26",
-      "asset": "BIT",
-      "contract": "BITU26",
-      "tradeDate": "2026-09-23",
-      "timezone": "America/Sao_Paulo",
-      "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-23?type=1",
-      "tickCount": 67244,
-      "stats": {
-        "first": 440060.0,
-        "last": 437280.0,
-        "high": 442820.0,
-        "low": 431240.0,
-        "rangePct": 0.026315,
-        "trendPct": -0.006317,
-        "volume": 318645.0,
+        "first": 5212.0,
+        "last": 5203.0,
+        "high": 5242.5,
+        "low": 5198.0,
+        "rangePct": 0.008538,
+        "trendPct": -0.001727,
+        "volume": 2473359.0,
         "tags": [
           "balanced"
         ]
       },
       "bars": {
-        "1m": "/data/historical/BIT/BITU26/2026-09-23/1m.json",
-        "5m": "/data/historical/BIT/BITU26/2026-09-23/5m.json",
-        "15m": "/data/historical/BIT/BITU26/2026-09-23/15m.json",
-        "1h": "/data/historical/BIT/BITU26/2026-09-23/1h.json"
+        "1m": "/data/historical/WDOFUT/WDOV26/2026-09-29/1m.json",
+        "5m": "/data/historical/WDOFUT/WDOV26/2026-09-29/5m.json",
+        "15m": "/data/historical/WDOFUT/WDOV26/2026-09-29/15m.json",
+        "1h": "/data/historical/WDOFUT/WDOV26/2026-09-29/1h.json"
       },
-      "barCount1m": 631
-    },
-    {
-      "id": "BIT-2026-09-24-BITU26",
-      "asset": "BIT",
-      "contract": "BITU26",
-      "tradeDate": "2026-09-24",
-      "timezone": "America/Sao_Paulo",
-      "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-24?type=1",
-      "tickCount": 60725,
-      "stats": {
-        "first": 433320.0,
-        "last": 438900.0,
-        "high": 440700.0,
-        "low": 432020.0,
-        "rangePct": 0.020031,
-        "trendPct": 0.012877,
-        "volume": 256232.0,
-        "tags": [
-          "trend-up"
-        ]
-      },
-      "bars": {
-        "1m": "/data/historical/BIT/BITU26/2026-09-24/1m.json",
-        "5m": "/data/historical/BIT/BITU26/2026-09-24/5m.json",
-        "15m": "/data/historical/BIT/BITU26/2026-09-24/15m.json",
-        "1h": "/data/historical/BIT/BITU26/2026-09-24/1h.json"
-      },
-      "barCount1m": 630
+      "barCount1m": 570
     },
     {
       "id": "BIT-2026-09-25-BITV26",
@@ -355,6 +297,64 @@
         "1h": "/data/historical/BIT/BITV26/2026-09-28/1h.json"
       },
       "barCount1m": 631
+    },
+    {
+      "id": "BIT-2026-09-29-BITV26",
+      "asset": "BIT",
+      "contract": "BITV26",
+      "tradeDate": "2026-09-29",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-29?type=1",
+      "tickCount": 49579,
+      "stats": {
+        "first": 444960.0,
+        "last": 437840.0,
+        "high": 445780.0,
+        "low": 437520.0,
+        "rangePct": 0.018563,
+        "trendPct": -0.016001,
+        "volume": 197952.0,
+        "tags": [
+          "trend-down"
+        ]
+      },
+      "bars": {
+        "1m": "/data/historical/BIT/BITV26/2026-09-29/1m.json",
+        "5m": "/data/historical/BIT/BITV26/2026-09-29/5m.json",
+        "15m": "/data/historical/BIT/BITV26/2026-09-29/15m.json",
+        "1h": "/data/historical/BIT/BITV26/2026-09-29/1h.json"
+      },
+      "barCount1m": 659
+    },
+    {
+      "id": "BIT-2026-09-30-BITV26",
+      "asset": "BIT",
+      "contract": "BITV26",
+      "tradeDate": "2026-09-30",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-30?type=1",
+      "tickCount": 61122,
+      "stats": {
+        "first": 441740.0,
+        "last": 436840.0,
+        "high": 448800.0,
+        "low": 435980.0,
+        "rangePct": 0.029022,
+        "trendPct": -0.011092,
+        "volume": 265262.0,
+        "tags": [
+          "trend-down"
+        ]
+      },
+      "bars": {
+        "1m": "/data/historical/BIT/BITV26/2026-09-30/1m.json",
+        "5m": "/data/historical/BIT/BITV26/2026-09-30/5m.json",
+        "15m": "/data/historical/BIT/BITV26/2026-09-30/15m.json",
+        "1h": "/data/historical/BIT/BITV26/2026-09-30/1h.json"
+      },
+      "barCount1m": 632
     }
   ]
 }
