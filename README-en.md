@@ -63,10 +63,6 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 - Analyst grading uses rules and the simulated future window. This does not validate a trading strategy or demonstrate predictive capability.
 - The project is a training tool and does not place market orders.
 
-## Roadmap completed in this version
-
-The pending items **10. Adaptive difficulty**, **15. Blind tape**, **16. Only structure vs Full context**, **17. Reverse replay after result**, **18. Visual session clock**, **19. Speed run**, **20. Revenge trade warning**, **29. Migrate to Vite + React + TypeScript**, **30. Pure-function tests**, and **32. State with useReducer** have been implemented. Details: [implementation notes](docs/roadmap-implementation.md).
-
 ## Documentation
 
 - [Roadmap in Portuguese](docs/roadmap.pt-BR.md)
