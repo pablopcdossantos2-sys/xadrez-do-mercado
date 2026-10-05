@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.2
+> **Strategic Document** · v1.3
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 8 shipped · 24 pending
+**Summary:** 32 items · 4 tiers · 10 shipped · 22 pending
 
 ---
 
@@ -25,27 +25,23 @@ Every item is ranked by **impact on user learning**, also considering implementa
 
 *Foundation — without this, the app doesn't teach.*
 
-These are the items that separate a *direction quiz* from a *deliberate training tool*. Every other tier depends on these to make pedagogical sense.
-
 ### 1. Counterfactual debrief
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-After the result, show what would have happened with **each alternative** (Long, Short, Skip) against the same future bars.
-
-> *Why it's #1:* learning doesn't happen on the win — it happens on the *contrast*.
+Show what each alternative (Long, Short, Skip) would have produced.
 
 ### 2. Playbook with labeled setups
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-Tag every puzzle with a setup type (VWAP Reclaim, ORB, Failed Breakdown, Liquidity Sweep, Trend Pullback, Range Fade, Momentum Push, Consolidation) and show the label in the sidebar.
+Tag every puzzle with its setup type and show the label in the sidebar.
 
 ### 3. AI validation against hindsight bias
 
 **Effort:** High · **Status:** Partial
 
-The current "correct answer" is *which side hit TP before SL* — that's pure hindsight. Accept multiple valid answers, use an auditable rule tree, and expose a confidence score.
+The current "correct answer" is *which side hit TP before SL* — pure hindsight. Accept multiple valid answers, use an auditable rule tree, and expose a confidence score.
 
 ### 4. Realism of the procedural generator
 
@@ -59,37 +55,35 @@ Inject volatility clustering, session regimes, volume correlated with |return|, 
 
 *Learning multipliers.*
 
-We fight the most common trader vice: *bad process with good outcome*.
-
 ### 5. Process score vs. outcome score
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-A second score that rewards good decisions even when the market doesn't cooperate. Fights result bias. The home screen shows an insight comparing process accuracy vs. outcome accuracy.
+A second score that rewards good decisions even when the market doesn't cooperate.
 
 ### 6. Heatmap of "where you fail"
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-Stats aggregated by setup, timeframe, direction, and instrument. The user learns where they're weak. Buckets with fewer than 2 samples are hidden.
+Stats aggregated by setup, timeframe, direction, and instrument. Weakest buckets first.
 
 ### 7. Expanded debrief "Why not the other side?"
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-After every decision, an objective panel lists **four classic axes** — structure, volume, location, confluence — each with a colored dot indicating whether the axis *supports* or *contradicts* the analyst's call. Every axis is computed from the visible history (HH/LL count, up/down volume split, distance to nearest level, and agreement across VWAP, EMA, structure, and volume).
+Objective panel with four classic axes — structure, volume, location, confluence — each with a colored dot indicating support/contradiction of the analyst call.
 
 ### 8. Per-decision journal with export
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-Every decision is appended to a local journal (`localStorage`, last 200 kept). The home screen shows the last 20 entries in a compact table with **Export JSON**, **Export CSV**, and **Clear journal** buttons. Ideal for offline study and for feeding external analysis tools.
+Every decision is appended to a local journal (last 200). Export as JSON or CSV. Now also stores skip reason and trap detected.
 
 ### 9. Justified skip (with reason)
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-On Skip, ask "Why?" and compare against the AI's real reason. Trains technical vocabulary.
+On Skip, a modal asks "Why?" with five canonical reasons (bad setup, far from VWAP, against trend, no confluence, unsure). The choice is compared against the analyst's reason and stored in the journal. Comparison is shown in the debrief.
 
 ### 10. Adaptive difficulty
 
@@ -99,9 +93,9 @@ Keep the user in flow zone (60–75% accuracy) by tuning generator noise.
 
 ### 11. "Trap of the day" warning
 
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
-Detect deceptive patterns and surface a side note before the decision, without giving away the answer.
+`detectTrap()` analyzes the visible history and flags deceptive patterns: oversized bar body (>1.5× ATR), dominant wick rejection, VWAP whipsaw (≥4 crossings in 8 bars), 3-bar push on declining volume, and failed breakouts in the last 4 bars. A warning banner appears in the Decision phase sidebar, without giving away the answer.
 
 ---
 
@@ -173,7 +167,7 @@ Detect risk escalation after losses and warn. Teaches trading psychology.
 
 **Effort:** Medium · **Status:** Pending
 
-ΔELO depends on puzzle difficulty. Self-calibrating progression.
+ΔELO depends on puzzle difficulty.
 
 ### 22. Ranks / tiers
 
@@ -185,7 +179,7 @@ Novice · Developing · Consistent · Sharp · Institutional.
 
 **Effort:** Low · **Status:** Pending
 
-1 freeze/day to avoid resetting the streak. Reduces return friction.
+1 freeze/day to avoid resetting the streak.
 
 ### 24. 30-second onboarding
 
@@ -209,7 +203,7 @@ Vertical layout, touch buttons, gestures.
 
 **Effort:** Medium · **Status:** Pending
 
-Each mastered setup becomes a "card". Gamifies study.
+Each mastered setup becomes a "card".
 
 ### 28. Subtle sound
 
@@ -227,25 +221,23 @@ When single-file exceeds ~2,000 LOC. Modular structure.
 
 **Effort:** Low · **Status:** Pending
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap.
 
 ### 31. Offline mode (service worker)
 
 **Effort:** Medium · **Status:** Pending
 
-PWA with cache. Train on a plane.
+PWA with cache.
 
 ### 32. State via useReducer
 
 **Effort:** Low · **Status:** Pending
 
-Replace the 12 interdependent useState hooks. Easier to test, fewer sync bugs.
+Replace the 12+ interdependent useState hooks.
 
 ---
 
 ## Prioritization matrix
-
-Compact view to decide implementation order. **Start with the green quadrant.**
 
 | # | Item | Tier | Effort | Impact | Status |
 |---|------|------|--------|--------|--------|
@@ -255,9 +247,10 @@ Compact view to decide implementation order. **Start with the green quadrant.**
 | 6 | Heatmap of "where you fail" | T2 | Medium | High | ✅ SHIPPED |
 | 7 | Expanded debrief "Why not the other side?" | T2 | Low | High | ✅ SHIPPED |
 | 8 | Per-decision journal with export | T2 | Low | High | ✅ SHIPPED |
+| 9 | Justified skip (with reason) | T2 | Low | High | ✅ SHIPPED |
+| 11 | "Trap of the day" warning | T2 | Medium | High | ✅ SHIPPED |
 | 3 | AI validation (hindsight bias) | T1 | High | Very high | Partial |
 | 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
-| 9 | Justified skip (with reason) | T2 | Low | High | Pending |
 | 10 | Adaptive difficulty | T2 | Medium | High | Pending |
 | 21 | Real ELO (Glicko) | T4 | Medium | Medium-high | Pending |
 | 29 | Migration to Vite + TS | T4 | High | Enabler | Recommended |
@@ -270,10 +263,11 @@ Compact view to decide implementation order. **Start with the green quadrant.**
 - ✅ Heatmap of "where you fail" (#6)
 - ✅ Expanded debrief "Why not the other side?" (#7)
 - ✅ Per-decision journal with export (#8)
+- ✅ Justified skip with reason (#9)
+- ✅ "Trap of the day" warning (#11)
 - ✅ Ranks / tiers (#22)
 - ✅ 30-second onboarding (#24)
-- → Justified skip with reason (#9)
-- → Trap of the day warning (#11)
+- → Adaptive difficulty (#10)
 
 ### Structural investments
 
@@ -288,10 +282,10 @@ Compact view to decide implementation order. **Start with the green quadrant.**
 
 Today, Tape Puzzles is a *beautiful direction-guessing game*. To become a **real training tool**, the key lies in three Tier 1 items: **counterfactual debrief**, **setup labeling**, and **data realism**.
 
-With those three, the user leaves every puzzle knowing *what* they missed, *why*, and *what the market would have done* in any direction — which is exactly what *"chess puzzles for traders"* should deliver.
+The addition of **process score**, the **weakness heatmap**, the **four-axis expanded debrief**, the **per-decision journal**, the **justified skip modal**, and the **trap warning** (Tier 2, #5, #6, #7, #8, #9, #11) closes the loop: the app now separates good decisions from good outcomes, tells the user exactly where their edge is missing, explains *why* the other side lost, keeps a persistent exportable record of every decision, asks the user to justify skips, and warns about the most common traps in real time.
 
-The addition of **process score**, the **weakness heatmap**, the **four-axis expanded debrief**, and the **per-decision journal** (Tier 2, #5, #6, #7, #8) closes the loop: the app now separates good decisions from good outcomes, tells the user exactly where their edge is missing, explains *why* the other side lost, and keeps a persistent, exportable record of every decision.
+The next frontier is the **generator realism** (#4) — until the data is realistic, the rest is training wheels on a synthetic track.
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.2 · 32 items · 4 tiers · 8 shipped · 24 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.3 · 32 items · 4 tiers · 10 shipped · 22 pending*
