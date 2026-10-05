@@ -32,3 +32,22 @@ The interactive application state is centralized in a typed React `useReducer`. 
 ## Roadmap consistency audit
 
 The audit also reconciled roadmap claims with the actual implementation. Items 3 (AI validation against hindsight bias) and 4 (procedural-generator realism) were marked Pending because the current source did not contain the capabilities previously described as shipped. This avoids documenting functionality that is not actually present.
+
+## 10. Adaptive difficulty — shipped
+
+Implemented a rolling process-accuracy controller using the last 20 scored decisions in the local journal. The warm-up phase keeps the difficulty at Normal until five process observations exist; after that, below 60% selects Easy, above 75% selects Hard, and the 60–75% zone stays Normal. Reverse exploration is not journaled, so it cannot distort difficulty.
+
+The generator receives the selected level and applies the roadmap multipliers:
+- Easy: volatility ×0.75, setup strength ×1.25, noise ×0.90.
+- Normal: ×1.00, ×1.00, ×1.00.
+- Hard: volatility ×1.30, setup strength ×0.70, noise ×1.15.
+
+Setup strength is applied to the 15 historical bars immediately preceding the decision point. The active level is shown in the game header.
+
+## 17. Reverse replay after result — shipped
+
+After a scored result, the user can start an isolated exploration of the same puzzle with Long, Short, or Skip. The original 38 future bars are replayed from the original entry point.
+
+Long/Short use the same SL/TP bracket controls and replay engine, including Play, Pause, Step, four playback speeds, and Flatten. Skip replays the future sequence without opening a position. A blue “Exploration — not counted” banner identifies the mode.
+
+Exploration has its own replay/result state and never writes to statistics or journal. “Back to result” restores the original scored result without changing ELO, streak, process accuracy, or history used by adaptive difficulty.
