@@ -1,4 +1,4 @@
-# Trading Tape Puzzles — Roadmap de Melhorias
+# Xadrez do Mercado — Roadmap de Melhorias
 
 > **Documento Estratégico** · v1.9
 >
