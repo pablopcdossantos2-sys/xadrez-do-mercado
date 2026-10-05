@@ -9,7 +9,8 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import type { ChangeEvent, ReactNode } from 'react';
 import { analyzeDebrief, analyzePuzzle, detectTrap, REF_SL, REF_TP, simulateSide } from './analytics';
-import { generateMarketData } from './data';
+import { generateMarketData, getDailyChallengeSeed } from './data';
+import { PATTERN_CARDS } from './cards';
 import { getAdaptiveDifficulty } from './difficulty';
 import { buildNextStats, reducer } from './reducer';
 import type { Action, AppState, Decision, Instrument, JournalEntry, Mode, Timeframe, TradeOutcome } from './types';
@@ -30,7 +31,7 @@ function initialState():AppState{
     phase:'HOME',puzzleData:{history:[],future:[]},replayData:[],aiData:null,userDecision:null,entryPrice:null,
     slOffset:REF_SL,tpOffset:REF_TP,playbackIdx:0,isPlaying:false,speed:3,tradeResult:null,rMultiple:0,eloDelta:0,
     debriefAxes:[],trap:null,skipReason:null,skipReasonMatch:null,aiSkipReason:null,freezeUsedThisPuzzle:false,freezeStreakValue:0,
-    puzzleId:1000,speedRun:{active:false,round:0,totalRounds:SPEED_TOTAL_ROUNDS,correct:0,processMatch:0,rSum:0,startedAt:0,deadlineAt:0,lastDurationMs:null},
+    puzzleId:1000,dailyChallenge:false,dailyChallengeDate:null,speedRun:{active:false,round:0,totalRounds:SPEED_TOTAL_ROUNDS,correct:0,processMatch:0,rSum:0,startedAt:0,deadlineAt:0,lastDurationMs:null},
     reverseDecision:null,reverseReplayData:[],reversePlaybackIdx:0,reverseIsPlaying:false,reverseResult:null,reverseEntryPrice:null,
     skipModalOpen:false,skipReasonDraft:'',clockNow:Date.now(),
   };
@@ -45,6 +46,7 @@ function fmtR(r:number){return (r>=0?'+':'')+r.toFixed(2)+'R';}
 function fmtDuration(ms:number){const s=Math.max(0,Math.round(ms/1000)),m=Math.floor(s/60);return m+':'+String(s%60).padStart(2,'0');}
 function fmtSessionTime(ts:number|null){if(ts===null)return '—';const d=new Date(ts*1000);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 function hasRecentLoss(journal:JournalEntry[]){return journal.length>0&&journal[journal.length-1].outcome==='LOSS';}
+function formatPct(value:number){return Math.round(value*100)+'%';}
 function rank(elo:number,t:T){return elo<1180?t('rankNovice'):elo<1260?t('rankDeveloping'):elo<1360?t('rankConsistent'):elo<1480?t('rankSharp'):t('rankInstitutional');}
 function Toggle({active,children,onClick}:{active:boolean;children:ReactNode;onClick:()=>void}){return <button className={'toggle '+(active?'active':'')} onClick={onClick}>{children}</button>;}
 
