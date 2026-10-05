@@ -42,6 +42,8 @@ Each puzzle presents 82 historical bars and asks for one decision. In Standard m
 - ELO, accuracy, process score, streak, and breakdowns by setup, direction, timeframe, and instrument.
 - Local journal with up to 200 decisions and JSON/CSV export.
 - Bilingual EN/PT-BR interface, optional sound, and keyboard shortcuts.
+- Adaptive difficulty, Only structure vs Full context mode, a visual session clock, and a revenge-trade warning.
+- Pure-function tests with Vitest.
 
 ## Architecture
 
@@ -63,7 +65,7 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 ## Roadmap completed in this version
 
-The pending items **10. Adaptive difficulty**, **15. Blind tape**, **17. Reverse replay after result**, **19. Speed run**, **29. Migrate to Vite + React + TypeScript**, and **32. State with useReducer** have been implemented. Details: [implementation notes](docs/roadmap-implementation.md).
+The pending items **10. Adaptive difficulty**, **15. Blind tape**, **16. Only structure vs Full context**, **17. Reverse replay after result**, **18. Visual session clock**, **19. Speed run**, **20. Revenge trade warning**, **29. Migrate to Vite + React + TypeScript**, **30. Pure-function tests**, and **32. State with useReducer** have been implemented. Details: [implementation notes](docs/roadmap-implementation.md).
 
 ## Documentation
 
