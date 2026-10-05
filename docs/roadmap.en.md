@@ -197,8 +197,6 @@ This is the purest form of counterfactual training: not "what would have happene
 ### Quick wins — do first
 
 - → Real levels (RTH/ETH) (#12)
-- → Session clock (#18)
-- → Revenge trade warning (#20)
 
 ### Structural investments
 
