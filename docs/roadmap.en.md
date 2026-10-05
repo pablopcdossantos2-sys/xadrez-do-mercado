@@ -1,12 +1,12 @@
 # Trading Tape Puzzles — Improvement Roadmap
 
-> **Strategic Document** · v1.3
+> **Strategic Document** · v1.4
 >
 > 32 improvements to turn Tape Puzzles from a guessing game into a real training tool.
 
 Every item is ranked by **impact on user learning**, also considering implementation effort, technical dependencies, and alignment with the project's stated goal: *"chess puzzles for futures day traders"*.
 
-**Summary:** 32 items · 4 tiers · 10 shipped · 22 pending
+**Summary:** 32 items · 4 tiers · 13 shipped · 19 pending
 
 ---
 
@@ -77,7 +77,7 @@ Objective panel with four classic axes — structure, volume, location, confluen
 
 **Effort:** Low · **Status:** ✅ SHIPPED
 
-Every decision is appended to a local journal (last 200). Export as JSON or CSV. Now also stores skip reason and trap detected.
+Every decision is appended to a local journal (last 200). Export as JSON or CSV. Stores skip reason, trap detected, and freeze usage.
 
 ### 9. Justified skip (with reason)
 
@@ -95,7 +95,7 @@ Keep the user in flow zone (60–75% accuracy) by tuning generator noise.
 
 **Effort:** Medium · **Status:** ✅ SHIPPED
 
-`detectTrap()` analyzes the visible history and flags deceptive patterns: oversized bar body (>1.5× ATR), dominant wick rejection, VWAP whipsaw (≥4 crossings in 8 bars), 3-bar push on declining volume, and failed breakouts in the last 4 bars. A warning banner appears in the Decision phase sidebar, without giving away the answer.
+`detectTrap()` analyzes the visible history and flags deceptive patterns: oversized bar body, dominant wick rejection, VWAP whipsaw, 3-bar push on declining volume, and failed breakouts in the last 4 bars. A warning banner appears in the Decision phase sidebar.
 
 ---
 
@@ -177,9 +177,9 @@ Novice · Developing · Consistent · Sharp · Institutional.
 
 ### 23. Streak with "freeze"
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-1 freeze/day to avoid resetting the streak.
+One freeze per day. If the user loses with a streak > 0 and freeze available, the streak is preserved and the freeze consumed. Resets automatically after 24h. Indicator shown in the top bar during play, and a dedicated banner appears in the Result phase when consumed. Sound cue (two-note chime) plays on consumption.
 
 ### 24. 30-second onboarding
 
@@ -189,9 +189,9 @@ Novice · Developing · Consistent · Sharp · Institutional.
 
 ### 25. Mobile responsiveness
 
-**Effort:** Medium · **Status:** Pending
+**Effort:** Medium · **Status:** ✅ SHIPPED
 
-Vertical layout, touch buttons, gestures.
+Layout stacks vertically below `md`: chart takes the top 40vh, sidebar occupies the remaining space with its own scroll. Top bar wraps gracefully; indicator toggles hidden on small screens; journal table progressively reveals columns (`hidden sm:table-cell`, `hidden md:table-cell`, `hidden lg:table-cell`). Buttons get `min-height: 40px` on touch. Touch pan/zoom enabled on the chart. Keyboard shortcuts de-emphasized on touch.
 
 ### 26. Daily challenges with deterministic seed
 
@@ -207,9 +207,9 @@ Each mastered setup becomes a "card".
 
 ### 28. Subtle sound
 
-**Effort:** Low · **Status:** Pending
+**Effort:** Low · **Status:** ✅ SHIPPED
 
-Chime on TP hit, thud on stop. Toggleable.
+A `useSound` hook built on the **Web Audio API** — no external files. Distinct tones for click (decision), chime (WIN), thud (LOSS), tick (SKIP), and a two-note shimmer (freeze consumed). Toggle button in the top bar; preference persisted in `localStorage`. Context is created lazily on the first user gesture, so browsers never block it.
 
 ### 29. Migrate to Vite + React + TypeScript
 
@@ -221,7 +221,7 @@ When single-file exceeds ~2,000 LOC. Modular structure.
 
 **Effort:** Low · **Status:** Pending
 
-classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap.
+classifySetup, computeVWAP, computeATR, analyzePuzzle, analyzeDebrief, detectTrap, isFreezeReady.
 
 ### 31. Offline mode (service worker)
 
@@ -249,6 +249,11 @@ Replace the 12+ interdependent useState hooks.
 | 8 | Per-decision journal with export | T2 | Low | High | ✅ SHIPPED |
 | 9 | Justified skip (with reason) | T2 | Low | High | ✅ SHIPPED |
 | 11 | "Trap of the day" warning | T2 | Medium | High | ✅ SHIPPED |
+| 22 | Ranks / tiers | T4 | Low | Medium | ✅ SHIPPED |
+| 23 | Streak with freeze | T4 | Low | Medium | ✅ SHIPPED |
+| 24 | 30-second onboarding | T4 | Low | Medium | ✅ SHIPPED |
+| 25 | Mobile responsiveness | T4 | Medium | Medium | ✅ SHIPPED |
+| 28 | Subtle sound | T4 | Low | Medium | ✅ SHIPPED |
 | 3 | AI validation (hindsight bias) | T1 | High | Very high | Partial |
 | 4 | Realism of procedural generator | T1 | High | Very high (long term) | Pending |
 | 10 | Adaptive difficulty | T2 | Medium | High | Pending |
@@ -266,7 +271,10 @@ Replace the 12+ interdependent useState hooks.
 - ✅ Justified skip with reason (#9)
 - ✅ "Trap of the day" warning (#11)
 - ✅ Ranks / tiers (#22)
+- ✅ Streak with freeze (#23)
 - ✅ 30-second onboarding (#24)
+- ✅ Mobile responsiveness (#25)
+- ✅ Subtle sound (#28)
 - → Adaptive difficulty (#10)
 
 ### Structural investments
@@ -282,10 +290,10 @@ Replace the 12+ interdependent useState hooks.
 
 Today, Tape Puzzles is a *beautiful direction-guessing game*. To become a **real training tool**, the key lies in three Tier 1 items: **counterfactual debrief**, **setup labeling**, and **data realism**.
 
-The addition of **process score**, the **weakness heatmap**, the **four-axis expanded debrief**, the **per-decision journal**, the **justified skip modal**, and the **trap warning** (Tier 2, #5, #6, #7, #8, #9, #11) closes the loop: the app now separates good decisions from good outcomes, tells the user exactly where their edge is missing, explains *why* the other side lost, keeps a persistent exportable record of every decision, asks the user to justify skips, and warns about the most common traps in real time.
+The addition of **process score**, the **weakness heatmap**, the **four-axis expanded debrief**, the **per-decision journal**, the **justified skip modal**, the **trap warning**, and the **streak freeze + sound + mobile** polish (Tier 2 #5–#11 and Tier 4 #22–#28) closes the loop: the app now separates good decisions from good outcomes, tells the user exactly where their edge is missing, explains *why* the other side lost, keeps a persistent exportable record of every decision, asks the user to justify skips, warns about the most common traps in real time, and is finally usable on a phone.
 
-The next frontier is the **generator realism** (#4) — until the data is realistic, the rest is training wheels on a synthetic track.
+The next frontier remains the **generator realism** (#4) — until the data is realistic, the rest is training wheels on a synthetic track.
 
 ---
 
-*Trading Tape Puzzles · Improvement Roadmap · v1.3 · 32 items · 4 tiers · 10 shipped · 22 pending*
+*Trading Tape Puzzles · Improvement Roadmap · v1.4 · 32 items · 4 tiers · 13 shipped · 19 pending*
