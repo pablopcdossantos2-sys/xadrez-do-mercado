@@ -49,7 +49,7 @@ export interface Stats {
   freezeUsedAt:number;
   collectedCards:string[];
 }
-export type Instrument = 'MES'|'MNQ';
+export type Instrument = 'MES'|'MNQ'|'WINFUT'|'WDOFUT'|'BIT';
 export type Timeframe = '1m'|'5m'|'15m'|'1h';
 export interface JournalEntry {
   ts:number;
