@@ -2,7 +2,7 @@
 const en={
   appName:'Trading Tape Puzzles',trainingTool:'Trading decision trainer',tagline:'Chess puzzles, but for futures day traders.',
   heroSubtitle:'Read the tape, make one call, learn from what the market would have done.',heroFooter:'Runs entirely in your browser. No account. No backend.',
-  mode:'Mode',standard:'Standard',blind:'Blind tape',speedRun:'Speed run',startTraining:'Start training',startBlind:'Start blind tape',startSpeedRun:'Start speed run',home:'Home',blindBadge:'BLIND TAPE',difficulty:'Difficulty',difficultyEasy:'Easy',difficultyNormal:'Normal',difficultyHard:'Hard',difficultyProcessHint:'Based on your process accuracy over the last 20 decisions.',
+  mode:'Mode',standard:'Standard',blind:'Blind tape',speedRun:'Speed run',contextMode:'Context',fullContext:'Full context',onlyStructure:'Only structure',structureModeHint:'Hide market context during the decision, while keeping the chart visible.',startTraining:'Start training',startBlind:'Start blind tape',startSpeedRun:'Start speed run',home:'Home',blindBadge:'BLIND TAPE',difficulty:'Difficulty',difficultyEasy:'Easy',difficultyNormal:'Normal',difficultyHard:'Hard',difficultyProcessHint:'Based on your process accuracy over the last 20 decisions.',
   blindHint:'During the decision phase, context, playbook, price/time scales, indicators, and volume are hidden.',speedHint:'10 rapid decisions within a 15-minute session. No intermediate debrief; each round is evaluated automatically.',
   marketContext:'Market context',decision:'Decision',replay:'Replay',result:'Result',decisionQ:'Long, short, or skip?',long:'Long',short:'Short',skip:'Skip',
   playbook:'Playbook',range:'Range',atr:'ATR(14)',priceVsVwap:'Price vs VWAP',sessionOpen:'Session open',entry:'Entry',stop:'Stop',target:'Target',
@@ -21,6 +21,7 @@ const en={
   skipTitle:'Why are you skipping?',skipReasonLabel:'Skip reason',skipSub:'Choose the main reason for your Skip decision.',skipBadSetup:'Bad setup',skipFarFromVwap:'Too far from VWAP',
   skipAgainstTrend:'Against the trend',skipNoConfluence:'No confluence',skipUnsure:'Not sure',cancel:'Cancel',submit:'Submit',
   freezeAvailable:'Freeze available',loadingChart:'Loading chart…',candlesAria:'Candlestick market replay chart',syntheticData:'Procedural synthetic market data',
+  sessionClock:'Session',sessionClockHint:'Current market time of the last visible bar.',revengeWarningTitle:'Revenge trade warning',revengeWarningText:'You just took a loss. Slow down, reread the structure, and do not trade to win it back.',
   speedRunDone:'Speed run complete',speedRunSummary:'Session summary',playAgain:'Run again',round:'Round',of:'of',roundComplete:'Round complete',
   speedDecisionRecorded:'Decision {decision} recorded at {r}R.',nextRoundAutomatically:'Next round loads automatically.',
   speedRunAccuracy:'Accuracy',speedRunProcess:'Process',speedRunR:'R total',timeUp:'Time up',
@@ -37,7 +38,7 @@ const en={
 const pt={
   appName:'Trading Tape Puzzles',trainingTool:'Treinador de tomada de decisão',tagline:'Enigmas de xadrez, mas para day traders de futuros.',
   heroSubtitle:'Leia o tape, faça uma escolha e aprenda com o que o mercado teria feito.',heroFooter:'Executado no navegador. Sem conta. Sem backend.',
-  mode:'Modo',standard:'Padrão',blind:'Blind tape',speedRun:'Speed run',startTraining:'Iniciar treinamento',startBlind:'Iniciar blind tape',startSpeedRun:'Iniciar speed run',home:'Início',blindBadge:'BLIND TAPE',difficulty:'Dificuldade',difficultyEasy:'Fácil',difficultyNormal:'Normal',difficultyHard:'Difícil',difficultyProcessHint:'Baseada na precisão de processo das últimas 20 decisões.',
+  mode:'Modo',standard:'Padrão',blind:'Blind tape',speedRun:'Speed run',contextMode:'Contexto',fullContext:'Contexto completo',onlyStructure:'Só estrutura',structureModeHint:'Oculta o contexto durante a decisão, mantendo o gráfico visível.',startTraining:'Iniciar treinamento',startBlind:'Iniciar blind tape',startSpeedRun:'Iniciar speed run',home:'Início',blindBadge:'BLIND TAPE',difficulty:'Dificuldade',difficultyEasy:'Fácil',difficultyNormal:'Normal',difficultyHard:'Difícil',difficultyProcessHint:'Baseada na precisão de processo das últimas 20 decisões.',
   blindHint:'Durante a decisão, contexto, playbook, escalas de preço/tempo, indicadores e volume ficam ocultos.',speedHint:'10 decisões rápidas em até 15 minutos. Sem debrief intermediário; cada rodada é avaliada automaticamente.',
   marketContext:'Contexto de mercado',decision:'Decisão',replay:'Replay',result:'Resultado',decisionQ:'Long, short ou skip?',long:'Long',short:'Short',skip:'Skip',
   playbook:'Playbook',range:'Range',atr:'ATR(14)',priceVsVwap:'Preço vs VWAP',sessionOpen:'Abertura da sessão',entry:'Entrada',stop:'Stop',target:'Alvo',
@@ -56,6 +57,7 @@ const pt={
   skipTitle:'Por que você está pulando?',skipReasonLabel:'Motivo do Skip',skipSub:'Escolha o principal motivo para sua decisão de Skip.',skipBadSetup:'Setup ruim',skipFarFromVwap:'Longe demais do VWAP',
   skipAgainstTrend:'Contra a tendência',skipNoConfluence:'Sem confluência',skipUnsure:'Não tenho certeza',cancel:'Cancelar',submit:'Confirmar',
   freezeAvailable:'Freeze disponível',loadingChart:'Carregando gráfico…',candlesAria:'Gráfico de replay de candles',syntheticData:'Dados de mercado sintéticos e procedurais',
+  sessionClock:'Sessão',sessionClockHint:'Horário de mercado da última barra visível.',revengeWarningTitle:'Alerta de revenge trade',revengeWarningText:'Você acabou de sofrer uma perda. Diminua o ritmo, releia a estrutura e não opere para tentar recuperar.',
   speedRunDone:'Speed run concluído',speedRunSummary:'Resumo da sessão',playAgain:'Executar novamente',round:'Rodada',of:'de',roundComplete:'Rodada concluída',
   speedDecisionRecorded:'Decisão {decision} registrada em {r}R.',nextRoundAutomatically:'A próxima rodada será carregada automaticamente.',
   speedRunAccuracy:'Precisão',speedRunProcess:'Processo',speedRunR:'R total',timeUp:'Tempo esgotado',
