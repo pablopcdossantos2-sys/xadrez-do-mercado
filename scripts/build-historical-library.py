@@ -221,8 +221,18 @@ def session_stats(bars: list[dict]) -> dict:
 
 
 def choose_curated(candidates: list[dict], limit: int) -> list[dict]:
+    if not candidates:
+        return []
+    by_contract: dict[str, list[dict]] = defaultdict(list)
+    for candidate in candidates:
+        by_contract[candidate["contract"]].append(candidate)
+    same_contract = max(
+        by_contract.values(),
+        key=lambda group: (len(group), sum(x["tickCount"] for x in group)),
+    )
+    candidates = same_contract if len(same_contract) >= limit else candidates
     if len(candidates) <= limit:
-        return candidates
+        return sorted(candidates, key=lambda x: x["tradeDate"])
     chosen: list[dict] = []
     seen: set[str] = set()
 
@@ -248,8 +258,6 @@ def choose_curated(candidates: list[dict], limit: int) -> list[dict]:
             take(candidate)
 
     return sorted(chosen, key=lambda x: x["tradeDate"])
-
-
 def build_day(trade_date: date, raw_rows) -> list[dict]:
     grouped: dict[str, list[tuple[int, float, float]]] = defaultdict(list)
     quantities: dict[str, float] = defaultdict(float)
@@ -335,7 +343,13 @@ def main() -> int:
             print(f"  candidate-assets={len(day_candidates)}")
             candidates.extend(day_candidates)
             if all(
-                sum(1 for c in candidates if c["asset"] == asset) >= args.max_sessions
+                max(
+                    (
+                        sum(1 for c in candidates if c["asset"] == asset and c["contract"] == contract)
+                        for contract in {c["contract"] for c in candidates if c["asset"] == asset}
+                    ),
+                    default=0,
+                ) >= args.max_sessions
                 for asset in ASSETS
             ):
                 print("ENOUGH: reached the requested session count for all assets")
