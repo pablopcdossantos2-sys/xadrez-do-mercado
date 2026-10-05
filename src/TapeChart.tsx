@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { createChart, CrosshairMode, type IChartApi, type IPriceLine, type Time } from 'lightweight-charts';
 import { computeDEMA, computeEMA, computeVWAP } from './analytics';
-import type { Bar } from './types';
+import type { Bar, SessionLevels } from './types';
 
 interface Props {
   bars:Bar[];
@@ -15,9 +15,10 @@ interface Props {
   entryPrice:number|null;
   slPrice:number|null;
   tpPrice:number|null;
+  sessionLevels?:SessionLevels;
 }
 
-export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,showVol,blind,entryPrice,slPrice,tpPrice}:Props){
+export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,showVol,blind,entryPrice,slPrice,tpPrice,sessionLevels}:Props){
   const ref=useRef<HTMLDivElement|null>(null);
   const chartRef=useRef<IChartApi|null>(null);
   const candleRef=useRef<ReturnType<IChartApi['addCandlestickSeries']>|null>(null);
@@ -68,15 +69,21 @@ export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,sho
 
     priceLinesRef.current.forEach(line=>candle.removePriceLine(line));priceLinesRef.current=[];
     if(!blind&&showLevels){
-      const base=bars.slice(0,Math.max(1,Math.min(45,bars.length))),pdh=Math.max(...base.map(b=>b.high)),pdl=Math.min(...base.map(b=>b.low));
+      const levels=sessionLevels??{rthHigh:null,rthLow:null,ethHigh:null,ethLow:null};
+      const fallback=bars.slice(0,Math.max(1,Math.min(45,bars.length)));
+      const pdh=Math.max(...fallback.map(b=>b.high)),pdl=Math.min(...fallback.map(b=>b.low));
       priceLinesRef.current.push(candle.createPriceLine({price:pdh,color:'#667085',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'PDH'}));
       priceLinesRef.current.push(candle.createPriceLine({price:pdl,color:'#667085',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'PDL'}));
+      if(levels.rthHigh!==null)priceLinesRef.current.push(candle.createPriceLine({price:levels.rthHigh,color:'#8b97a8',lineWidth:1,lineStyle:1,axisLabelVisible:true,title:'RTH H'}));
+      if(levels.rthLow!==null)priceLinesRef.current.push(candle.createPriceLine({price:levels.rthLow,color:'#8b97a8',lineWidth:1,lineStyle:1,axisLabelVisible:true,title:'RTH L'}));
+      if(levels.ethHigh!==null)priceLinesRef.current.push(candle.createPriceLine({price:levels.ethHigh,color:'#596579',lineWidth:1,lineStyle:1,axisLabelVisible:true,title:'ETH H'}));
+      if(levels.ethLow!==null)priceLinesRef.current.push(candle.createPriceLine({price:levels.ethLow,color:'#596579',lineWidth:1,lineStyle:1,axisLabelVisible:true,title:'ETH L'}));
     }
     if(!blind&&entryPrice!==null)priceLinesRef.current.push(candle.createPriceLine({price:entryPrice,color:'#6f8cff',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'Entry'}));
     if(!blind&&slPrice!==null)priceLinesRef.current.push(candle.createPriceLine({price:slPrice,color:'#ef5350',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'SL'}));
     if(!blind&&tpPrice!==null)priceLinesRef.current.push(candle.createPriceLine({price:tpPrice,color:'#26a69a',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'TP'}));
     chart.timeScale().fitContent();
-  },[bars,blind,showVwap,showEma,showDema,showLevels,showVol,entryPrice,slPrice,tpPrice]);
+  },[bars,blind,showVwap,showEma,showDema,showLevels,showVol,entryPrice,slPrice,tpPrice,sessionLevels]);
 
   return <div className="chart-wrap"><div ref={ref} className="tape-chart" />{!blind&&<div className="chart-legend"><span>VWAP</span><span>EMA 20</span><span>DEMA</span><span className="legend-note">Interactive chart · synthetic procedural data</span></div>}</div>;
 }
