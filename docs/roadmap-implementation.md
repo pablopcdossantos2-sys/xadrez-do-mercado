@@ -68,3 +68,39 @@ When a new Standard or Blind decision starts immediately after a losing scored t
 
 Added a Vitest suite covering pure analytics and adaptive-difficulty behavior: EMA, ATR, bracket outcome ordering, warm-up behavior, and easy/normal/hard threshold mapping. The repository now exposes `npm run test` for the suite.
 
+## 3. Analyst validation against hindsight bias — shipped
+
+Reworked the puzzle analyst so its recommendation is computed only from the 82 historical bars. Future bars are now isolated to outcome simulation after the decision. The analysis exposes a signal-confidence score and a small accepted-answer set for ambiguous setups; process scoring uses that accepted set rather than forcing a single hindsight-derived answer.
+
+## 4. Procedural generator realism — shipped
+
+Expanded the synthetic generator with session-dependent volatility and volume profiles, persistent volatility clustering, a deterministic opening gap at RTH open, and a deterministic high-impact macro shock inside the future window. The generator remains explicitly synthetic; these features model market behavior without claiming historical-feed realism.
+
+## 12. Real levels (RTH vs ETH) — shipped
+
+Added separate RTH and ETH high/low calculations from the historical bars and rendered them both in the context panel and on the interactive chart. These are synthetic session references, not exchange-derived historical levels.
+
+## 13. Synthetic tape microstructure — shipped
+
+Added a deterministic synthetic order-flow estimate per visible candle, exposing buy volume, sell volume, delta, imbalance, and aggressor bias. The UI updates this estimate during replay and explicitly labels it as synthetic rather than real bid/ask data.
+
+## 14. Macro events mid-puzzle — shipped
+
+Each generated puzzle now receives one deterministic high-impact simulated event during the future sequence. When replay reaches the event, the UI surfaces the event label and the generator applies an associated price/volume shock.
+
+## 21. Real ELO curve — shipped
+
+Replaced the fixed +18/-15 rating step with a classical Elo calculation using expected score, K-factor 24, and a synthetic opponent rating tied to difficulty. Harder puzzles therefore carry different rating expectations instead of every result moving the rating by the same amount.
+
+## 26. Daily challenges with deterministic seed — shipped
+
+Added a Daily Challenge entry point that uses a calendar-date-derived deterministic seed and Normal difficulty, so the same instrument/timeframe combination produces the same daily puzzle for that date. Daily runs are logged as challenge entries and can be finished from the result screen without loading a second puzzle.
+
+## 27. Collectible pattern cards — shipped
+
+Added a persistent collection of setup cards. Each solved puzzle exposes its setup as a collectible, the home screen shows collected versus locked patterns, and Reset Stats clears the collection.
+
+## 31. Offline mode — shipped
+
+Added a minimal PWA shell with a web manifest, SVG app icon, service-worker registration, shell precaching, and runtime same-origin caching. After an online load, the application assets can be served from cache when the network is unavailable.
+
