@@ -8,7 +8,7 @@ export const JOURNAL_MAX=200, FREEZE_WINDOW_MS=24*60*60*1000;
 
 const newBucket=():StatsBucket=>({labelEn:'',labelPt:'',samples:0,correct:0,processMatch:0,rSum:0});
 export const emptyBreakdown=():Breakdown=>({bySetup:{},byTimeframe:{},byDirection:{},byInstrument:{}});
-export const createDefaultStats=():Stats=>({elo:1236,solved:0,correct:0,processMatch:0,streak:0,bestStreak:0,rSum:0,breakdown:emptyBreakdown(),freezeAvailable:1,freezeUsedAt:0});
+export const createDefaultStats=():Stats=>({elo:1236,solved:0,correct:0,processMatch:0,streak:0,bestStreak:0,rSum:0,breakdown:emptyBreakdown(),freezeAvailable:1,freezeUsedAt:0,collectedCards:[]});
 
 export function migrateStats(raw:unknown):Stats{
   if(!raw||typeof raw!=='object')return createDefaultStats();
@@ -22,7 +22,7 @@ export function migrateStats(raw:unknown):Stats{
       });
     });
   }
-  return {...createDefaultStats(),...s,breakdown:b};
+  return {...createDefaultStats(),...s,breakdown:b,collectedCards:Array.isArray(s.collectedCards)?s.collectedCards.filter((x):x is string=>typeof x==='string'):[]};
 }
 export function loadStats():Stats{
   try{const current=localStorage.getItem(STATS_KEY),legacy=localStorage.getItem(LEGACY_STATS_KEY);return current?migrateStats(JSON.parse(current)):legacy?migrateStats(JSON.parse(legacy)):createDefaultStats();}
@@ -40,7 +40,7 @@ export function loadSoundPreference(){try{return localStorage.getItem(SOUND_KEY)
 export function saveSoundPreference(v:boolean){try{localStorage.setItem(SOUND_KEY,v?'1':'0');}catch{}}
 
 function normaliseEntry(x:Partial<JournalEntry>):JournalEntry{
-  return {...x,ts:Number(x.ts)||Date.now(),puzzleId:Number(x.puzzleId)||0,instrument:x.instrument==='MNQ'?'MNQ':'MES',timeframe:x.timeframe??'15m',mode:x.mode??'standard',setup:x.setup??null,decision:x.decision??'SKIP',aiDecision:x.aiDecision??'SKIP',processMatch:Boolean(x.processMatch),outcome:x.outcome??'SKIP',r:Number(x.r)||0,entry:typeof x.entry==='number'?x.entry:null,slOffset:Number(x.slOffset)||12,tpOffset:Number(x.tpOffset)||24,skipReason:x.skipReason??null,skipReasonMatch:x.skipReasonMatch??null,trap:x.trap??null,freezeUsed:Boolean(x.freezeUsed),speedRunRound:x.speedRunRound??null,speedRunDurationMs:x.speedRunDurationMs??null};
+  return {...x,ts:Number(x.ts)||Date.now(),puzzleId:Number(x.puzzleId)||0,instrument:x.instrument==='MNQ'?'MNQ':'MES',timeframe:x.timeframe??'15m',mode:x.mode??'standard',setup:x.setup??null,decision:x.decision??'SKIP',aiDecision:x.aiDecision??'SKIP',processMatch:Boolean(x.processMatch),outcome:x.outcome??'SKIP',r:Number(x.r)||0,entry:typeof x.entry==='number'?x.entry:null,slOffset:Number(x.slOffset)||12,tpOffset:Number(x.tpOffset)||24,skipReason:x.skipReason??null,skipReasonMatch:x.skipReasonMatch??null,trap:x.trap??null,freezeUsed:Boolean(x.freezeUsed),speedRunRound:x.speedRunRound??null,speedRunDurationMs:x.speedRunDurationMs??null,dailyChallenge:Boolean(x.dailyChallenge)};
 }
 export function loadJournal():JournalEntry[]{
   try{const raw=localStorage.getItem(JOURNAL_KEY)??localStorage.getItem(LEGACY_JOURNAL_KEY);if(!raw)return[];const data=JSON.parse(raw);return Array.isArray(data)?data.slice(-JOURNAL_MAX).map(normaliseEntry):[];}catch{return[];}
