@@ -10,7 +10,7 @@ Os arquivos do diretório `public/data/historical/` são candles derivados de da
 public/data/historical/
 ├── manifest.json
 ├── WINFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
-├── WDOFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
+└── WDOFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
 
 ```
 
