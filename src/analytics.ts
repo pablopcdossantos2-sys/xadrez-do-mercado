@@ -1,28 +1,56 @@
-
-import type { Bar, DebriefAxis, PuzzleAnalysis, Setup, TradeOutcome, TrapInfo } from './types';
+import type { Bar, DebriefAxis, Microstructure, PuzzleAnalysis, SessionLevels, Setup, TradeOutcome, TrapInfo } from './types';
 
 export const REF_SL=12;
 export const REF_TP=24;
+
+const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 
 export function computeEMA(bars:Bar[],period:number){
   if(period<=0)throw new Error('EMA period must be positive');
   const k=2/(period+1);let ema:number|null=null;
   return bars.map(b=>{ema=ema===null?b.close:b.close*k+ema*(1-k);return{time:b.time,value:Number(ema.toFixed(4))};});
 }
+
 export function computeDEMA(bars:Bar[],period:number){
   const e1=computeEMA(bars,period);
   const e2=computeEMA(e1.map(x=>({time:x.time,open:x.value,high:x.value,low:x.value,close:x.value,volume:0})),period);
   return e1.map((x,i)=>({time:x.time,value:Number((2*x.value-e2[i].value).toFixed(4))}));
 }
+
 export function computeVWAP(bars:Bar[]){
   let pv=0,v=0;
   return bars.map(b=>{const vol=b.volume||1;pv+=((b.high+b.low+b.close)/3)*vol;v+=vol;return{time:b.time,value:Number((pv/v).toFixed(4))};});
 }
+
 export function computeATR(bars:Bar[],period=14){
   if(period<=0||bars.length<period+1)return 0;let sum=0;
   for(let i=bars.length-period;i<bars.length;i++){const p=bars[i-1],c=bars[i];sum+=Math.max(c.high-c.low,Math.abs(c.high-p.close),Math.abs(c.low-p.close));}
   return sum/period;
 }
+
+export function computeSessionLevels(bars:Bar[]):SessionLevels{
+  let rthHigh:number|null=null,rthLow:number|null=null,ethHigh:number|null=null,ethLow:number|null=null;
+  for(const b of bars){
+    const d=new Date(b.time*1000),m=d.getHours()*60+d.getMinutes(),rth=m>=570&&m<960;
+    if(rth){rthHigh=rthHigh===null?b.high:Math.max(rthHigh,b.high);rthLow=rthLow===null?b.low:Math.min(rthLow,b.low);}
+    else{ethHigh=ethHigh===null?b.high:Math.max(ethHigh,b.high);ethLow=ethLow===null?b.low:Math.min(ethLow,b.low);}
+  }
+  return{rthHigh,rthLow,ethHigh,ethLow};
+}
+
+export function computeMicrostructure(bars:Bar[]):Microstructure{
+  const b=bars.at(-1);
+  if(!b)return{buyVolume:0,sellVolume:0,delta:0,imbalance:0,aggressor:'balanced'};
+  const range=Math.max(.01,b.high-b.low);
+  const bodyBias=(b.close-b.open)/range;
+  const closeLocation=((b.close-(b.high+b.low)/2)/range);
+  const buyRatio=clamp(.5+bodyBias*.30+closeLocation*.20,.05,.95);
+  const buyVolume=Math.round(b.volume*buyRatio),sellVolume=Math.max(0,b.volume-buyVolume),delta=buyVolume-sellVolume;
+  const imbalance=delta/Math.max(1,b.volume);
+  const aggressor=imbalance>.12?'buyers':imbalance<-.12?'sellers':'balanced';
+  return{buyVolume,sellVolume,delta,imbalance,aggressor};
+}
+
 export function classifySetup({history,atr,vwap,ema}:{history:Bar[];atr:number;vwap:number;ema:number}):Setup{
   const L=history.length;if(L<25||!atr)return{id:'neutral',en:'Neutral Tape',pt:'Tape Neutro',bias:'skip'};
   const last=history[L-1],prev=history[L-2],highs=history.map(b=>b.high),lows=history.map(b=>b.low);
@@ -46,19 +74,36 @@ export function classifySetup({history,atr,vwap,ema}:{history:Bar[];atr:number;v
   if(move<-atr*1.5)return{id:'momentum_short',en:'Momentum Push — Short',pt:'Impulso — Short',bias:'short'};
   return{id:'consolidation',en:'Consolidation',pt:'Consolidação',bias:'skip'};
 }
+
+function historyOnlyDecision(history:Bar[],setup:Setup,atr:number,vwap:number,ema:number):{decision:TradeOutcome['result'] extends never?never: 'LONG'|'SHORT'|'SKIP';acceptedDecisions:('LONG'|'SHORT'|'SKIP')[];signalConfidence:number}{
+  const last=history.at(-1)!,recent=history.slice(-6),momentum=last.close-(recent[0]?.open??last.open);
+  let score=0;
+  score+=setup.bias==='long'?3:setup.bias==='short'?-3:0;
+  score+=last.close>vwap?1:-1;
+  score+=last.close>ema?1:-1;
+  score+=momentum>atr*.6?1:momentum<-atr*.6?-1:0;
+  score+=last.close>=last.open?1:-1;
+  const magnitude=Math.abs(score),decision=magnitude>=2?(score>0?'LONG':'SHORT'):'SKIP';
+  const confidence=clamp(.5+magnitude*.09,.5,.95);
+  const acceptedDecisions=decision==='SKIP'?['SKIP',score>=0?'LONG':'SHORT']:(magnitude>=4?[decision]:[decision,'SKIP']);
+  return{decision,acceptedDecisions,signalConfidence:Number(confidence.toFixed(2))};
+}
+
 export function simulateSide(future:Bar[],entry:number,side:'LONG'|'SHORT',slPts:number,tpPts:number):TradeOutcome{
   const sl=side==='LONG'?entry-slPts:entry+slPts,tp=side==='LONG'?entry+tpPts:entry-tpPts;
   for(let i=0;i<future.length;i++){const b=future[i],hitSL=side==='LONG'?b.low<=sl:b.high>=sl,hitTP=side==='LONG'?b.high>=tp:b.low<=tp;if(hitSL)return{result:'LOSS',r:-1,bars:i+1,exit:sl};if(hitTP)return{result:'WIN',r:Number((tpPts/slPts).toFixed(2)),bars:i+1,exit:tp};}
   const last=future[future.length-1],diff=side==='LONG'?last.close-entry:entry-last.close;
   return{result:'TIMEOUT',r:Number((diff/slPts).toFixed(2)),bars:future.length,exit:last.close};
 }
+
 export function analyzePuzzle(history:Bar[],future:Bar[]):PuzzleAnalysis{
   const entryPrice=history.at(-1)!.close,atr=computeATR(history)||1,vwap=computeVWAP(history).at(-1)!.value,ema=computeEMA(history,20).at(-1)!.value,setup=classifySetup({history,atr,vwap,ema});
+  const validated=historyOnlyDecision(history,setup,atr,vwap,ema);
   const outcomes={LONG:simulateSide(future,entryPrice,'LONG',REF_SL,REF_TP),SHORT:simulateSide(future,entryPrice,'SHORT',REF_SL,REF_TP),SKIP:{result:'SKIP',r:0,bars:0,exit:entryPrice} as TradeOutcome};
-  const sorted=(Object.entries(outcomes) as [keyof typeof outcomes,TradeOutcome][]).map(([d,o])=>({d,r:o.r,bars:o.bars||999})).sort((a,b)=>b.r-a.r||a.bars-b.bars);
-  const decision=sorted[0].r>0.5?sorted[0].d:'SKIP',high=Math.max(...history.map(b=>b.high)),low=Math.min(...history.map(b=>b.low)),range=high-low,dist=entryPrice-vwap;
-  return{decision,setup,outcomes,entryPrice,atr,vwap,ema,range,high,low,vwapDir:dist>=0?'above':'below',distVwapAbs:Math.abs(dist),atrPct:Math.abs(dist)/atr,lastClose:entryPrice};
+  const high=Math.max(...history.map(b=>b.high)),low=Math.min(...history.map(b=>b.low)),range=high-low,dist=entryPrice-vwap;
+  return{decision:validated.decision,acceptedDecisions:validated.acceptedDecisions,signalConfidence:validated.signalConfidence,setup,outcomes,entryPrice,atr,vwap,ema,range,high,low,vwapDir:dist>=0?'above':'below',distVwapAbs:Math.abs(dist),atrPct:Math.abs(dist)/atr,lastClose:entryPrice,levels:computeSessionLevels(history),microstructure:computeMicrostructure(history)};
 }
+
 export function detectTrap(history:Bar[]):TrapInfo|null{
   if(history.length<20)return null;
   const atr=computeATR(history)||1,last=history.at(-1)!,body=Math.abs(last.close-last.open),up=last.high-Math.max(last.open,last.close),down=Math.min(last.open,last.close)-last.low,range=last.high-last.low||1;
@@ -71,7 +116,8 @@ export function detectTrap(history:Bar[]):TrapInfo|null{
   if(history.length>=4){const a=history.at(-3)!,b=history.at(-2)!,c=history.at(-1)!;if(b.volume<a.volume&&c.volume<b.volume&&c.close!==a.close)return{key:'volumeDivergence',messageEn:'Price is still moving while volume decreases — a common divergence trap.',messagePt:'O preço continua avançando enquanto o volume diminui — uma armadilha comum de divergência.'};}
   return null;
 }
-export function analyzeDebrief(history:Bar[],ai:Decision):DebriefAxis[]{
+
+export function analyzeDebrief(history:Bar[],ai:'LONG'|'SHORT'|'SKIP'):DebriefAxis[]{
   const entry=history.at(-1)!.close,atr=computeATR(history)||1,last20=history.slice(-20);let hh=0,ll=0;
   for(let i=1;i<last20.length;i++){if(last20[i].high>last20[i-1].high)hh++;if(last20[i].low<last20[i-1].low)ll++;}
   const structure=hh/(last20.length-1)>.6&&ll/(last20.length-1)<.4?'long':ll/(last20.length-1)>.6&&hh/(last20.length-1)<.4?'short':'neutral';
