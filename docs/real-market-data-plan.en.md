@@ -41,15 +41,14 @@ Completed.
 - History/future puzzle split.
 - Synthetic generator retained as a fallback.
 
-## Phase 2 — Acquire real historical sessions
+## Phase 2 — Acquire real historical sessions ✅
 
-Immediate priority.
+The first B3 library is functional and the candidate pool is now expanded for pedagogical curation.
 
 Start with Brazilian instruments:
 
 - WINFUT;
-- WDOFUT;
-- BIT.
+- WDOFUT.
 
 The first collection for each market family does not need to cover entire years. A small but diverse collection is enough to validate the experience:
 
@@ -64,7 +63,7 @@ The first collection for each market family does not need to cover entire years.
 
 These sessions are treated as **real exercise sources**, not as a generic financial-history viewer.
 
-## Phase 3 — Historical data pipeline
+## Phase 3 — Historical data pipeline ✅
 
 The pipeline should:
 
@@ -97,19 +96,9 @@ The historical layer should retain:
 
 A continuous series should only be created when the rollover rule is explicit.
 
-## Phase 5 — Historical exercise library
+## Phase 5 — Historical exercise library — curation implemented
 
-After normalization, each window can receive pedagogical metadata:
-
-- dominant setup;
-- volatility regime;
-- session period;
-- opening gap;
-- event presence;
-- difficulty;
-- data quality;
-- instrument and contract;
-- real trading-session date.
+After normalization, every session receives pedagogical metadata computed by the pipeline: trend direction, relative volatility, same-contract opening gap, session character (reversal/consolidation/breakout/opening drive/two-sided), difficulty, candle continuity/quality, trend strength, close location, opening move, instrument, contract, and real trading date. Puzzle selection rotates seeds across curation regimes so a large number of similar sessions cannot dominate the library.
 
 The user does not need to know the date during the decision. The date can be revealed only in the result/debrief to preserve the puzzle experience.
 
@@ -140,7 +129,7 @@ When usage terms allow redistribution, datasets can be versioned in the project 
 
 Historical and public does not automatically mean unrestricted redistribution; applicable terms still need to be checked.
 
-## Phase 7 — Puzzle curation
+## Phase 7 — Puzzle curation ✅
 
 With real data available, the puzzle engine has two paths:
 
@@ -154,11 +143,18 @@ Generate a procedural sequence for rare cases, tests, and controlled training.
 
 The user experience remains the same. Only the data source differs.
 
-## Phase 8 — Foreign futures
+## Phase 8 — Foreign futures — pipeline implemented
 
-The next front is building a real historical library for **MES and MNQ** from an authorized source, using the same dataset contract already used for the Brazilian library. The foreign library should preserve regular-session timestamps, contract identity, volume, and rollover rules without mixing expiries.
+The selected source for actual **MES and MNQ** is CME Globex MDP 3.0 distributed through Databento. `scripts/build-cme-historical-library.py` requests real 1-minute OHLCV from the volume-ranked continuous symbol, resolves the returned instrument ID to the actual CME contract (for example MESH5/MNQH5), preserves Globex and RTH session metadata, derives 5m/15m/1h locally, and applies the same pedagogical curation used for B3.
 
-At this time, MES and MNQ remain on the synthetic generator and are not part of the published real historical library.
+The pipeline requires `DATABENTO_API_KEY`. Its default output is `private-data/historical/`, which is ignored by Git. Publishing CME data into `public/data/historical/` requires an explicit `--acknowledge-redistribution-rights` flag and the GitHub workflow additionally requires `CME_REDISTRIBUTION_ALLOWED=true`. This prevents licensed CME data from being redistributed accidentally.
+
+References:
+- https://databento.com/docs/quickstart
+- https://databento.com/docs/schemas-and-data-formats/ohlcv
+- https://databento.com/docs/standards-and-conventions/symbology
+- https://databento.com/docs/knowledge-base/datasets
+- https://www.cmegroup.com/datamine.html
 
 ## Completion criteria
 
@@ -166,7 +162,9 @@ The historical migration is complete when there is:
 
 - at least one working real historical dataset for WINFUT;
 - at least one for WDOFUT;
-- 1m, 5m, and 15m support;
+- a functional real-data MES/MNQ pipeline, with publication conditional on redistribution rights;
+- 1m, 5m, and 15m support for all published real instruments;
+- 1h support for MES/MNQ when an authorized Globex library is published;
 - real volume;
 - contract/session metadata;
 - window selection without future leakage;
