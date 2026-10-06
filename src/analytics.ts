@@ -28,10 +28,29 @@ export function computeATR(bars:Bar[],period=14){
   return sum/period;
 }
 
-export function computeSessionLevels(bars:Bar[]):SessionLevels{
+export interface SessionClockConfig{timezone?:string;rthStart?:string;rthEnd?:string}
+
+function clockMinutes(time:number,timezone?:string){
+  const d=new Date(time*1000);
+  if(!timezone)return d.getHours()*60+d.getMinutes();
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:timezone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(d);
+  const hour=Number(parts.find(part=>part.type==='hour')?.value??0);
+  const minute=Number(parts.find(part=>part.type==='minute')?.value??0);
+  return hour*60+minute;
+}
+
+function parseClock(value:string|undefined,fallback:number){
+  if(!value)return fallback;
+  const [hour,minute]=value.split(':').map(Number);
+  return Number.isFinite(hour)&&Number.isFinite(minute)?hour*60+minute:fallback;
+}
+
+export function computeSessionLevels(bars:Bar[],config:SessionClockConfig={}):SessionLevels{
+  const start=parseClock(config.rthStart,570),end=parseClock(config.rthEnd,960);
   let rthHigh:number|null=null,rthLow:number|null=null,ethHigh:number|null=null,ethLow:number|null=null;
   for(const b of bars){
-    const d=new Date(b.time*1000),m=d.getHours()*60+d.getMinutes(),rth=m>=570&&m<960;
+    const m=clockMinutes(b.time,config.timezone);
+    const rth=start<=end?m>=start&&m<end:m>=start||m<end;
     if(rth){rthHigh=rthHigh===null?b.high:Math.max(rthHigh,b.high);rthLow=rthLow===null?b.low:Math.min(rthLow,b.low);}
     else{ethHigh=ethHigh===null?b.high:Math.max(ethHigh,b.high);ethLow=ethLow===null?b.low:Math.min(ethLow,b.low);}
   }
@@ -96,12 +115,12 @@ export function simulateSide(future:Bar[],entry:number,side:'LONG'|'SHORT',slPts
   return{result:'TIMEOUT',r:Number((diff/slPts).toFixed(2)),bars:future.length,exit:last.close};
 }
 
-export function analyzePuzzle(history:Bar[],future:Bar[]):PuzzleAnalysis{
+export function analyzePuzzle(history:Bar[],future:Bar[],sessionClock:SessionClockConfig={}):PuzzleAnalysis{
   const entryPrice=history.at(-1)!.close,atr=computeATR(history)||1,vwap=computeVWAP(history).at(-1)!.value,ema=computeEMA(history,20).at(-1)!.value,setup=classifySetup({history,atr,vwap,ema});
   const validated=historyOnlyDecision(history,setup,atr,vwap,ema);
   const outcomes={LONG:simulateSide(future,entryPrice,'LONG',REF_SL,REF_TP),SHORT:simulateSide(future,entryPrice,'SHORT',REF_SL,REF_TP),SKIP:{result:'SKIP',r:0,bars:0,exit:entryPrice} as TradeOutcome};
   const high=Math.max(...history.map(b=>b.high)),low=Math.min(...history.map(b=>b.low)),range=high-low,dist=entryPrice-vwap;
-  return{decision:validated.decision,acceptedDecisions:validated.acceptedDecisions,signalConfidence:validated.signalConfidence,setup,outcomes,entryPrice,atr,vwap,ema,range,high,low,vwapDir:dist>=0?'above':'below',distVwapAbs:Math.abs(dist),atrPct:Math.abs(dist)/atr,lastClose:entryPrice,levels:computeSessionLevels(history),microstructure:computeMicrostructure(history)};
+  return{decision:validated.decision,acceptedDecisions:validated.acceptedDecisions,signalConfidence:validated.signalConfidence,setup,outcomes,entryPrice,atr,vwap,ema,range,high,low,vwapDir:dist>=0?'above':'below',distVwapAbs:Math.abs(dist),atrPct:Math.abs(dist)/atr,lastClose:entryPrice,levels:computeSessionLevels(history,sessionClock),microstructure:computeMicrostructure(history)};
 }
 
 export function detectTrap(history:Bar[]):TrapInfo|null{
