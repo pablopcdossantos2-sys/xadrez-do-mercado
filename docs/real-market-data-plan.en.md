@@ -43,7 +43,7 @@ Completed.
 
 ## Phase 2 — Acquire real historical sessions ✅
 
-The first B3 library is functional and the candidate pool is now expanded for pedagogical curation.
+The public B3 library now contains eight curated WINFUT sessions and eight curated WDOFUT sessions.
 
 Start with Brazilian instruments:
 
@@ -143,18 +143,40 @@ Generate a procedural sequence for rare cases, tests, and controlled training.
 
 The user experience remains the same. Only the data source differs.
 
-## Phase 8 — Foreign futures — pipeline implemented
+## Phase 8 — Foreign futures — zero-budget strategy implemented
 
-The selected source for actual **MES and MNQ** is CME Globex MDP 3.0 distributed through Databento. `scripts/build-cme-historical-library.py` requests real 1-minute OHLCV from the volume-ranked continuous symbol, resolves the returned instrument ID to the actual CME contract (for example MESH5/MNQH5), preserves Globex and RTH session metadata, derives 5m/15m/1h locally, and applies the same pedagogical curation used for B3.
+Because the project has no budget for market-data subscriptions, MES and MNQ now have two separate paths.
 
-The pipeline requires `DATABENTO_API_KEY`. Its default output is `private-data/historical/`, which is ignored by Git. Publishing CME data into `public/data/historical/` requires an explicit `--acknowledge-redistribution-rights` flag and the GitHub workflow additionally requires `CME_REDISTRIBUTION_ALLOWED=true`. This prevents licensed CME data from being redistributed accidentally.
+### Free path — FirstRate Data samples
+
+FirstRate Data publishes free evaluation samples for MES and MNQ. The importer in `scripts/build-firstrate-sample-library.py` downloads those public samples, parses one-minute OHLCV in New York time, splits CME Globex sessions, derives 5m/15m/1h, and applies the same pedagogical curation used for B3.
+
+Run:
+
+```bash
+npm run historical:firstrate:sample
+```
+
+The resulting files remain in `private-data/firstrate/`, are ignored by Git, are served only by the Vite development server at `/data/local-historical/`, and are never copied into the production build. The app merges this local private manifest with the public B3 manifest automatically during local development.
+
+If the samples are absent, MES/MNQ continue to use the synthetic fallback.
+
+Official sample links:
+- MES: https://frd001.s3.us-east-2.amazonaws.com/frd_sample_futures_MES.zip
+- MNQ: https://frd001.s3.us-east-2.amazonaws.com/frd_sample_futures_MNQ.zip
 
 References:
-- https://databento.com/docs/quickstart
-- https://databento.com/docs/schemas-and-data-formats/ohlcv
-- https://databento.com/docs/standards-and-conventions/symbology
-- https://databento.com/docs/knowledge-base/datasets
-- https://www.cmegroup.com/datamine.html
+- https://firstratedata.com/i/futures/MES
+- https://firstratedata.com/i/futures/MNQ
+- https://firstratedata.com/free-intraday-data
+- https://firstratedata.com/about/faq
+- https://firstratedata.com/about/license
+
+### Optional future path — Databento/CME
+
+The existing Databento pipeline remains available if the project later obtains sponsored or otherwise authorized access. It is no longer a requirement for zero-budget development.
+
+Raw CME data must not be published publicly without explicit redistribution rights.
 
 ## Completion criteria
 
