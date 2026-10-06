@@ -1,6 +1,7 @@
-name: Bootstrap historical market library # streaming aggregation v3
+name: Curate historical market library
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - ".github/workflows/bootstrap-historical-library.yml"
@@ -9,14 +10,17 @@ permissions:
   contents: write
 
 concurrency:
-  group: historical-library-bootstrap
+  group: historical-library-curation
   cancel-in-progress: true
 
 jobs:
-  bootstrap:
-    if: github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[historical-bootstrap]')
+  curate:
+    if: github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message || '', '[historical-bootstrap]')
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
+    env:
+      DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
+      CME_REDISTRIBUTION_ALLOWED: ${{ secrets.CME_REDISTRIBUTION_ALLOWED }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,24 +30,32 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
 
-      - name: Build real historical library
-        # Stream raw trades directly into minute buckets and stop after enough sessions are available.
+      - name: Validate historical scripts
         run: |
-          python3 scripts/build-historical-library.py \
-            --start-date 2026-09-23 \
-            --end-date 2026-10-02 \
-            --max-sessions 4
+          python3 -m py_compile             scripts/historical_curation.py             scripts/build-historical-library.py             scripts/build-cme-historical-library.py
+
+      - name: Build curated B3 historical library
+        run: |
+          python3 scripts/build-historical-library.py             --start-date 2026-09-01             --end-date 2026-10-02             --candidate-sessions 12             --max-sessions 8
+
+      - name: Build authorized CME MES/MNQ library when entitled
+        run: |
+          if [ -n "$DATABENTO_API_KEY" ] && [ "$CME_REDISTRIBUTION_ALLOWED" = "true" ]; then
+            python3 scripts/build-cme-historical-library.py               --start-date 2026-09-01               --end-date 2026-10-02               --candidate-sessions 16               --max-sessions 8               --output-root public/data/historical               --acknowledge-redistribution-rights
+          else
+            echo "CME publication skipped: DATABENTO_API_KEY and CME_REDISTRIBUTION_ALLOWED=true are both required."
+          fi
 
       - name: Commit generated library
         run: |
-          if git diff --quiet -- public/data/historical ':(exclude)public/data/historical/manifest.json'; then
+          if git diff --quiet -- public/data/historical; then
             echo "No historical-library changes were generated."
-            exit 1
+            exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/historical
-          git commit -m "data: bootstrap real historical market library [historical-bootstrap]"
+          git commit -m "data: curate real historical market library [historical-bootstrap]"
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
