@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from 'react';
-import { createChart, CrosshairMode, type IChartApi, type IPriceLine, type Time } from 'lightweight-charts';
+import { ColorType, createChart, CrosshairMode, type IChartApi, type IPriceLine, type Time } from 'lightweight-charts';
 import { computeDEMA, computeEMA, computeVWAP } from './analytics';
 import type { Bar, SessionLevels } from './types';
 
@@ -35,7 +35,7 @@ export default function TapeChart({bars,showVwap,showEma,showDema,showLevels,sho
     const chart=createChart(el,{
       width:el.clientWidth||800,
       height:Math.max(320,Math.round(el.clientWidth*.53)),
-      layout:{background:{type:'solid',color:'#0f141d'},textColor:'#b5bfce'},
+      layout:{background:{type:ColorType.Solid,color:'#0f141d'},textColor:'#b5bfce'},
       grid:{vertLines:{color:'#202834'},horzLines:{color:'#202834'}},
       crosshair:{mode:CrosshairMode.Normal},
       rightPriceScale:{borderColor:'#2a3544',visible:!blind,scaleMargins:{top:.08,bottom:.22}},

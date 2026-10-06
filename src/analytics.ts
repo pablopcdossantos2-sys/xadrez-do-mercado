@@ -14,7 +14,7 @@ export function computeEMA(bars:Bar[],period:number){
 export function computeDEMA(bars:Bar[],period:number){
   const e1=computeEMA(bars,period);
   const e2=computeEMA(e1.map(x=>({time:x.time,open:x.value,high:x.value,low:x.value,close:x.value,volume:0})),period);
-  return e1.map((x,i)=>({time:x.time,value:Number((2*x.value-e2[i].value).toFixed(4))}));
+  return e1.map((x,i)=>({time:x.time,value:Number((2*x.value-e2[i]!.value).toFixed(4))}));
 }
 
 export function computeVWAP(bars:Bar[]){
@@ -24,14 +24,34 @@ export function computeVWAP(bars:Bar[]){
 
 export function computeATR(bars:Bar[],period=14){
   if(period<=0||bars.length<period+1)return 0;let sum=0;
-  for(let i=bars.length-period;i<bars.length;i++){const p=bars[i-1],c=bars[i];sum+=Math.max(c.high-c.low,Math.abs(c.high-p.close),Math.abs(c.low-p.close));}
+  for(let i=bars.length-period;i<bars.length;i++){const p=bars[i-1]!,c=bars[i]!;sum+=Math.max(c.high-c.low,Math.abs(c.high-p.close),Math.abs(c.low-p.close));}
   return sum/period;
 }
 
-export function computeSessionLevels(bars:Bar[]):SessionLevels{
+export interface SessionClockConfig{timezone?:string;rthStart?:string;rthEnd?:string}
+
+function clockMinutes(time:number,timezone?:string){
+  const d=new Date(time*1000);
+  if(!timezone)return d.getHours()*60+d.getMinutes();
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:timezone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(d);
+  const hour=Number(parts.find(part=>part.type==='hour')?.value??0);
+  const minute=Number(parts.find(part=>part.type==='minute')?.value??0);
+  return hour*60+minute;
+}
+
+function parseClock(value:string|undefined,fallback:number){
+  if(!value)return fallback;
+  const parts=value.split(':');
+  const hour=Number(parts[0]),minute=Number(parts[1]);
+  return Number.isFinite(hour)&&Number.isFinite(minute)?hour*60+minute:fallback;
+}
+
+export function computeSessionLevels(bars:Bar[],config:SessionClockConfig={}):SessionLevels{
+  const start=parseClock(config.rthStart,570),end=parseClock(config.rthEnd,960);
   let rthHigh:number|null=null,rthLow:number|null=null,ethHigh:number|null=null,ethLow:number|null=null;
   for(const b of bars){
-    const d=new Date(b.time*1000),m=d.getHours()*60+d.getMinutes(),rth=m>=570&&m<960;
+    const m=clockMinutes(b.time,config.timezone);
+    const rth=start<=end?m>=start&&m<end:m>=start||m<end;
     if(rth){rthHigh=rthHigh===null?b.high:Math.max(rthHigh,b.high);rthLow=rthLow===null?b.low:Math.min(rthLow,b.low);}
     else{ethHigh=ethHigh===null?b.high:Math.max(ethHigh,b.high);ethLow=ethLow===null?b.low:Math.min(ethLow,b.low);}
   }
@@ -53,9 +73,9 @@ export function computeMicrostructure(bars:Bar[]):Microstructure{
 
 export function classifySetup({history,atr,vwap,ema}:{history:Bar[];atr:number;vwap:number;ema:number}):Setup{
   const L=history.length;if(L<25||!atr)return{id:'neutral',en:'Neutral Tape',pt:'Tape Neutro',bias:'skip'};
-  const last=history[L-1],prev=history[L-2],highs=history.map(b=>b.high),lows=history.map(b=>b.low);
+  const last=history[L-1]!,prev=history[L-2]!,highs=history.map(b=>b.high),lows=history.map(b=>b.low);
   const priorHigh=Math.max(...highs.slice(-30,-4)),priorLow=Math.min(...lows.slice(-30,-4));
-  for(let i=Math.max(0,L-3);i<L;i++){const b=history[i];if(b.low<priorLow&&b.close>priorLow&&last.close>priorLow)return{id:'liq_sweep_long',en:'Liquidity Sweep — Long',pt:'Varredura de Liquidez — Long',bias:'long'};if(b.high>priorHigh&&b.close<priorHigh&&last.close<priorHigh)return{id:'liq_sweep_short',en:'Liquidity Sweep — Short',pt:'Varredura de Liquidez — Short',bias:'short'};}
+  for(let i=Math.max(0,L-3);i<L;i++){const b=history[i]!;if(b.low<priorLow&&b.close>priorLow&&last.close>priorLow)return{id:'liq_sweep_long',en:'Liquidity Sweep — Long',pt:'Varredura de Liquidez — Long',bias:'long'};if(b.high>priorHigh&&b.close<priorHigh&&last.close<priorHigh)return{id:'liq_sweep_short',en:'Liquidity Sweep — Short',pt:'Varredura de Liquidez — Short',bias:'short'};}
   if(prev.close<vwap&&last.close>vwap)return{id:'vwap_reclaim',en:'VWAP Reclaim',pt:'Reclaim de VWAP',bias:'long'};
   if(prev.close>vwap&&last.close<vwap)return{id:'vwap_reject',en:'VWAP Rejection',pt:'Rejeição do VWAP',bias:'short'};
   const or=history.slice(0,6),orh=Math.max(...or.map(b=>b.high)),orl=Math.min(...or.map(b=>b.low));
@@ -69,7 +89,7 @@ export function classifySetup({history,atr,vwap,ema}:{history:Bar[];atr:number;v
   if(Math.abs(dist)<atr*.9&&last.close<last.open&&dist>0)return{id:'pullback_short',en:'Trend Pullback — Short',pt:'Pullback de Tendência — Short',bias:'short'};
   const r20h=Math.max(...highs.slice(-20)),r20l=Math.min(...lows.slice(-20)),range=r20h-r20l;
   if(range>atr*4){const mid=(r20h+r20l)/2,top=r20h-atr*.6,bottom=r20l+atr*.6;if(last.high>top&&last.close<last.high-atr*.3&&last.close>mid)return{id:'range_fade_short',en:'Range Fade — Short',pt:'Fade de Range — Short',bias:'short'};if(last.low<bottom&&last.close>last.low+atr*.3&&last.close<mid)return{id:'range_fade_long',en:'Range Fade — Long',pt:'Fade de Range — Long',bias:'long'};}
-  const anchor=history[Math.max(0,L-6)],move=last.close-anchor.open;
+  const anchor=history[Math.max(0,L-6)]!,move=last.close-anchor.open;
   if(move>atr*1.5)return{id:'momentum_long',en:'Momentum Push — Long',pt:'Impulso — Long',bias:'long'};
   if(move<-atr*1.5)return{id:'momentum_short',en:'Momentum Push — Short',pt:'Impulso — Short',bias:'short'};
   return{id:'consolidation',en:'Consolidation',pt:'Consolidação',bias:'skip'};
@@ -90,18 +110,19 @@ function historyOnlyDecision(history:Bar[],setup:Setup,atr:number,vwap:number,em
 }
 
 export function simulateSide(future:Bar[],entry:number,side:'LONG'|'SHORT',slPts:number,tpPts:number):TradeOutcome{
+  if(!future.length)return{result:'TIMEOUT',r:0,bars:0,exit:entry};
   const sl=side==='LONG'?entry-slPts:entry+slPts,tp=side==='LONG'?entry+tpPts:entry-tpPts;
-  for(let i=0;i<future.length;i++){const b=future[i],hitSL=side==='LONG'?b.low<=sl:b.high>=sl,hitTP=side==='LONG'?b.high>=tp:b.low<=tp;if(hitSL)return{result:'LOSS',r:-1,bars:i+1,exit:sl};if(hitTP)return{result:'WIN',r:Number((tpPts/slPts).toFixed(2)),bars:i+1,exit:tp};}
-  const last=future[future.length-1],diff=side==='LONG'?last.close-entry:entry-last.close;
+  for(let i=0;i<future.length;i++){const b=future[i]!,hitSL=side==='LONG'?b.low<=sl:b.high>=sl,hitTP=side==='LONG'?b.high>=tp:b.low<=tp;if(hitSL)return{result:'LOSS',r:-1,bars:i+1,exit:sl};if(hitTP)return{result:'WIN',r:Number((tpPts/slPts).toFixed(2)),bars:i+1,exit:tp};}
+  const last=future.at(-1)!,diff=side==='LONG'?last.close-entry:entry-last.close;
   return{result:'TIMEOUT',r:Number((diff/slPts).toFixed(2)),bars:future.length,exit:last.close};
 }
 
-export function analyzePuzzle(history:Bar[],future:Bar[]):PuzzleAnalysis{
+export function analyzePuzzle(history:Bar[],future:Bar[],sessionClock:SessionClockConfig={}):PuzzleAnalysis{
   const entryPrice=history.at(-1)!.close,atr=computeATR(history)||1,vwap=computeVWAP(history).at(-1)!.value,ema=computeEMA(history,20).at(-1)!.value,setup=classifySetup({history,atr,vwap,ema});
   const validated=historyOnlyDecision(history,setup,atr,vwap,ema);
   const outcomes={LONG:simulateSide(future,entryPrice,'LONG',REF_SL,REF_TP),SHORT:simulateSide(future,entryPrice,'SHORT',REF_SL,REF_TP),SKIP:{result:'SKIP',r:0,bars:0,exit:entryPrice} as TradeOutcome};
   const high=Math.max(...history.map(b=>b.high)),low=Math.min(...history.map(b=>b.low)),range=high-low,dist=entryPrice-vwap;
-  return{decision:validated.decision,acceptedDecisions:validated.acceptedDecisions,signalConfidence:validated.signalConfidence,setup,outcomes,entryPrice,atr,vwap,ema,range,high,low,vwapDir:dist>=0?'above':'below',distVwapAbs:Math.abs(dist),atrPct:Math.abs(dist)/atr,lastClose:entryPrice,levels:computeSessionLevels(history),microstructure:computeMicrostructure(history)};
+  return{decision:validated.decision,acceptedDecisions:validated.acceptedDecisions,signalConfidence:validated.signalConfidence,setup,outcomes,entryPrice,atr,vwap,ema,range,high,low,vwapDir:dist>=0?'above':'below',distVwapAbs:Math.abs(dist),atrPct:Math.abs(dist)/atr,lastClose:entryPrice,levels:computeSessionLevels(history,sessionClock),microstructure:computeMicrostructure(history)};
 }
 
 export function detectTrap(history:Bar[]):TrapInfo|null{
@@ -111,7 +132,7 @@ export function detectTrap(history:Bar[]):TrapInfo|null{
   if(up/range>.55&&up>atr*.6)return{key:'wick',messageEn:'A dominant upper wick signals rejection; chasing the move can be a trap.',messagePt:'Um pavio superior dominante sinaliza rejeição; perseguir o movimento pode ser uma armadilha.'};
   if(down/range>.55&&down>atr*.6)return{key:'wick',messageEn:'A dominant lower wick signals rejection; chasing the move can be a trap.',messagePt:'Um pavio inferior dominante sinaliza rejeição; perseguir o movimento pode ser uma armadilha.'};
   const vv=computeVWAP(history),bars=history.slice(-8),vals=vv.slice(-8);let cross=0;
-  for(let i=1;i<bars.length;i++)if((bars[i-1].close>vals[i-1].value)!==(bars[i].close>vals[i].value))cross++;
+  for(let i=1;i<bars.length;i++)if((bars[i-1]!.close>vals[i-1]!.value)!==(bars[i]!.close>vals[i]!.value))cross++;
   if(cross>=4)return{key:'vwapWhipsaw',messageEn:'Price crossed VWAP '+cross+' times in eight bars — directional bets are vulnerable to whipsaw.',messagePt:'O preço cruzou o VWAP '+cross+' vezes em oito barras — apostas direcionais ficam vulneráveis ao whipsaw.'};
   if(history.length>=4){const a=history.at(-3)!,b=history.at(-2)!,c=history.at(-1)!;if(b.volume<a.volume&&c.volume<b.volume&&c.close!==a.close)return{key:'volumeDivergence',messageEn:'Price is still moving while volume decreases — a common divergence trap.',messagePt:'O preço continua avançando enquanto o volume diminui — uma armadilha comum de divergência.'};}
   return null;
@@ -119,12 +140,12 @@ export function detectTrap(history:Bar[]):TrapInfo|null{
 
 export function analyzeDebrief(history:Bar[],ai:'LONG'|'SHORT'|'SKIP'):DebriefAxis[]{
   const entry=history.at(-1)!.close,atr=computeATR(history)||1,last20=history.slice(-20);let hh=0,ll=0;
-  for(let i=1;i<last20.length;i++){if(last20[i].high>last20[i-1].high)hh++;if(last20[i].low<last20[i-1].low)ll++;}
+  for(let i=1;i<last20.length;i++){if(last20[i]!.high>last20[i-1]!.high)hh++;if(last20[i]!.low<last20[i-1]!.low)ll++;}
   const structure=hh/(last20.length-1)>.6&&ll/(last20.length-1)<.4?'long':ll/(last20.length-1)>.6&&hh/(last20.length-1)<.4?'short':'neutral';
   const ten=history.slice(-10);let up=0,down=0;ten.forEach(b=>b.close>=b.open?up+=b.volume:down+=b.volume);
   const volume=up/(up+down||1)>.6?'long':up/(up+down||1)<.4?'short':'neutral';
   const mid=Math.floor(history.length/2),levels=[{n:'PDH',p:Math.max(...history.slice(0,mid).map(b=>b.high)),b:'short' as const},{n:'PDL',p:Math.min(...history.slice(0,mid).map(b=>b.low)),b:'long' as const},{n:'ONH',p:Math.max(...history.slice(mid).map(b=>b.high)),b:'short' as const},{n:'ONL',p:Math.min(...history.slice(mid).map(b=>b.low)),b:'long' as const}];
-  const nearest=levels.sort((a,b)=>Math.abs(entry-a.p)-Math.abs(entry-b.p))[0],location=Math.abs(entry-nearest.p)<atr*1.5?nearest.b:'neutral',ema=computeEMA(history,20).at(-1)!.value,vwap=computeVWAP(history).at(-1)!.value;
+  const nearest=levels.sort((a,b)=>Math.abs(entry-a.p)-Math.abs(entry-b.p))[0]!,location=Math.abs(entry-nearest.p)<atr*1.5?nearest.b:'neutral',ema=computeEMA(history,20).at(-1)!.value,vwap=computeVWAP(history).at(-1)!.value;
   const counts={long:0,short:0};[entry>vwap?'long':'short',entry>ema?'long':'short',structure,volume].forEach(x=>{if(x==='long')counts.long++;if(x==='short')counts.short++;});
   const conf=ai==='LONG'&&counts.long>=2?'long':ai==='SHORT'&&counts.short>=2?'short':'neutral',upPct=Math.round(up/(up+down||1)*100);
   return[

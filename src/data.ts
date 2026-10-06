@@ -39,7 +39,7 @@ export function generateMarketData(timeframe:Timeframe,instrument:Instrument,see
   let trendBias=(random()-0.5)*1.5;
   let volCluster=1;
   const eventIndex=decisionIdx+12+(state%20);
-  const eventKind=EVENT_KINDS[state%EVENT_KINDS.length];
+  const eventKind=EVENT_KINDS[state%EVENT_KINDS.length]!;
   const macroEvents:MacroEvent[]=[{
     index:eventIndex-decisionIdx,
     time:t+eventIndex*stepSec,

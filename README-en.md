@@ -23,7 +23,7 @@ npm run build
 
 ## How it works
 
-Each puzzle presents 82 historical bars and asks for one decision. In Standard mode, the 38 future bars can be replayed bar by bar with an adjustable bracket and Flatten. The result includes rule-based grading, ELO, R outcome, debrief, and counterfactuals.
+Synthetic puzzles use 82 history bars and 38 future bars. Real historical puzzles adapt the window to a single exchange session (1m: 82+38; 5m: 72+30; 15m: 26+12; CME MES/MNQ 1h: 12+6). In Standard mode, future bars can be replayed bar by bar with an adjustable bracket and Flatten. The result includes rule-based grading, ELO, R outcome, debrief, and counterfactuals.
 
 Windows can come from real historical market data or the synthetic generator. **The product does not depend on real-time market data.**
 
@@ -35,7 +35,7 @@ Windows can come from real historical market data or the synthetic generator. **
 
 ## Features
 
-- Replay of real historical windows and procedural synthetic generation.
+- Replay of curated real historical windows and procedural synthetic generation.
 - MES, MNQ, WINFUT, and WDOFUT across 1m, 5m, 15m, and 1h timeframes.
 - Candles, volume, VWAP, EMA 20, DEMA, and session levels.
 - Setup classifier covering Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push, and Consolidation.
@@ -65,8 +65,10 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 ## Scope and limitations
 
 - Synthetic generation remains available as a fallback.
-- Real-data integration is being designed around **historical datasets**, not real-time streaming.
-- The historical priority is WINFUT and WDOFUT.
+- WINFUT/WDOFUT use the real B3 library in 1m, 5m and 15m; 1h remains synthetic for those instruments.
+- MES/MNQ have a real CME Globex historical pipeline via Databento. When an authorized CME library is published, 1m, 5m, 15m and 1h can use real sessions; otherwise the synthetic fallback remains active.
+- Real-data integration is based on **historical datasets**, not real-time streaming.
+- The foreign pipeline uses actual MES/MNQ contracts rather than ES/NQ proxies.
 - Raw historical market files may have their own usage/redistribution terms; the project should keep application code and market files separate when necessary.
 - WINFUT and WDOFUT use the B3 product codes WIN and WDO respectively.
 - Analyst grading uses only information available up to the decision point. This does not validate a trading strategy or demonstrate predictive capability.

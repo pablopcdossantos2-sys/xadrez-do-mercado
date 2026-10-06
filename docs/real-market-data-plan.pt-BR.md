@@ -111,19 +111,20 @@ A camada histórica deverá guardar:
 
 Uma série contínua poderá ser criada apenas quando a regra de rollover estiver explícita.
 
-## Etapa 5 — Banco de exercícios históricos
+## Etapa 5 — Banco de exercícios históricos — curadoria implementada
 
-Depois da normalização, cada janela poderá receber metadados pedagógicos:
+Depois da normalização, cada sessão recebe metadados pedagógicos calculados pelo pipeline:
 
-- setup predominante;
-- regime de volatilidade;
-- período do pregão;
-- presença de gap;
-- presença de evento;
-- dificuldade;
-- qualidade dos dados;
-- ativo e contrato;
-- data real do pregão.
+- direção predominante (`trend-up`, `trend-down`, `balanced`);
+- volatilidade relativa (`low`, `normal`, `high`);
+- gap de abertura quando comparável com o pregão anterior do mesmo contrato;
+- caráter do pregão (`reversal`, `consolidation`, `breakout`, `opening-drive` ou `two-sided`);
+- dificuldade (`easy`, `normal`, `hard`);
+- qualidade/continuidade dos candles;
+- força da tendência, posição do fechamento no range e movimento de abertura;
+- ativo, contrato e data real do pregão.
+
+A seleção dos exercícios distribui as seeds entre regimes de curadoria, para que uma grande quantidade de pregões semelhantes não domine a biblioteca.
 
 O usuário não precisa conhecer a data durante a decisão. A data pode ser revelada apenas no resultado/debrief, para preservar a experiência de puzzle.
 
@@ -154,7 +155,7 @@ Quando as condições de uso permitirem redistribuição, os datasets podem ser 
 
 O fato de um dado ser histórico e público não elimina a necessidade de verificar as condições aplicáveis ao seu uso e redistribuição.
 
-## Etapa 7 — Curadoria dos puzzles — em andamento
+## Etapa 7 — Curadoria dos puzzles ✅
 
 Com os dados reais disponíveis, o gerador de puzzles passa a ter dois caminhos:
 
@@ -168,11 +169,26 @@ Gera uma sequência procedural para completar casos raros, testes e treinamento 
 
 A experiência do usuário permanece a mesma. A diferença fica na origem dos dados.
 
-## Etapa 8 — Futuros estrangeiros
+## Etapa 8 — Futuros estrangeiros — pipeline implementado
 
-A próxima frente é montar a biblioteca real de **MES e MNQ** em fonte autorizada, mantendo o mesmo contrato de dados já usado no histórico brasileiro. A biblioteca estrangeira deverá preservar sessão regular, horário de negociação, contrato, volume e regras de rollover, sem misturar dados de vencimentos diferentes.
+A fonte selecionada para **MES e MNQ reais** é o CME Globex MDP 3.0 distribuído pela Databento. O pipeline em `scripts/build-cme-historical-library.py`:
 
-Neste momento, MES e MNQ permanecem com o gerador sintético e não fazem parte da biblioteca histórica real publicada.
+1. solicita OHLCV real de 1 minuto do contrato líder por volume;
+2. resolve o `instrument_id` para o contrato CME efetivo (por exemplo, MESH5/MNQH5), sem substituir MES/MNQ por ES/NQ;
+3. separa cada sessão Globex das 18:00 às 17:00 em `America/New_York`;
+4. preserva RTH (09:30–16:00), contrato, timezone e volume;
+5. deriva 5m, 15m e 1h localmente;
+6. aplica a mesma curadoria pedagógica usada para B3;
+7. mescla MES/MNQ no mesmo manifesto sem apagar WIN/WDO.
+
+O acesso exige `DATABENTO_API_KEY`. Por padrão, o resultado é gravado em `private-data/historical/`, que está ignorado pelo Git. A publicação em `public/data/historical/` exige a flag `--acknowledge-redistribution-rights` e, no GitHub Actions, o secret `CME_REDISTRIBUTION_ALLOWED=true`. Isso impede que dados CME licenciados sejam redistribuídos publicamente por acidente.
+
+Referências:
+- https://databento.com/docs/quickstart
+- https://databento.com/docs/schemas-and-data-formats/ohlcv
+- https://databento.com/docs/standards-and-conventions/symbology
+- https://databento.com/docs/knowledge-base/datasets
+- https://www.cmegroup.com/datamine.html
 
 ## Critério de conclusão
 

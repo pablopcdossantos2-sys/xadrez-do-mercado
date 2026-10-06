@@ -26,6 +26,8 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from historical_curation import choose_curated, summarize_coverage
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT_ROOT = ROOT / "public" / "data" / "historical"
 MANIFEST = OUT_ROOT / "manifest.json"
@@ -220,44 +222,7 @@ def session_stats(bars: list[dict]) -> dict:
     }
 
 
-def choose_curated(candidates: list[dict], limit: int) -> list[dict]:
-    if not candidates:
-        return []
-    by_contract: dict[str, list[dict]] = defaultdict(list)
-    for candidate in candidates:
-        by_contract[candidate["contract"]].append(candidate)
-    same_contract = max(
-        by_contract.values(),
-        key=lambda group: (len(group), sum(x["tickCount"] for x in group)),
-    )
-    candidates = same_contract if len(same_contract) >= limit else candidates
-    if len(candidates) <= limit:
-        return sorted(candidates, key=lambda x: x["tradeDate"])
-    chosen: list[dict] = []
-    seen: set[str] = set()
 
-    def take(item: dict):
-        key = item["id"]
-        if key not in seen and len(chosen) < limit:
-            seen.add(key)
-            chosen.append(item)
-
-    by_vol_low = sorted(candidates, key=lambda x: x["stats"]["rangePct"])
-    by_vol_high = list(reversed(by_vol_low))
-    by_up = sorted(candidates, key=lambda x: x["stats"]["trendPct"], reverse=True)
-    by_down = list(reversed(by_up))
-    by_activity = sorted(candidates, key=lambda x: x["stats"]["volume"], reverse=True)
-
-    for pool in (by_vol_low, by_vol_high, by_up, by_down, by_activity):
-        if len(chosen) >= limit:
-            break
-        take(pool[0])
-
-    if len(chosen) < limit:
-        for candidate in sorted(candidates, key=lambda x: x["tradeDate"]):
-            take(candidate)
-
-    return sorted(chosen, key=lambda x: x["tradeDate"])
 def build_day(trade_date: date, raw_rows) -> list[dict]:
     grouped: dict[str, list[tuple[int, float, float]]] = defaultdict(list)
     quantities: dict[str, float] = defaultdict(float)
@@ -300,6 +265,7 @@ def build_day(trade_date: date, raw_rows) -> list[dict]:
                 "sourceUrl": B3_URL.format(date=trade_date.isoformat()),
                 "tickCount": len(grouped[contract]),
                 "stats": stats,
+                "session": {"kind": "B3", "start": "09:00", "end": "18:00", "regularStart": "09:00", "regularEnd": "18:00"},
                 "bars1m": bars,
             }
         )
@@ -323,9 +289,10 @@ def write_session(session: dict):
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--start-date", default="2026-09-23")
+    parser.add_argument("--start-date", default="2026-09-01")
     parser.add_argument("--end-date", default="2026-10-02")
-    parser.add_argument("--max-sessions", type=int, default=4)
+    parser.add_argument("--max-sessions", type=int, default=8)
+    parser.add_argument("--candidate-sessions", type=int, default=12)
     args = parser.parse_args()
 
     start = parse_date(args.start_date)
@@ -343,16 +310,10 @@ def main() -> int:
             print(f"  candidate-assets={len(day_candidates)}")
             candidates.extend(day_candidates)
             if all(
-                max(
-                    (
-                        sum(1 for c in candidates if c["asset"] == asset and c["contract"] == contract)
-                        for contract in {c["contract"] for c in candidates if c["asset"] == asset}
-                    ),
-                    default=0,
-                ) >= args.max_sessions
+                sum(1 for c in candidates if c["asset"] == asset) >= args.candidate_sessions
                 for asset in ASSETS
             ):
-                print("ENOUGH: reached the requested session count for all assets")
+                print("ENOUGH: reached the requested candidate pool for all assets")
                 break
         except (ValueError, zipfile.BadZipFile) as exc:
             print(f"  FAIL {trade_date}: {exc}", file=sys.stderr)
@@ -370,8 +331,23 @@ def main() -> int:
     if not selected:
         raise RuntimeError("No historical WINFUT/WDOFUT sessions were produced.")
 
-    for old in OUT_ROOT.glob("*/*/*/*.json"):
-        old.unlink()
+    existing_manifest = {}
+    preserved_sessions = []
+    if MANIFEST.exists():
+        try:
+            existing_manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+            preserved_sessions = [
+                s for s in existing_manifest.get("sessions", [])
+                if s.get("asset") not in ASSETS
+            ]
+        except (json.JSONDecodeError, OSError):
+            existing_manifest = {}
+
+    for asset in ASSETS:
+        asset_root = OUT_ROOT / asset
+        if asset_root.exists():
+            for old in asset_root.glob("*/*/*.json"):
+                old.unlink()
 
     manifest_sessions = []
     for session in selected:
@@ -389,6 +365,8 @@ def main() -> int:
                     "sourceUrl",
                     "tickCount",
                     "stats",
+                    "curation",
+                    "session",
                     "bars",
                     "barCount1m",
                 )
@@ -396,18 +374,29 @@ def main() -> int:
         )
 
     OUT_ROOT.mkdir(parents=True, exist_ok=True)
+    b3_source = {
+        "provider": "B3",
+        "feed": "derivatives tick-by-tick",
+        "endpoint": B3_URL,
+        "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained.",
+    }
+    sources = [b3_source]
+    for source in existing_manifest.get("sources", []):
+        if source.get("provider") != "B3":
+            sources.append(source)
+    all_sessions = sorted(
+        [*preserved_sessions, *manifest_sessions],
+        key=lambda s: (s.get("asset", ""), s.get("tradeDate", ""), s.get("contract", "")),
+    )
     MANIFEST.write_text(
         json.dumps(
             {
-                "version": 1,
+                "version": 2,
                 "generatedAt": datetime.now(tz=BRT).isoformat(),
-                "source": {
-                    "provider": "B3",
-                    "feed": "derivatives tick-by-tick",
-                    "endpoint": B3_URL,
-                    "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained.",
-                },
-                "sessions": manifest_sessions,
+                "source": b3_source,
+                "sources": sources,
+                "coverage": summarize_coverage(all_sessions),
+                "sessions": all_sessions,
             },
             indent=2,
             ensure_ascii=False,
@@ -415,7 +404,7 @@ def main() -> int:
         + "\n",
         encoding="utf-8",
     )
-    print(f"WROTE {MANIFEST} ({len(manifest_sessions)} sessions)")
+    print(f"WROTE {MANIFEST} ({len(manifest_sessions)} B3 sessions; {len(preserved_sessions)} preserved foreign sessions)")
     return 0
 
 

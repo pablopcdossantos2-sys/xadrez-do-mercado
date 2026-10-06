@@ -1,8 +1,13 @@
 # Biblioteca histórica de mercado
 
-Esta pasta contém a saída compacta do pipeline de ingestão histórica do **Xadrez do Mercado**.
+Esta pasta contém a saída compacta dos pipelines de dados reais do **Xadrez do Mercado**.
 
-Os arquivos do diretório `public/data/historical/` são candles derivados de dados reais de negócio a negócio de derivativos B3. Os ZIPs brutos não são versionados.
+## Fontes
+
+- **WINFUT / WDOFUT:** negócios individuais da B3, agregados localmente em OHLCV.
+- **MES / MNQ:** CME Globex MDP 3.0 via Databento, usando OHLCV de 1 minuto e resolução do contrato CME efetivo. A publicação destes arquivos depende dos direitos de redistribuição aplicáveis.
+
+Os arquivos brutos não são versionados.
 
 ## Estrutura
 
@@ -10,29 +15,54 @@ Os arquivos do diretório `public/data/historical/` são candles derivados de da
 public/data/historical/
 ├── manifest.json
 ├── WINFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
-└── WDOFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
-
+├── WDOFUT/<contrato>/<data>/{1m,5m,15m,1h}.json
+├── MES/<contrato>/<data>/{1m,5m,15m,1h}.json
+└── MNQ/<contrato>/<data>/{1m,5m,15m,1h}.json
 ```
 
-Cada sessão preserva o contrato específico negociado naquele pregão. A seleção do contrato dominante usa a quantidade negociada no arquivo do dia.
+Pastas MES/MNQ só aparecem no bundle público quando uma execução autorizada do pipeline CME tiver ocorrido.
 
-## Construção
+## Curadoria pedagógica
+
+Cada sessão recebe metadados para tendência, volatilidade relativa, gap, reversão, consolidação, breakout, opening drive, dificuldade e qualidade/continuidade. A seleção final usa cobertura de regimes, e não apenas recência ou volume.
+
+O gerador de puzzles usa esses regimes para distribuir exercícios entre comportamentos distintos do mercado. Um puzzle histórico nunca concatena pregões diferentes.
+
+## Construção B3
 
 Requer Python 3.10+:
 
 ```bash
-python scripts/build-historical-library.py
+npm run historical:b3
 ```
 
-A primeira biblioteca publicada contém 8 sessões reais: quatro de WINFUT e quatro de WDOFUT, cobrindo 23/09/2026 a 30/09/2026. O pipeline prioriza diversidade de volatilidade, direção e atividade e pode ser regenerado com uma janela maior.
+O pipeline varre um pool maior de candidatos e escolhe sessões que maximizam diversidade pedagógica.
 
-O mesmo script é executado pelo workflow de bootstrap do GitHub Actions.
+## Construção CME — MES/MNQ
+
+Defina `DATABENTO_API_KEY` e execute:
+
+```bash
+npm run historical:cme
+```
+
+Por segurança, a saída padrão é `private-data/historical/` e não é versionada. Para publicar no bundle web é necessário possuir os direitos correspondentes e executar explicitamente:
+
+```bash
+python scripts/build-cme-historical-library.py \
+  --output-root public/data/historical \
+  --acknowledge-redistribution-rights
+```
+
+O workflow de curadoria só publica CME quando `DATABENTO_API_KEY` estiver configurado e `CME_REDISTRIBUTION_ALLOWED=true`.
 
 ## Princípios
 
 - 1 minuto é a granularidade-base.
-- 5m, 15m e 1h são derivados de 1m.
-- Volume é a soma da quantidade negociada.
-- Gaps reais e minutos sem negócio não são preenchidos artificialmente.
-- A janela de puzzle é escolhida depois, sobre candles já históricos.
-- Não há geração sintética dentro desta biblioteca.
+- 5m, 15m e 1h são derivados localmente de 1m.
+- Volume real é preservado.
+- Minutos sem negócio não são preenchidos artificialmente.
+- Contratos de vencimentos diferentes nunca são concatenados dentro de um puzzle.
+- WIN/WDO usam pregões B3 isolados.
+- MES/MNQ usam sessões Globex isoladas (18:00–17:00, America/New_York), com RTH 09:30–16:00 registrado no manifesto.
+- Não há geração sintética dentro da biblioteca histórica.

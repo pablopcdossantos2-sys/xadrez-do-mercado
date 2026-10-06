@@ -35,7 +35,7 @@ As janelas podem vir de dados históricos reais ou do gerador sintético. **O pr
 
 ## Recursos
 
-- Replay de janelas históricas reais e geração procedural sintética.
+- Replay de janelas históricas reais com curadoria por regime e geração procedural sintética.
 - MES, MNQ, WINFUT e WDOFUT nos timeframes 1m, 5m, 15m e 1h.
 - Candles, volume, VWAP, EMA 20, DEMA e níveis de sessão.
 - Classificador de setups: Liquidity Sweep, VWAP Reclaim/Rejection, Opening Range Breakout, Failed Breakout/Breakdown, Trend Pullback, Range Fade, Momentum Push e Consolidation.
@@ -65,10 +65,10 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 ## Escopo e limitações
 
 - O gerador sintético continua disponível como fallback.
-- **MES e MNQ já estão disponíveis no catálogo, mas ainda usam dados sintéticos; a biblioteca histórica real atual é somente WINFUT e WDOFUT.**
-- Para WINFUT/WDOFUT, 1m, 5m e 15m podem usar puzzles históricos reais de um único pregão; 1h permanece sintético por enquanto.
+- WINFUT/WDOFUT usam a biblioteca B3 real em 1m, 5m e 15m; 1h continua sintético nesses ativos.
+- MES/MNQ possuem pipeline histórico real CME Globex via Databento. Quando a biblioteca CME autorizada está publicada, 1m, 5m, 15m e 1h usam sessões reais; sem dataset autorizado disponível, o fallback sintético é mantido.
 - A integração de dados reais está sendo orientada para **datasets históricos**, não para streaming em tempo real.
-- A prioridade histórica é WINFUT e WDOFUT.
+- A curadoria histórica cobre WINFUT/WDOFUT e o pipeline estrangeiro cobre MES/MNQ reais sem usar ES/NQ como substitutos.
 - Dados históricos brutos podem ter regras próprias de uso/redistribuição; o projeto deve manter separados o código e os arquivos de mercado quando necessário.
 - WINFUT e WDOFUT usam os códigos de produto B3 WIN e WDO, respectivamente.
 - A avaliação do analista usa somente o histórico disponível até o ponto de decisão. Isso não valida uma estratégia nem demonstra capacidade preditiva.
