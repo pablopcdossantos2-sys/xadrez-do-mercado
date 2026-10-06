@@ -115,3 +115,18 @@ The implementation path is:
 6. retain synthetic generation as fallback and for controlled test cases.
 
 There is intentionally no backend streaming stage in this plan. Any storage/distribution decision must still respect the applicable market-data usage terms.
+
+
+## Historical real-data curation — shipped
+
+The historical library now uses pedagogical curation rather than a recency-only session sample. The pipeline labels sessions by trend direction, relative volatility, same-contract gap, reversal/consolidation/breakout/opening-drive character, difficulty, candle continuity, trend strength, and close location. Session selection rotates deterministic seeds across regime buckets so repeated balanced days cannot crowd out rarer market behavior.
+
+The B3 pipeline now builds a larger candidate pool and selects up to eight diverse sessions per WINFUT/WDOFUT family while preserving contract identity and one-session puzzle boundaries.
+
+## MES/MNQ real historical pipeline — shipped, publication entitlement-gated
+
+A dedicated CME Globex MDP 3.0 historical pipeline was added through Databento for the actual MES and MNQ micro futures. It requests 1-minute OHLCV from volume-ranked continuous discovery symbols, resolves the returned instrument IDs to the actual CME raw contracts, derives 5m/15m/1h locally, and applies the same pedagogical curation used for B3.
+
+The pipeline writes outside the public bundle by default. Public publication is intentionally gated by both an API credential and an explicit redistribution-rights acknowledgement. Until an authorized MES/MNQ dataset is present in the public manifest, the application continues to fall back to synthetic generation for those instruments.
+
+Historical RTH/ETH levels and the visible session clock now use the exchange timezone for real sessions, avoiding browser-local-time distortion. Real-session date, contract, quality and curation tags are disclosed only after the decision and are persisted in journal exports.
