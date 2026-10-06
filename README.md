@@ -8,14 +8,151 @@
 
 Aplicação web de treinamento interativo para tomada de decisão em mercados futuros, focada em leitura de price action e escolhas Long, Short ou Skip.
 
-## Início rápido
+## Instalação e execução — passo a passo
+
+Esta seção foi escrita pensando também em quem **não costuma usar terminal ou GitHub**.
+
+### 1. O que você precisa instalar antes
+
+Para executar o projeto no seu computador, é necessário ter o **Node.js 20.19 ou superior**. O `npm`, usado para instalar as dependências do projeto, já acompanha o Node.js.
+
+Depois de instalar o Node.js, abra o **Terminal**, **PowerShell** ou **Prompt de Comando** e digite:
+
+```bash
+node --version
+npm --version
+```
+
+Se os dois comandos mostrarem números de versão, a instalação está pronta.
+
+> No Windows, você pode abrir o PowerShell pesquisando por **PowerShell** no menu Iniciar.
+
+### 2. Obtenha os arquivos do projeto
+
+Você pode fazer isso de duas formas.
+
+#### Opção A — mais simples: baixar um arquivo ZIP
+
+Esta opção não exige Git.
+
+1. Abra a página do repositório no GitHub.
+2. Clique no botão **Code**.
+3. Escolha **Download ZIP**.
+4. Quando o download terminar, extraia o arquivo ZIP para uma pasta de sua preferência.
+5. Abra essa pasta extraída.
+
+Exemplo de pasta:
+
+```text
+C:\Users\SeuNome\Documents\xadrez-do-mercado
+```
+
+#### Opção B — usando Git
+
+Se você já tiver o Git instalado, também pode clonar o repositório:
+
+```bash
+git clone https://github.com/pablopcdossantos2-sys/xadrez-do-mercado.git
+cd xadrez-do-mercado
+```
+
+Se você nunca utilizou Git, a **Opção A (Download ZIP)** é suficiente.
+
+### 3. Abra o terminal dentro da pasta do projeto
+
+O terminal precisa estar aberto **na mesma pasta onde está o arquivo `package.json`**.
+
+No Windows, uma forma simples é:
+
+1. abra a pasta do projeto no Explorador de Arquivos;
+2. clique na barra onde aparece o caminho da pasta;
+3. digite `powershell`;
+4. pressione **Enter**.
+
+Uma janela do PowerShell será aberta já na pasta correta.
+
+### 4. Instale as dependências
+
+Digite:
+
+```bash
+npm install
+```
+
+Esse comando baixa automaticamente as bibliotecas necessárias, como React, Vite e Lightweight Charts.
+
+Normalmente ele precisa ser executado apenas na primeira vez, ou quando as dependências do projeto forem alteradas.
+
+### 5. Execute a aplicação em modo de desenvolvimento
+
+Digite:
+
+```bash
+npm run dev
+```
+
+O terminal exibirá um endereço semelhante a:
+
+```text
+http://localhost:5173/
+```
+
+Abra esse endereço no navegador.
+
+> Enquanto estiver usando a aplicação dessa forma, **mantenha a janela do terminal aberta**. Para encerrar o servidor, volte ao terminal e pressione `Ctrl + C`.
+
+### 6. Opcional: carregar os samples históricos reais de MES e MNQ
+
+A ferramenta funciona mesmo sem esta etapa, utilizando o fallback sintético quando necessário.
+
+Para baixar e preparar os samples gratuitos da FirstRate Data para uso local, execute:
+
+```bash
+npm run historical:firstrate:sample
+```
+
+Depois, inicie normalmente:
+
+```bash
+npm run dev
+```
+
+Esses dados são armazenados localmente em `private-data/` e não são publicados no build de produção.
+
+### 7. Gerar a versão compilada para produção
+
+Se a intenção for criar os arquivos finais da aplicação, execute:
+
+```bash
+npm run build
+```
+
+Esse comando:
+
+1. verifica o código TypeScript;
+2. compila e otimiza a aplicação com o Vite;
+3. cria a pasta `dist/`, que contém os arquivos prontos para publicação em um servidor web.
+
+### 8. Testar localmente a versão compilada
+
+Depois de executar `npm run build`, você pode visualizar a versão de produção com:
+
+```bash
+npm run preview
+```
+
+O terminal mostrará um endereço local. Abra-o no navegador da mesma forma que no modo de desenvolvimento.
+
+### Resumo para quem só quer executar o projeto
+
+Depois de baixar e extrair o projeto, os três comandos essenciais são:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Para produção:
+E, quando quiser gerar a versão final compilada:
 
 ```bash
 npm run build
