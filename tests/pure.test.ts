@@ -68,8 +68,8 @@ describe('analytics pure functions',()=>{
 
 describe('real market data foundation',()=>{
   it('parses standard and semicolon OHLCV CSV',()=>{
-    const comma=parseOhlcvCsv('time,open,high,low,close,volume\\n2026-01-02T10:00:00Z,10,12,9,11,1500');
-    const semicolon=parseOhlcvCsv('time;open;high;low;close;volume\\n2026-01-02T10:00:00Z;10,5;12,5;9,5;11,5;1500');
+    const comma=parseOhlcvCsv('time,open,high,low,close,volume\n2026-01-02T10:00:00Z,10,12,9,11,1500');
+    const semicolon=parseOhlcvCsv('time;open;high;low;close;volume\n2026-01-02T10:00:00Z;10,5;12,5;9,5;11,5;1500');
     expect(comma[0]?.close).toBe(11);
     expect(semicolon[0]?.close).toBe(11.5);
   });
