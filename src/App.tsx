@@ -12,6 +12,7 @@ import { analyzeDebrief, analyzePuzzle, computeMicrostructure, detectTrap, REF_S
 import { generateMarketData, getDailyChallengeSeed, type GeneratorDifficulty } from './data';
 import { PATTERN_CARDS } from './cards';
 import { getAdaptiveDifficulty } from './difficulty';
+import { assetSpec } from './assets';
 import { buildNextStats, reducer } from './reducer';
 import type { Action, AppState, Decision, Instrument, JournalEntry, Mode, Timeframe, TradeOutcome } from './types';
 import { exportJournalCsv, exportJournalJson, isFreezeReady, loadJournal, loadLanguage, loadSoundPreference, loadStats, saveJournal, saveLanguage, saveSoundPreference, saveStats } from './storage';
@@ -45,7 +46,7 @@ function useSound(enabled:boolean){
 function resultText(t:T,r:string|null){return r==='WIN'?t('resultWin'):r==='LOSS'?t('resultLoss'):r==='TIMEOUT'?t('resultTimeout'):r==='FLATTEN'?t('resultFlat'):t('resultSkip');}
 function fmtR(r:number){return (r>=0?'+':'')+r.toFixed(2)+'R';}
 function fmtDuration(ms:number){const s=Math.max(0,Math.round(ms/1000)),m=Math.floor(s/60);return m+':'+String(s%60).padStart(2,'0');}
-function fmtSessionTime(ts:number|null){if(ts===null)return '—';const d=new Date(ts*1000);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function fmtSessionTime(ts:number|null,timezone?:string){if(ts===null)return '—';const d=new Date(ts*1000);if(!timezone)return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');return new Intl.DateTimeFormat('en-GB',{timeZone:timezone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(d);}
 function hasRecentLoss(journal:JournalEntry[]){return journal.length>0&&journal[journal.length-1].outcome==='LOSS';}
 function localDateKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function formatPct(value:number){return Math.round(value*100)+'%';}
@@ -75,6 +76,7 @@ function Home({state,t,dispatch,start,startDaily}:{state:AppState;t:T;dispatch:(
 }
 
 function Stat({label,value}:{label:string;value:string}){return <div><span>{label}</span><strong>{value}</strong></div>;}
+function analyzeLoadedPuzzle(data:AppState['puzzleData'],instrument:Instrument){const spec=assetSpec(instrument);const clock=data.dataSource==='historical'?{timezone:data.historicalTimezone,rthStart:spec.sessionStart,rthEnd:spec.sessionEnd}:undefined;return analyzePuzzle(data.history,data.future,clock);}
 
 function ResultPanel({state,t,onNext,onReverse}:{state:AppState;t:T;onNext:()=>void;onReverse:(decision:Decision)=>void}){
   if(!state.aiData)return null;
@@ -151,7 +153,7 @@ function App(){
 
   const newPuzzle=useCallback(async(speedNow?:number)=>{
     const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,seed=Date.now()+id*101,data=await generatePuzzle(seed,difficulty);
-    dispatch({type:'LOAD_PUZZLE',data,analysis:analyzePuzzle(data.history,data.future),trap:detectTrap(data.history),puzzleId:id,speedNow});
+    dispatch({type:'LOAD_PUZZLE',data,analysis:analyzeLoadedPuzzle(data,state.instrument),trap:detectTrap(data.history),puzzleId:id,speedNow});
     speedLock.current=false;
   },[generatePuzzle,state.journal,state.puzzleId]);
   const start=useCallback(async(mode:Mode)=>{
@@ -160,7 +162,7 @@ function App(){
     dispatch({type:'SET_DAILY_CONTEXT',active:false,date:null});
     dispatch({type:'SET_MODE',mode});
     const id=state.puzzleId+1,difficulty=getAdaptiveDifficulty(state.journal).key,data=await generatePuzzle(now+id*101,difficulty);
-    dispatch({type:'LOAD_PUZZLE',data,analysis:analyzePuzzle(data.history,data.future),trap:detectTrap(data.history),puzzleId:id,speedNow:mode==='speed'?now:undefined});
+    dispatch({type:'LOAD_PUZZLE',data,analysis:analyzeLoadedPuzzle(data,state.instrument),trap:detectTrap(data.history),puzzleId:id,speedNow:mode==='speed'?now:undefined});
     speedLock.current=false;
   },[generatePuzzle,sound,state.journal,state.puzzleId]);
   const startDaily=useCallback(async()=>{
@@ -168,7 +170,7 @@ function App(){
     sound.click();
     dispatch({type:'SET_DAILY_CONTEXT',active:true,date});
     dispatch({type:'SET_MODE',mode:'standard'});
-    dispatch({type:'LOAD_PUZZLE',data,analysis:analyzePuzzle(data.history,data.future),trap:detectTrap(data.history),puzzleId:id});
+    dispatch({type:'LOAD_PUZZLE',data,analysis:analyzeLoadedPuzzle(data,state.instrument),trap:detectTrap(data.history),puzzleId:id});
     speedLock.current=false;
   },[generatePuzzle,sound,state.puzzleId]);
   const finish=useCallback((result:Exclude<AppState['tradeResult'],null>,r:number,extra?:{skipReason?:string;skipReasonMatch?:boolean})=>{
@@ -219,7 +221,7 @@ function App(){
   const timeLabel=rm+':'+String(rs).padStart(2,'0');
   const revengeWarning=state.phase==='DECISION'&&state.mode!=='speed'&&hasRecentLoss(state.journal);
   const visibleBar=bars.at(-1);
-  const sessionClock=visibleBar?fmtSessionTime(visibleBar.time):'—';
+  const sessionClock=visibleBar?fmtSessionTime(visibleBar.time,state.puzzleData.dataSource==='historical'?state.puzzleData.historicalTimezone:undefined):'—';
   const activeMacro=state.puzzleData.macroEvents.filter(e=>bars.length>=state.puzzleData.history.length+e.index).at(-1);
   const levels=state.aiData?.levels;
   const micro=computeMicrostructure(bars);
