@@ -41,15 +41,14 @@ Concluída.
 - Separação entre histórico visível e futuro do puzzle.
 - Gerador sintético mantido como fallback.
 
-## Etapa 2 — Aquisição de pregões históricos reais
+## Etapa 2 — Aquisição de pregões históricos reais ✅
 
-Prioridade imediata.
+Primeira biblioteca funcional concluída.
 
 Começaremos pelos ativos brasileiros:
 
 - WINFUT;
-- WDOFUT;
-- BIT.
+- WDOFUT.
 
 A primeira coleção de cada família não precisa representar anos inteiros. Um conjunto pequeno, porém diversificado, já é suficiente para validar a experiência:
 
@@ -64,7 +63,7 @@ A primeira coleção de cada família não precisa representar anos inteiros. Um
 
 Os pregões serão escolhidos como **fontes reais de exercícios**, e não como um simples histórico financeiro exposto ao usuário.
 
-## Etapa 3 — Pipeline histórico
+## Etapa 3 — Pipeline histórico ✅
 
 O pipeline deverá:
 
@@ -80,6 +79,21 @@ O pipeline deverá:
 10. separar cada janela em histórico + futuro sem vazamento.
 
 A regra é: **nenhum dado posterior ao ponto de decisão pode participar da recomendação do analista**.
+
+## Estado atual da biblioteca — 05/10/2026
+
+A primeira biblioteca publicada contém **8 pregões reais da B3**: quatro de WINFUT e quatro de WDOFUT. O pipeline preserva o contrato específico de cada sessão e gera 1m, 5m, 15m e 1h a partir dos negócios individuais.
+
+Na geração de puzzles, cada exercício histórico passa a usar **um único pregão real**. Sessões diferentes não são mais concatenadas para formar uma janela, evitando que um puzzle atravesse artificialmente o fechamento de um dia e a abertura do seguinte.
+
+As janelas históricas adotadas são:
+
+- 1m: 82 candles de histórico + 38 futuros;
+- 5m: 72 candles de histórico + 30 futuros;
+- 15m: 26 candles de histórico + 12 futuros;
+- 1h: fallback sintético por enquanto, porque um único pregão B3 não contém candles suficientes para uma janela histórica intradiária útil.
+
+Essa adaptação vale apenas para os dados reais. O gerador sintético mantém o formato original de 82 + 38 candles.
 
 ## Etapa 4 — Continuidade dos contratos
 
@@ -140,7 +154,7 @@ Quando as condições de uso permitirem redistribuição, os datasets podem ser 
 
 O fato de um dado ser histórico e público não elimina a necessidade de verificar as condições aplicáveis ao seu uso e redistribuição.
 
-## Etapa 7 — Curadoria dos puzzles
+## Etapa 7 — Curadoria dos puzzles — em andamento
 
 Com os dados reais disponíveis, o gerador de puzzles passa a ter dois caminhos:
 
