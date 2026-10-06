@@ -5,6 +5,9 @@ on:
   push:
     paths:
       - ".github/workflows/bootstrap-historical-library.yml"
+      - "scripts/build-historical-library.py"
+      - "scripts/build-cme-historical-library.py"
+      - "scripts/historical_curation.py"
 
 permissions:
   contents: write
@@ -21,6 +24,7 @@ jobs:
     env:
       DATABENTO_API_KEY: ${{ secrets.DATABENTO_API_KEY }}
       CME_REDISTRIBUTION_ALLOWED: ${{ secrets.CME_REDISTRIBUTION_ALLOWED }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +40,7 @@ jobs:
 
       - name: Build curated B3 historical library
         run: |
-          python3 scripts/build-historical-library.py             --start-date 2026-09-01             --end-date 2026-10-02             --candidate-sessions 12             --max-sessions 8
+          python3 scripts/build-historical-library.py             --start-date 2026-09-16             --end-date 2026-10-02             --candidate-sessions 9             --max-sessions 8
 
       - name: Build authorized CME MES/MNQ library when entitled
         run: |
