@@ -5,7 +5,7 @@ import { eloDelta } from '../src/rating';
 import { getAdaptiveDifficulty } from '../src/difficulty';
 import { parseOhlcvCsv, parseOhlcvJson, splitDataset } from '../src/realData';
 import { ACTIVE_ASSETS } from '../src/assets';
-import { historicalWindowShape, selectHistoricalContractSessions, selectHistoricalSession, selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
+import { historicalWindowShape, mergeHistoricalManifests, selectHistoricalContractSessions, selectHistoricalSession, selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
 import type { Bar, JournalEntry } from '../src/types';
 
 function bar(close:number,open=close,high=Math.max(open,close),low=Math.min(open,close),time=0):Bar{
@@ -108,6 +108,20 @@ describe('real market data foundation',()=>{
     expect(historicalWindowShape('1h','WINFUT')).toBeNull();
     expect(historicalWindowShape('1h','MES')).toEqual({historyBars:12,futureBars:6});
     expect(historicalWindowShape('1h','MNQ')).toEqual({historyBars:12,futureBars:6});
+  });
+
+  it('merges a private local overlay without removing the public B3 library',()=>{
+    const b3Session={id:'b3',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-23',timezone:'America/Sao_Paulo',source:'b3',sourceUrl:'x',tickCount:10,
+      stats:{first:1,last:1,high:1,low:1,rangePct:0,trendPct:0,volume:1,tags:['balanced']},bars:{'1m':'/b3.json'},barCount1m:120} as const;
+    const cmeSession={id:'cme',asset:'MES',contract:'MES-CONTINUOUS-SAMPLE',tradeDate:'2026-09-23',timezone:'America/New_York',source:'firstrate-free-sample',sourceUrl:'x',recordCount:10,
+      stats:{first:1,last:1,high:1,low:1,rangePct:0,trendPct:0,volume:1,tags:['trend-up']},bars:{'1m':'/local.json'},barCount1m:120} as const;
+    const primary={version:2,generatedAt:'2026-09-23T00:00:00Z',source:{provider:'B3',feed:'ticks',endpoint:'x',notes:'x'},coverage:{WINFUT:['balanced']},sessions:[b3Session]} as const;
+    const overlay={version:2,generatedAt:'2026-09-24T00:00:00Z',source:{provider:'FirstRate Data',feed:'sample',endpoint:'y',notes:'private'},coverage:{MES:['trend-up']},sessions:[cmeSession]} as const;
+    const merged=mergeHistoricalManifests(primary,overlay);
+    expect(merged.sessions.map(x=>x.id)).toEqual(['cme','b3']);
+    expect(merged.coverage?.MES).toEqual(['trend-up']);
+    expect(merged.coverage?.WINFUT).toEqual(['balanced']);
+    expect(merged.sources?.map(x=>x.provider)).toEqual(['B3','FirstRate Data']);
   });
 
   it('selects one deterministic historical session instead of stitching trading days',()=>{

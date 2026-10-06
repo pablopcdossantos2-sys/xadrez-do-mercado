@@ -34,4 +34,4 @@ jobs:
 
       - name: Validate historical Python pipelines
         run: |
-          python3 -m py_compile scripts/historical_curation.py scripts/build-historical-library.py scripts/build-cme-historical-library.py
+          python3 -m py_compile scripts/historical_curation.py scripts/build-historical-library.py scripts/build-cme-historical-library.py scripts/build-firstrate-sample-library.py

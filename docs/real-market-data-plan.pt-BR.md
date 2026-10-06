@@ -82,7 +82,7 @@ A regra é: **nenhum dado posterior ao ponto de decisão pode participar da reco
 
 ## Estado atual da biblioteca — 05/10/2026
 
-A primeira biblioteca publicada contém **8 pregões reais da B3**: quatro de WINFUT e quatro de WDOFUT. O pipeline preserva o contrato específico de cada sessão e gera 1m, 5m, 15m e 1h a partir dos negócios individuais.
+A biblioteca pública atual contém **16 pregões reais da B3**: oito de WINFUT e oito de WDOFUT, selecionados por diversidade pedagógica. O pipeline preserva o contrato específico de cada sessão e gera 1m, 5m, 15m e 1h a partir dos negócios individuais.
 
 Na geração de puzzles, cada exercício histórico passa a usar **um único pregão real**. Sessões diferentes não são mais concatenadas para formar uma janela, evitando que um puzzle atravesse artificialmente o fechamento de um dia e a abertura do seguinte.
 
@@ -169,26 +169,50 @@ Gera uma sequência procedural para completar casos raros, testes e treinamento 
 
 A experiência do usuário permanece a mesma. A diferença fica na origem dos dados.
 
-## Etapa 8 — Futuros estrangeiros — pipeline implementado
+## Etapa 8 — Futuros estrangeiros — estratégia zero-budget implementada
 
-A fonte selecionada para **MES e MNQ reais** é o CME Globex MDP 3.0 distribuído pela Databento. O pipeline em `scripts/build-cme-historical-library.py`:
+Como o projeto não possui orçamento para aquisição de market data, MES e MNQ passam a ter dois caminhos separados:
 
-1. solicita OHLCV real de 1 minuto do contrato líder por volume;
-2. resolve o `instrument_id` para o contrato CME efetivo (por exemplo, MESH5/MNQH5), sem substituir MES/MNQ por ES/NQ;
-3. separa cada sessão Globex das 18:00 às 17:00 em `America/New_York`;
-4. preserva RTH (09:30–16:00), contrato, timezone e volume;
-5. deriva 5m, 15m e 1h localmente;
-6. aplica a mesma curadoria pedagógica usada para B3;
-7. mescla MES/MNQ no mesmo manifesto sem apagar WIN/WDO.
+### Caminho gratuito — FirstRate Data samples
 
-O acesso exige `DATABENTO_API_KEY`. Por padrão, o resultado é gravado em `private-data/historical/`, que está ignorado pelo Git. A publicação em `public/data/historical/` exige a flag `--acknowledge-redistribution-rights` e, no GitHub Actions, o secret `CME_REDISTRIBUTION_ALLOWED=true`. Isso impede que dados CME licenciados sejam redistribuídos publicamente por acidente.
+A FirstRate Data oferece samples gratuitos para MES e MNQ. Os samples intraday são barras de 1 minuto em horário de Nova York e servem para avaliação/testes.
+
+O comando:
+
+```bash
+npm run historical:firstrate:sample
+```
+
+baixa os samples públicos de MES e MNQ, identifica o arquivo de 1 minuto, separa sessões Globex, deriva 5m/15m/1h e executa a mesma curadoria pedagógica usada na B3.
+
+Por exigência de licenciamento, os dados ficam exclusivamente em `private-data/firstrate/`, que é ignorado pelo Git. O servidor Vite os disponibiliza somente em desenvolvimento local por `/data/local-historical/`. Eles não entram no build de produção e não são versionados no GitHub.
+
+A aplicação tenta carregar essa biblioteca privada local e a mescla à biblioteca pública B3. Assim, em desenvolvimento local:
+
+- WIN/WDO continuam vindo da biblioteca pública B3;
+- MES/MNQ podem usar dados reais gratuitos dos samples FirstRate;
+- se os samples não estiverem presentes, MES/MNQ continuam no fallback sintético.
+
+Os samples oficiais são:
+- MES: https://frd001.s3.us-east-2.amazonaws.com/frd_sample_futures_MES.zip
+- MNQ: https://frd001.s3.us-east-2.amazonaws.com/frd_sample_futures_MNQ.zip
 
 Referências:
-- https://databento.com/docs/quickstart
-- https://databento.com/docs/schemas-and-data-formats/ohlcv
-- https://databento.com/docs/standards-and-conventions/symbology
-- https://databento.com/docs/knowledge-base/datasets
-- https://www.cmegroup.com/datamine.html
+- https://firstratedata.com/i/futures/MES
+- https://firstratedata.com/i/futures/MNQ
+- https://firstratedata.com/free-intraday-data
+- https://firstratedata.com/about/faq
+- https://firstratedata.com/about/license
+
+### Caminho opcional futuro — Databento/CME
+
+O pipeline `scripts/build-cme-historical-library.py` continua disponível para o caso de o projeto obter, no futuro, acesso autorizado sem custo ou patrocínio. Ele não é requisito para desenvolver ou testar a ferramenta hoje.
+
+A publicação pública de candles CME brutos permanece bloqueada sem direitos explícitos de redistribuição.
+
+### Fontes públicas de terceiros encontradas
+
+Também foram encontrados repositórios públicos com MES/MNQ intraday, porém eles não serão incorporados automaticamente apenas por estarem no GitHub. Código aberto não implica licença válida sobre os dados de mercado subjacentes. O projeto só usará uma fonte desse tipo se a licença do **dataset** e o direito de redistribuição estiverem claros.
 
 ## Critério de conclusão
 

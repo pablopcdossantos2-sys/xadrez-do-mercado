@@ -5,7 +5,8 @@ Esta pasta contém a saída compacta dos pipelines de dados reais do **Xadrez do
 ## Fontes
 
 - **WINFUT / WDOFUT:** negócios individuais da B3, agregados localmente em OHLCV.
-- **MES / MNQ:** CME Globex MDP 3.0 via Databento, usando OHLCV de 1 minuto e resolução do contrato CME efetivo. A publicação destes arquivos depende dos direitos de redistribuição aplicáveis.
+- **MES / MNQ (zero-budget/local):** samples gratuitos da FirstRate Data, processados para `private-data/firstrate/` e servidos apenas pelo Vite em desenvolvimento local.
+- **MES / MNQ (opcional futuro):** CME Globex MDP 3.0 via Databento, caso haja acesso/licença autorizados.
 
 Os arquivos brutos não são versionados.
 
@@ -38,9 +39,18 @@ npm run historical:b3
 
 O pipeline varre um pool maior de candidatos e escolhe sessões que maximizam diversidade pedagógica.
 
-## Construção CME — MES/MNQ
+## Construção gratuita local — MES/MNQ
 
-Defina `DATABENTO_API_KEY` e execute:
+```bash
+npm run historical:firstrate:sample
+npm run dev
+```
+
+A aplicação detecta automaticamente `private-data/firstrate/manifest.json` durante o desenvolvimento e mescla MES/MNQ à biblioteca pública B3. O diretório privado não é copiado para o build.
+
+## Construção CME autorizada — MES/MNQ
+
+Opcionalmente, se houver acesso licenciado, defina `DATABENTO_API_KEY` e execute:
 
 ```bash
 npm run historical:cme
