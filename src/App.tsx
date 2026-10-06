@@ -17,7 +17,7 @@ import type { Action, AppState, Decision, Instrument, JournalEntry, Mode, Timefr
 import { exportJournalCsv, exportJournalJson, isFreezeReady, loadJournal, loadLanguage, loadSoundPreference, loadStats, saveJournal, saveLanguage, saveSoundPreference, saveStats } from './storage';
 import { translate, type TranslationKey } from './translations';
 import TapeChart from './TapeChart';
-import { loadHistoricalManifest, loadHistoricalSession, selectHistoricalContractSessions, selectHistoricalWindow, type HistoricalLibraryManifest } from './historicalLibrary';
+import { historicalWindowShape, loadHistoricalManifest, loadHistoricalSession, selectHistoricalSession, selectHistoricalWindow, type HistoricalLibraryManifest } from './historicalLibrary';
 import './styles.css';
 
 const SPEED_TOTAL_ROUNDS=10;
@@ -122,23 +122,21 @@ function App(){
       }catch{}
     }
     if(manifest){
-      const sessions=selectHistoricalContractSessions(manifest,state.instrument,state.timeframe);
-      if(sessions.length){
+      const shape=historicalWindowShape(state.timeframe);
+      const session=shape?selectHistoricalSession(manifest,state.instrument,state.timeframe,seed):null;
+      if(session&&shape){
         try{
-          const datasets=await Promise.all(sessions.map(session=>loadHistoricalSession(session,state.timeframe)));
-          const bars=datasets.flat().sort((left,right)=>left.time-right.time);
-          const window=selectHistoricalWindow(bars,seed);
+          const bars=await loadHistoricalSession(session,state.timeframe);
+          const window=selectHistoricalWindow(bars,seed,shape.historyBars,shape.futureBars);
           if(window){
-            const first=sessions[0]!;
-            const last=sessions.at(-1)!;
             return{
               history:window.history,
               future:window.future,
               macroEvents:[],
               dataSource:'historical' as const,
-              historicalSessionId:sessions.map(session=>session.id).join('|'),
-              historicalTradeDate:first.tradeDate===last.tradeDate?first.tradeDate:first.tradeDate+'..'+last.tradeDate,
-              historicalContract:first.contract
+              historicalSessionId:session.id,
+              historicalTradeDate:session.tradeDate,
+              historicalContract:session.contract
             };
           }
         }catch{}
