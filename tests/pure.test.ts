@@ -5,7 +5,7 @@ import { eloDelta } from '../src/rating';
 import { getAdaptiveDifficulty } from '../src/difficulty';
 import { parseOhlcvCsv, parseOhlcvJson, splitDataset } from '../src/realData';
 import { ACTIVE_ASSETS } from '../src/assets';
-import { selectHistoricalContractSessions, selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
+import { historicalWindowShape, selectHistoricalContractSessions, selectHistoricalSession, selectHistoricalSessions, selectHistoricalWindow } from '../src/historicalLibrary';
 import type { Bar, JournalEntry } from '../src/types';
 
 function bar(close:number,open=close,high=Math.max(open,close),low=Math.min(open,close),time=0):Bar{
@@ -68,8 +68,8 @@ describe('analytics pure functions',()=>{
 
 describe('real market data foundation',()=>{
   it('parses standard and semicolon OHLCV CSV',()=>{
-    const comma=parseOhlcvCsv('time,open,high,low,close,volume\\n2026-01-02T10:00:00Z,10,12,9,11,1500');
-    const semicolon=parseOhlcvCsv('time;open;high;low;close;volume\\n2026-01-02T10:00:00Z;10,5;12,5;9,5;11,5;1500');
+    const comma=parseOhlcvCsv('time,open,high,low,close,volume\n2026-01-02T10:00:00Z,10,12,9,11,1500');
+    const semicolon=parseOhlcvCsv('time;open;high;low;close;volume\n2026-01-02T10:00:00Z;10,5;12,5;9,5;11,5;1500');
     expect(comma[0]?.close).toBe(11);
     expect(semicolon[0]?.close).toBe(11.5);
   });
@@ -87,6 +87,27 @@ describe('real market data foundation',()=>{
     expect(a).toEqual(b);
     expect(a?.history).toHaveLength(82);
     expect(a?.future).toHaveLength(38);
+  });
+
+  it('uses intraday historical window shapes and keeps 1h on synthetic fallback',()=>{
+    expect(historicalWindowShape('1m')).toEqual({historyBars:82,futureBars:38});
+    expect(historicalWindowShape('5m')).toEqual({historyBars:72,futureBars:30});
+    expect(historicalWindowShape('15m')).toEqual({historyBars:26,futureBars:12});
+    expect(historicalWindowShape('1h')).toBeNull();
+  });
+
+  it('selects one deterministic historical session instead of stitching trading days',()=>{
+    const base={timezone:'America/Sao_Paulo',source:'b3',sourceUrl:'x',tickCount:100,
+      stats:{first:1,last:1,high:1,low:1,rangePct:0,trendPct:0,volume:1,tags:[]},bars:{'15m':'/x.json'},barCount1m:120} as const;
+    const manifest={version:1,generatedAt:'x',source:{provider:'B3',feed:'deriv',endpoint:'x',notes:'x'},sessions:[
+      {...base,id:'d1',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-23'},
+      {...base,id:'d2',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-24'},
+      {...base,id:'d3',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-25'}
+    ]} as const;
+    const first=selectHistoricalSession(manifest,'WINFUT','15m',123);
+    const second=selectHistoricalSession(manifest,'WINFUT','15m',123);
+    expect(first?.id).toBe(second?.id);
+    expect(first?.tradeDate).toMatch(/^2026-09-2[3-5]$/);
   });
 
   it('prefers the longest same-contract historical run',()=>{

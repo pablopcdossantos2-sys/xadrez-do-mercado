@@ -23,7 +23,7 @@ npm run build
 
 ## Como funciona
 
-Cada puzzle apresenta 82 barras de histórico e solicita uma decisão. No modo Padrão, as 38 barras futuras podem ser reproduzidas barra a barra, com bracket ajustável e Flatten. O resultado inclui avaliação baseada em regras, ELO, resultado em R, debrief e contrafactuais.
+Os puzzles sintéticos apresentam 82 barras de histórico e 38 barras futuras. Nos puzzles históricos reais, a janela é adaptada ao timeframe para permanecer integralmente dentro de um único pregão (1m: 82+38; 5m: 72+30; 15m: 26+12). No modo Padrão, as barras futuras podem ser reproduzidas barra a barra, com bracket ajustável e Flatten. O resultado inclui avaliação baseada em regras, ELO, resultado em R, debrief e contrafactuais.
 
 As janelas podem vir de dados históricos reais ou do gerador sintético. **O produto não depende de dados em tempo real.**
 
@@ -66,6 +66,7 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 - O gerador sintético continua disponível como fallback.
 - **MES e MNQ já estão disponíveis no catálogo, mas ainda usam dados sintéticos; a biblioteca histórica real atual é somente WINFUT e WDOFUT.**
+- Para WINFUT/WDOFUT, 1m, 5m e 15m podem usar puzzles históricos reais de um único pregão; 1h permanece sintético por enquanto.
 - A integração de dados reais está sendo orientada para **datasets históricos**, não para streaming em tempo real.
 - A prioridade histórica é WINFUT e WDOFUT.
 - Dados históricos brutos podem ter regras próprias de uso/redistribuição; o projeto deve manter separados o código e os arquivos de mercado quando necessário.
