@@ -6,7 +6,7 @@
 
 > Chess puzzles, but for futures day traders.
 
-Browser-based interactive training tool for futures decision-making practice, focused on price-action reading and Long, Short, or Skip choices.
+Browser-based interactive web application for futures-market decision-making practice, focused on price-action reading and Long, Short, or Skip choices.
 
 ## Quick start
 
@@ -85,7 +85,7 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 ## Authorship and development
 
-Xadrez do Mercado is a browser-based training tool independently developed by Pablo Phillipe Cândido dos Santos for futures day-trading decision practice through price-action puzzles, trade replay, and counterfactual debriefing.
+Xadrez do Mercado is an interactive web training application independently developed by Pablo Phillipe Cândido dos Santos for futures day-trading decision practice through price-action puzzles, replay of real historical sessions when available, and synthetic generation as a fallback, with counterfactual debriefing and local performance tracking.
 
 Development used generative artificial intelligence tools as an auxiliary resource, while the author remained responsible for the project's conception, implementation, integration, and verification.
 
