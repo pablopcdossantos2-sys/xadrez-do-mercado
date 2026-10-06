@@ -66,7 +66,7 @@ Interactive state is centralized in `useReducer`, replacing a collection of inte
 
 - Synthetic generation remains available as a fallback.
 - WINFUT/WDOFUT use the real B3 library in 1m, 5m and 15m; 1h remains synthetic for those instruments.
-- MES/MNQ have a real CME Globex historical pipeline via Databento. When an authorized CME library is published, 1m, 5m, 15m and 1h can use real sessions; otherwise the synthetic fallback remains active.
+- MES/MNQ can use FirstRate Data's free real-data samples during local development via `npm run historical:firstrate:sample`. Those files stay under `private-data/`, are not committed, and never enter production builds. Without the local library, the synthetic fallback remains active.
 - Real-data integration is based on **historical datasets**, not real-time streaming.
 - The foreign pipeline uses actual MES/MNQ contracts rather than ES/NQ proxies.
 - Raw historical market files may have their own usage/redistribution terms; the project should keep application code and market files separate when necessary.
