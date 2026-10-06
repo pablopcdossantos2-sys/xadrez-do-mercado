@@ -1,128 +1,306 @@
 {
-  "version": 1,
-  "generatedAt": "2026-10-05T20:21:27.783638-03:00",
+  "version": 2,
+  "generatedAt": "2026-10-05T21:42:08.406811-03:00",
   "source": {
     "provider": "B3",
     "feed": "derivatives tick-by-tick",
     "endpoint": "https://drp.b3.com.br/rapinegocios/tickercsv/{date}?type=1",
-    "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained for WINFUT and WDOFUT."
+    "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained."
+  },
+  "sources": [
+    {
+      "provider": "B3",
+      "feed": "derivatives tick-by-tick",
+      "endpoint": "https://drp.b3.com.br/rapinegocios/tickercsv/{date}?type=1",
+      "notes": "Raw ZIPs are processed and discarded; only compact OHLCV exercise data is retained."
+    }
+  ],
+  "coverage": {
+    "WDOFUT": [
+      "balanced",
+      "breakout",
+      "consolidation",
+      "easy",
+      "gap-down",
+      "gap-up",
+      "hard",
+      "high-volatility",
+      "low-volatility",
+      "normal",
+      "normal-volatility",
+      "opening-drive",
+      "reversal",
+      "trend-down",
+      "trend-up",
+      "two-sided"
+    ],
+    "WINFUT": [
+      "balanced",
+      "breakout",
+      "consolidation",
+      "easy",
+      "gap-down",
+      "gap-up",
+      "hard",
+      "high-volatility",
+      "low-volatility",
+      "normal",
+      "normal-volatility",
+      "opening-drive",
+      "reversal",
+      "trend-down",
+      "trend-up",
+      "two-sided"
+    ]
   },
   "sessions": [
     {
-      "id": "WINFUT-2026-09-23-WINV26",
-      "asset": "WINFUT",
-      "contract": "WINV26",
-      "tradeDate": "2026-09-23",
+      "id": "WDOFUT-2026-09-17-WDOV26",
+      "asset": "WDOFUT",
+      "contract": "WDOV26",
+      "tradeDate": "2026-09-17",
       "timezone": "America/Sao_Paulo",
       "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-23?type=1",
-      "tickCount": 6164014,
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-17?type=1",
+      "tickCount": 473549,
       "stats": {
-        "first": 187900,
-        "last": 186680,
-        "high": 190140,
-        "low": 186365,
-        "rangePct": 0.02009,
-        "trendPct": -0.006493,
-        "volume": 19831425,
+        "first": 5153.0,
+        "last": 5140.0,
+        "high": 5193.0,
+        "low": 5139.0,
+        "rangePct": 0.010479,
+        "trendPct": -0.002523,
+        "volume": 2363426.0,
         "tags": [
-          "balanced"
+          "balanced",
+          "high-volatility",
+          "gap-down",
+          "reversal",
+          "hard"
+        ],
+        "gapPct": -0.002516,
+        "continuityPct": 1.0,
+        "openingMovePct": -0.000582,
+        "closeLocation": 0.018519,
+        "trendStrength": 0.240767
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "high",
+        "gap": "gap-down",
+        "characters": [
+          "reversal"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 95,
+        "tags": [
+          "balanced",
+          "high-volatility",
+          "gap-down",
+          "reversal",
+          "hard"
         ]
       },
-      "bars": {
-        "1m": "/data/historical/WINFUT/WINV26/2026-09-23/1m.json",
-        "5m": "/data/historical/WINFUT/WINV26/2026-09-23/5m.json",
-        "15m": "/data/historical/WINFUT/WINV26/2026-09-23/15m.json",
-        "1h": "/data/historical/WINFUT/WINV26/2026-09-23/1h.json"
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
-      "barCount1m": 564
+      "bars": {
+        "1m": "/data/historical/WDOFUT/WDOV26/2026-09-17/1m.json",
+        "5m": "/data/historical/WDOFUT/WDOV26/2026-09-17/5m.json",
+        "15m": "/data/historical/WDOFUT/WDOV26/2026-09-17/15m.json",
+        "1h": "/data/historical/WDOFUT/WDOV26/2026-09-17/1h.json"
+      },
+      "barCount1m": 570
     },
     {
-      "id": "WINFUT-2026-09-24-WINV26",
-      "asset": "WINFUT",
-      "contract": "WINV26",
-      "tradeDate": "2026-09-24",
+      "id": "WDOFUT-2026-09-18-WDOV26",
+      "asset": "WDOFUT",
+      "contract": "WDOV26",
+      "tradeDate": "2026-09-18",
       "timezone": "America/Sao_Paulo",
       "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-24?type=1",
-      "tickCount": 6165264,
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-18?type=1",
+      "tickCount": 403431,
       "stats": {
-        "first": 186575,
-        "last": 184980,
-        "high": 187555,
-        "low": 184725,
-        "rangePct": 0.015168,
-        "trendPct": -0.008549,
-        "volume": 19580827,
+        "first": 5150.0,
+        "last": 5157.5,
+        "high": 5179.5,
+        "low": 5134.5,
+        "rangePct": 0.008738,
+        "trendPct": 0.001456,
+        "volume": 1958894.0,
         "tags": [
-          "trend-down"
+          "balanced",
+          "high-volatility",
+          "two-sided",
+          "hard"
+        ],
+        "gapPct": 0.001946,
+        "continuityPct": 1.0,
+        "openingMovePct": 0.001359,
+        "closeLocation": 0.511111,
+        "trendStrength": 0.166629
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "high",
+        "gap": "none",
+        "characters": [
+          "two-sided"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 88,
+        "tags": [
+          "balanced",
+          "high-volatility",
+          "two-sided",
+          "hard"
         ]
       },
-      "bars": {
-        "1m": "/data/historical/WINFUT/WINV26/2026-09-24/1m.json",
-        "5m": "/data/historical/WINFUT/WINV26/2026-09-24/5m.json",
-        "15m": "/data/historical/WINFUT/WINV26/2026-09-24/15m.json",
-        "1h": "/data/historical/WINFUT/WINV26/2026-09-24/1h.json"
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
-      "barCount1m": 564
+      "bars": {
+        "1m": "/data/historical/WDOFUT/WDOV26/2026-09-18/1m.json",
+        "5m": "/data/historical/WDOFUT/WDOV26/2026-09-18/5m.json",
+        "15m": "/data/historical/WDOFUT/WDOV26/2026-09-18/15m.json",
+        "1h": "/data/historical/WDOFUT/WDOV26/2026-09-18/1h.json"
+      },
+      "barCount1m": 570
     },
     {
-      "id": "WINFUT-2026-09-25-WINV26",
-      "asset": "WINFUT",
-      "contract": "WINV26",
-      "tradeDate": "2026-09-25",
+      "id": "WDOFUT-2026-09-21-WDOV26",
+      "asset": "WDOFUT",
+      "contract": "WDOV26",
+      "tradeDate": "2026-09-21",
       "timezone": "America/Sao_Paulo",
       "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-25?type=1",
-      "tickCount": 5431789,
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-21?type=1",
+      "tickCount": 409530,
       "stats": {
-        "first": 185320,
-        "last": 184700,
-        "high": 185400,
-        "low": 183125,
-        "rangePct": 0.012276,
-        "trendPct": -0.003346,
-        "volume": 17301995,
+        "first": 5143.5,
+        "last": 5125.0,
+        "high": 5149.0,
+        "low": 5113.5,
+        "rangePct": 0.006902,
+        "trendPct": -0.003597,
+        "volume": 2040635.0,
         "tags": [
-          "balanced"
+          "trend-down",
+          "low-volatility",
+          "gap-down",
+          "opening-drive",
+          "normal"
+        ],
+        "gapPct": -0.002714,
+        "continuityPct": 1.0,
+        "openingMovePct": -0.004083,
+        "closeLocation": 0.323944,
+        "trendStrength": 0.521153
+      },
+      "curation": {
+        "trend": "trend-down",
+        "volatility": "low",
+        "gap": "gap-down",
+        "characters": [
+          "opening-drive"
+        ],
+        "difficulty": "normal",
+        "quality": "excellent",
+        "score": 100,
+        "tags": [
+          "trend-down",
+          "low-volatility",
+          "gap-down",
+          "opening-drive",
+          "normal"
         ]
       },
-      "bars": {
-        "1m": "/data/historical/WINFUT/WINV26/2026-09-25/1m.json",
-        "5m": "/data/historical/WINFUT/WINV26/2026-09-25/5m.json",
-        "15m": "/data/historical/WINFUT/WINV26/2026-09-25/15m.json",
-        "1h": "/data/historical/WINFUT/WINV26/2026-09-25/1h.json"
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
-      "barCount1m": 564
+      "bars": {
+        "1m": "/data/historical/WDOFUT/WDOV26/2026-09-21/1m.json",
+        "5m": "/data/historical/WDOFUT/WDOV26/2026-09-21/5m.json",
+        "15m": "/data/historical/WDOFUT/WDOV26/2026-09-21/15m.json",
+        "1h": "/data/historical/WDOFUT/WDOV26/2026-09-21/1h.json"
+      },
+      "barCount1m": 570
     },
     {
-      "id": "WINFUT-2026-09-30-WINV26",
-      "asset": "WINFUT",
-      "contract": "WINV26",
-      "tradeDate": "2026-09-30",
+      "id": "WDOFUT-2026-09-22-WDOV26",
+      "asset": "WDOFUT",
+      "contract": "WDOV26",
+      "tradeDate": "2026-09-22",
       "timezone": "America/Sao_Paulo",
       "source": "b3-derivatives-tick-by-tick",
-      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-30?type=1",
-      "tickCount": 6696260,
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-22?type=1",
+      "tickCount": 457082,
       "stats": {
-        "first": 184700,
-        "last": 187700,
-        "high": 188860,
-        "low": 184500,
-        "rangePct": 0.023606,
-        "trendPct": 0.016243,
-        "volume": 20833410,
+        "first": 5124.5,
+        "last": 5109.5,
+        "high": 5145.0,
+        "low": 5104.0,
+        "rangePct": 0.008001,
+        "trendPct": -0.002927,
+        "volume": 2292854.0,
         "tags": [
-          "trend-up"
+          "balanced",
+          "normal-volatility",
+          "reversal",
+          "hard"
+        ],
+        "gapPct": -9.8e-05,
+        "continuityPct": 1.0,
+        "openingMovePct": 0.002147,
+        "closeLocation": 0.134146,
+        "trendStrength": 0.365829
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "normal",
+        "gap": "none",
+        "characters": [
+          "reversal"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 92,
+        "tags": [
+          "balanced",
+          "normal-volatility",
+          "reversal",
+          "hard"
         ]
       },
-      "bars": {
-        "1m": "/data/historical/WINFUT/WINV26/2026-09-30/1m.json",
-        "5m": "/data/historical/WINFUT/WINV26/2026-09-30/5m.json",
-        "15m": "/data/historical/WINFUT/WINV26/2026-09-30/15m.json",
-        "1h": "/data/historical/WINFUT/WINV26/2026-09-30/1h.json"
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
-      "barCount1m": 563
+      "bars": {
+        "1m": "/data/historical/WDOFUT/WDOV26/2026-09-22/1m.json",
+        "5m": "/data/historical/WDOFUT/WDOV26/2026-09-22/5m.json",
+        "15m": "/data/historical/WDOFUT/WDOV26/2026-09-22/15m.json",
+        "1h": "/data/historical/WDOFUT/WDOV26/2026-09-22/1h.json"
+      },
+      "barCount1m": 570
     },
     {
       "id": "WDOFUT-2026-09-23-WDOV26",
@@ -134,16 +312,50 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-23?type=1",
       "tickCount": 596395,
       "stats": {
-        "first": 5135,
-        "last": 5173,
+        "first": 5135.0,
+        "last": 5173.0,
         "high": 5182.5,
-        "low": 5128,
+        "low": 5128.0,
         "rangePct": 0.010613,
         "trendPct": 0.0074,
-        "volume": 2919489,
+        "volume": 2919489.0,
         "tags": [
-          "trend-up"
+          "trend-up",
+          "high-volatility",
+          "gap-up",
+          "breakout",
+          "easy"
+        ],
+        "gapPct": 0.004991,
+        "continuityPct": 1.0,
+        "openingMovePct": 0.000876,
+        "closeLocation": 0.825688,
+        "trendStrength": 0.697258
+      },
+      "curation": {
+        "trend": "trend-up",
+        "volatility": "high",
+        "gap": "gap-up",
+        "characters": [
+          "breakout"
+        ],
+        "difficulty": "easy",
+        "quality": "excellent",
+        "score": 100,
+        "tags": [
+          "trend-up",
+          "high-volatility",
+          "gap-up",
+          "breakout",
+          "easy"
         ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
       "bars": {
         "1m": "/data/historical/WDOFUT/WDOV26/2026-09-23/1m.json",
@@ -163,16 +375,53 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-24?type=1",
       "tickCount": 580467,
       "stats": {
-        "first": 5193,
+        "first": 5193.0,
         "last": 5198.5,
         "high": 5209.5,
-        "low": 5172,
+        "low": 5172.0,
         "rangePct": 0.007221,
         "trendPct": 0.001059,
-        "volume": 2700760,
+        "volume": 2700760.0,
         "tags": [
-          "balanced"
+          "balanced",
+          "low-volatility",
+          "gap-up",
+          "reversal",
+          "consolidation",
+          "hard"
+        ],
+        "gapPct": 0.003866,
+        "continuityPct": 1.0,
+        "openingMovePct": -0.002985,
+        "closeLocation": 0.706667,
+        "trendStrength": 0.146656
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "low",
+        "gap": "gap-up",
+        "characters": [
+          "reversal",
+          "consolidation"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 98,
+        "tags": [
+          "balanced",
+          "low-volatility",
+          "gap-up",
+          "reversal",
+          "consolidation",
+          "hard"
         ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
       "bars": {
         "1m": "/data/historical/WDOFUT/WDOV26/2026-09-24/1m.json",
@@ -192,16 +441,51 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-25?type=1",
       "tickCount": 505119,
       "stats": {
-        "first": 5194,
+        "first": 5194.0,
         "last": 5189.5,
-        "high": 5219,
-        "low": 5178,
+        "high": 5219.0,
+        "low": 5178.0,
         "rangePct": 0.007894,
         "trendPct": -0.000866,
-        "volume": 2362514,
+        "volume": 2362514.0,
         "tags": [
-          "balanced"
+          "balanced",
+          "normal-volatility",
+          "reversal",
+          "consolidation",
+          "hard"
+        ],
+        "gapPct": -0.000866,
+        "continuityPct": 1.0,
+        "openingMovePct": 0.001829,
+        "closeLocation": 0.280488,
+        "trendStrength": 0.109704
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "normal",
+        "gap": "none",
+        "characters": [
+          "reversal",
+          "consolidation"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 92,
+        "tags": [
+          "balanced",
+          "normal-volatility",
+          "reversal",
+          "consolidation",
+          "hard"
         ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
       "bars": {
         "1m": "/data/historical/WDOFUT/WDOV26/2026-09-25/1m.json",
@@ -221,16 +505,53 @@
       "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-29?type=1",
       "tickCount": 556507,
       "stats": {
-        "first": 5212,
-        "last": 5203,
+        "first": 5212.0,
+        "last": 5203.0,
         "high": 5242.5,
-        "low": 5198,
+        "low": 5198.0,
         "rangePct": 0.008538,
         "trendPct": -0.001727,
-        "volume": 2473359,
+        "volume": 2473359.0,
         "tags": [
-          "balanced"
+          "balanced",
+          "normal-volatility",
+          "gap-up",
+          "reversal",
+          "consolidation",
+          "hard"
+        ],
+        "gapPct": 0.004336,
+        "continuityPct": 1.0,
+        "openingMovePct": 0.00048,
+        "closeLocation": 0.11236,
+        "trendStrength": 0.202272
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "normal",
+        "gap": "gap-up",
+        "characters": [
+          "reversal",
+          "consolidation"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 99,
+        "tags": [
+          "balanced",
+          "normal-volatility",
+          "gap-up",
+          "reversal",
+          "consolidation",
+          "hard"
         ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
       },
       "bars": {
         "1m": "/data/historical/WDOFUT/WDOV26/2026-09-29/1m.json",
@@ -239,6 +560,505 @@
         "1h": "/data/historical/WDOFUT/WDOV26/2026-09-29/1h.json"
       },
       "barCount1m": 570
+    },
+    {
+      "id": "WINFUT-2026-09-16-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-16",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-16?type=1",
+      "tickCount": 5972540,
+      "stats": {
+        "first": 189320.0,
+        "last": 187600.0,
+        "high": 189730.0,
+        "low": 186410.0,
+        "rangePct": 0.017536,
+        "trendPct": -0.009085,
+        "volume": 18534765.0,
+        "tags": [
+          "trend-down",
+          "normal-volatility",
+          "opening-drive",
+          "normal"
+        ],
+        "gapPct": null,
+        "continuityPct": 0.989474,
+        "openingMovePct": -0.009032,
+        "closeLocation": 0.358434,
+        "trendStrength": 0.518077
+      },
+      "curation": {
+        "trend": "trend-down",
+        "volatility": "normal",
+        "gap": "unknown",
+        "characters": [
+          "opening-drive"
+        ],
+        "difficulty": "normal",
+        "quality": "excellent",
+        "score": 95,
+        "tags": [
+          "trend-down",
+          "normal-volatility",
+          "opening-drive",
+          "normal"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-16/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-16/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-16/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-16/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-17-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-17",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-17?type=1",
+      "tickCount": 5674760,
+      "stats": {
+        "first": 188810.0,
+        "last": 188280.0,
+        "high": 189085.0,
+        "low": 184465.0,
+        "rangePct": 0.024469,
+        "trendPct": -0.002807,
+        "volume": 18071676.0,
+        "tags": [
+          "balanced",
+          "high-volatility",
+          "gap-up",
+          "two-sided",
+          "hard"
+        ],
+        "gapPct": 0.00645,
+        "continuityPct": 0.989474,
+        "openingMovePct": -0.005005,
+        "closeLocation": 0.825758,
+        "trendStrength": 0.114717
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "high",
+        "gap": "gap-up",
+        "characters": [
+          "two-sided"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 92,
+        "tags": [
+          "balanced",
+          "high-volatility",
+          "gap-up",
+          "two-sided",
+          "hard"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-17/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-17/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-17/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-17/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-21-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-21",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-21?type=1",
+      "tickCount": 5268240,
+      "stats": {
+        "first": 187980.0,
+        "last": 188035.0,
+        "high": 189225.0,
+        "low": 186840.0,
+        "rangePct": 0.012688,
+        "trendPct": 0.000293,
+        "volume": 17064039.0,
+        "tags": [
+          "balanced",
+          "low-volatility",
+          "gap-up",
+          "consolidation",
+          "normal"
+        ],
+        "gapPct": 0.004515,
+        "continuityPct": 0.989474,
+        "openingMovePct": 0.001011,
+        "closeLocation": 0.501048,
+        "trendStrength": 0.023093
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "low",
+        "gap": "gap-up",
+        "characters": [
+          "consolidation"
+        ],
+        "difficulty": "normal",
+        "quality": "excellent",
+        "score": 90,
+        "tags": [
+          "balanced",
+          "low-volatility",
+          "gap-up",
+          "consolidation",
+          "normal"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-21/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-21/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-21/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-21/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-22-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-22",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-22?type=1",
+      "tickCount": 5412726,
+      "stats": {
+        "first": 187225.0,
+        "last": 188560.0,
+        "high": 189145.0,
+        "low": 186195.0,
+        "rangePct": 0.015756,
+        "trendPct": 0.00713,
+        "volume": 17496937.0,
+        "tags": [
+          "trend-up",
+          "normal-volatility",
+          "gap-down",
+          "two-sided",
+          "normal"
+        ],
+        "gapPct": -0.004308,
+        "continuityPct": 0.989474,
+        "openingMovePct": -0.003766,
+        "closeLocation": 0.801695,
+        "trendStrength": 0.452526
+      },
+      "curation": {
+        "trend": "trend-up",
+        "volatility": "normal",
+        "gap": "gap-down",
+        "characters": [
+          "two-sided"
+        ],
+        "difficulty": "normal",
+        "quality": "excellent",
+        "score": 99,
+        "tags": [
+          "trend-up",
+          "normal-volatility",
+          "gap-down",
+          "two-sided",
+          "normal"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-22/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-22/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-22/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-22/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-23-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-23",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-23?type=1",
+      "tickCount": 6164014,
+      "stats": {
+        "first": 187900.0,
+        "last": 186680.0,
+        "high": 190140.0,
+        "low": 186365.0,
+        "rangePct": 0.02009,
+        "trendPct": -0.006493,
+        "volume": 19831425.0,
+        "tags": [
+          "balanced",
+          "high-volatility",
+          "gap-down",
+          "reversal",
+          "hard"
+        ],
+        "gapPct": -0.0035,
+        "continuityPct": 0.989474,
+        "openingMovePct": -0.006173,
+        "closeLocation": 0.083444,
+        "trendStrength": 0.323196
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "high",
+        "gap": "gap-down",
+        "characters": [
+          "reversal"
+        ],
+        "difficulty": "hard",
+        "quality": "excellent",
+        "score": 96,
+        "tags": [
+          "balanced",
+          "high-volatility",
+          "gap-down",
+          "reversal",
+          "hard"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-23/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-23/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-23/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-23/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-24-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-24",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-24?type=1",
+      "tickCount": 6165264,
+      "stats": {
+        "first": 186575.0,
+        "last": 184980.0,
+        "high": 187555.0,
+        "low": 184725.0,
+        "rangePct": 0.015168,
+        "trendPct": -0.008549,
+        "volume": 19580827.0,
+        "tags": [
+          "trend-down",
+          "normal-volatility",
+          "breakout",
+          "easy"
+        ],
+        "gapPct": -0.000562,
+        "continuityPct": 0.989474,
+        "openingMovePct": 0.004877,
+        "closeLocation": 0.090106,
+        "trendStrength": 0.563621
+      },
+      "curation": {
+        "trend": "trend-down",
+        "volatility": "normal",
+        "gap": "none",
+        "characters": [
+          "breakout"
+        ],
+        "difficulty": "easy",
+        "quality": "excellent",
+        "score": 96,
+        "tags": [
+          "trend-down",
+          "normal-volatility",
+          "breakout",
+          "easy"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-24/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-24/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-24/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-24/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-25-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-25",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-25?type=1",
+      "tickCount": 5431789,
+      "stats": {
+        "first": 185320.0,
+        "last": 184700.0,
+        "high": 185400.0,
+        "low": 183125.0,
+        "rangePct": 0.012276,
+        "trendPct": -0.003346,
+        "volume": 17301995.0,
+        "tags": [
+          "balanced",
+          "low-volatility",
+          "consolidation",
+          "opening-drive",
+          "normal"
+        ],
+        "gapPct": 0.001838,
+        "continuityPct": 0.989474,
+        "openingMovePct": -0.005153,
+        "closeLocation": 0.692308,
+        "trendStrength": 0.272564
+      },
+      "curation": {
+        "trend": "balanced",
+        "volatility": "low",
+        "gap": "none",
+        "characters": [
+          "consolidation",
+          "opening-drive"
+        ],
+        "difficulty": "normal",
+        "quality": "excellent",
+        "score": 95,
+        "tags": [
+          "balanced",
+          "low-volatility",
+          "consolidation",
+          "opening-drive",
+          "normal"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-25/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-25/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-25/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-25/1h.json"
+      },
+      "barCount1m": 564
+    },
+    {
+      "id": "WINFUT-2026-09-30-WINV26",
+      "asset": "WINFUT",
+      "contract": "WINV26",
+      "tradeDate": "2026-09-30",
+      "timezone": "America/Sao_Paulo",
+      "source": "b3-derivatives-tick-by-tick",
+      "sourceUrl": "https://drp.b3.com.br/rapinegocios/tickercsv/2026-09-30?type=1",
+      "tickCount": 6696260,
+      "stats": {
+        "first": 184700.0,
+        "last": 187700.0,
+        "high": 188860.0,
+        "low": 184500.0,
+        "rangePct": 0.023606,
+        "trendPct": 0.016243,
+        "volume": 20833410.0,
+        "tags": [
+          "trend-up",
+          "high-volatility",
+          "opening-drive",
+          "normal"
+        ],
+        "gapPct": 0.0,
+        "continuityPct": 0.987719,
+        "openingMovePct": 0.017759,
+        "closeLocation": 0.733945,
+        "trendStrength": 0.688088
+      },
+      "curation": {
+        "trend": "trend-up",
+        "volatility": "high",
+        "gap": "none",
+        "characters": [
+          "opening-drive"
+        ],
+        "difficulty": "normal",
+        "quality": "excellent",
+        "score": 99,
+        "tags": [
+          "trend-up",
+          "high-volatility",
+          "opening-drive",
+          "normal"
+        ]
+      },
+      "session": {
+        "kind": "B3",
+        "start": "09:00",
+        "end": "18:00",
+        "regularStart": "09:00",
+        "regularEnd": "18:00"
+      },
+      "bars": {
+        "1m": "/data/historical/WINFUT/WINV26/2026-09-30/1m.json",
+        "5m": "/data/historical/WINFUT/WINV26/2026-09-30/5m.json",
+        "15m": "/data/historical/WINFUT/WINV26/2026-09-30/15m.json",
+        "1h": "/data/historical/WINFUT/WINV26/2026-09-30/1h.json"
+      },
+      "barCount1m": 563
     }
   ]
 }
