@@ -287,36 +287,110 @@ def write_session(session: dict):
     session["barCount1m"] = len(bars)
 
 
+
+def load_existing_b3_candidates(existing_manifest: dict) -> list[dict]:
+    candidates: list[dict] = []
+    for session in existing_manifest.get("sessions", []):
+        asset = session.get("asset")
+        if asset not in ASSETS:
+            continue
+        contract = str(session.get("contract", ""))
+        trade_date = str(session.get("tradeDate", ""))
+        one_minute = OUT_ROOT / asset / contract / trade_date / "1m.json"
+        if not one_minute.exists():
+            continue
+        try:
+            bars = json.loads(one_minute.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        if not isinstance(bars, list) or len(bars) < 120:
+            continue
+        candidates.append(
+            {
+                "id": session.get("id", f"{asset}-{trade_date}-{contract}"),
+                "asset": asset,
+                "contract": contract,
+                "tradeDate": trade_date,
+                "timezone": session.get("timezone", "America/Sao_Paulo"),
+                "source": session.get("source", "b3-derivatives-tick-by-tick"),
+                "sourceUrl": session.get("sourceUrl", B3_URL.format(date=trade_date)),
+                "tickCount": int(session.get("tickCount", 0)),
+                "stats": session_stats(bars),
+                "session": session.get(
+                    "session",
+                    {"kind": "B3", "start": "09:00", "end": "18:00", "regularStart": "09:00", "regularEnd": "18:00"},
+                ),
+                "bars1m": bars,
+            }
+        )
+    return candidates
+
+
+def reached_candidate_target(candidates: list[dict], target: int) -> bool:
+    return all(sum(1 for c in candidates if c["asset"] == asset) >= target for asset in ASSETS)
+
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--start-date", default="2026-09-01")
+    parser.add_argument("--start-date", default="2026-09-16")
     parser.add_argument("--end-date", default="2026-10-02")
     parser.add_argument("--max-sessions", type=int, default=8)
-    parser.add_argument("--candidate-sessions", type=int, default=12)
+    parser.add_argument("--candidate-sessions", type=int, default=9)
     args = parser.parse_args()
 
     start = parse_date(args.start_date)
     end = parse_date(args.end_date)
-    candidates: list[dict] = []
 
-    for trade_date in iter_dates(start, end):
-        blob = fetch_zip(trade_date)
-        if blob is None:
-            print(f"SKIP {trade_date} (no B3 derivative tick file)")
-            continue
-        print(f"FETCH {trade_date} ({len(blob) / 1_000_000:.1f} MB)")
+    existing_manifest = {}
+    if MANIFEST.exists():
         try:
-            day_candidates = build_day(trade_date, read_derivative_rows(blob, trade_date))
-            print(f"  candidate-assets={len(day_candidates)}")
-            candidates.extend(day_candidates)
-            if all(
-                sum(1 for c in candidates if c["asset"] == asset) >= args.candidate_sessions
-                for asset in ASSETS
-            ):
-                print("ENOUGH: reached the requested candidate pool for all assets")
-                break
-        except (ValueError, zipfile.BadZipFile) as exc:
-            print(f"  FAIL {trade_date}: {exc}", file=sys.stderr)
+            existing_manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            existing_manifest = {}
+
+    candidates = load_existing_b3_candidates(existing_manifest)
+    known_ids = {c["id"] for c in candidates}
+    existing_dates = {
+        (c["asset"], c["tradeDate"])
+        for c in candidates
+    }
+    print(
+        "REUSE "
+        + ", ".join(
+            f"{asset}={sum(1 for c in candidates if c['asset'] == asset)}"
+            for asset in ASSETS
+        )
+        + " existing sessions"
+    )
+
+    if not reached_candidate_target(candidates, args.candidate_sessions):
+        for trade_date in iter_dates(start, end):
+            trade_date_iso = trade_date.isoformat()
+            if all((asset, trade_date_iso) in existing_dates for asset in ASSETS):
+                print(f"REUSE {trade_date} (already in library)")
+                continue
+            blob = fetch_zip(trade_date)
+            if blob is None:
+                print(f"SKIP {trade_date} (no B3 derivative tick file)")
+                continue
+            print(f"FETCH {trade_date} ({len(blob) / 1_000_000:.1f} MB)")
+            try:
+                day_candidates = build_day(trade_date, read_derivative_rows(blob, trade_date))
+                added = 0
+                for candidate in day_candidates:
+                    if candidate["id"] in known_ids:
+                        continue
+                    candidates.append(candidate)
+                    known_ids.add(candidate["id"])
+                    existing_dates.add((candidate["asset"], candidate["tradeDate"]))
+                    added += 1
+                print(f"  candidate-assets={len(day_candidates)} added={added}")
+                if reached_candidate_target(candidates, args.candidate_sessions):
+                    print("ENOUGH: reached the requested incremental candidate pool for all assets")
+                    break
+            except (ValueError, zipfile.BadZipFile) as exc:
+                print(f"  FAIL {trade_date}: {exc}", file=sys.stderr)
 
     by_asset: dict[str, list[dict]] = defaultdict(list)
     for candidate in candidates:
@@ -331,17 +405,10 @@ def main() -> int:
     if not selected:
         raise RuntimeError("No historical WINFUT/WDOFUT sessions were produced.")
 
-    existing_manifest = {}
-    preserved_sessions = []
-    if MANIFEST.exists():
-        try:
-            existing_manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-            preserved_sessions = [
-                s for s in existing_manifest.get("sessions", [])
-                if s.get("asset") not in ASSETS
-            ]
-        except (json.JSONDecodeError, OSError):
-            existing_manifest = {}
+    preserved_sessions = [
+        s for s in existing_manifest.get("sessions", [])
+        if s.get("asset") not in ASSETS
+    ]
 
     for asset in ASSETS:
         asset_root = OUT_ROOT / asset
