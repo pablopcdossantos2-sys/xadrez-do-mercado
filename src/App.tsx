@@ -122,7 +122,7 @@ function App(){
       }catch{}
     }
     if(manifest){
-      const shape=historicalWindowShape(state.timeframe);
+      const shape=historicalWindowShape(state.timeframe,state.instrument);
       const session=shape?selectHistoricalSession(manifest,state.instrument,state.timeframe,seed):null;
       if(session&&shape){
         try{
