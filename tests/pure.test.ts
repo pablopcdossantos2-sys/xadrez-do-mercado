@@ -47,6 +47,18 @@ describe('analytics pure functions',()=>{
     expect(outcome.r).toBe(0.25);
   });
 
+  it('uses the exchange timezone when classifying historical RTH and ETH',()=>{
+    const bars=[
+      bar(10,10,14,8,Date.parse('2026-09-23T13:30:00Z')/1000),
+      bar(12,12,16,11,Date.parse('2026-09-23T22:30:00Z')/1000)
+    ];
+    const levels=computeSessionLevels(bars,{timezone:'America/New_York',rthStart:'09:30',rthEnd:'16:00'});
+    expect(levels.rthHigh).toBe(14);
+    expect(levels.rthLow).toBe(8);
+    expect(levels.ethHigh).toBe(16);
+    expect(levels.ethLow).toBe(11);
+  });
+
   it('derives microstructure from the latest candle without external data',()=>{
     const micro=computeMicrostructure([bar(12,10,13,9,0)]);
     expect(micro.buyVolume+micro.sellVolume).toBe(1000);
