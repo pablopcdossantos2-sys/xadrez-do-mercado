@@ -8,14 +8,151 @@
 
 Browser-based interactive web application for futures-market decision-making practice, focused on price-action reading and Long, Short, or Skip choices.
 
-## Quick start
+## Installation and running the project — step by step
+
+This section is also intended for users who **do not usually work with terminals or GitHub repositories**.
+
+### 1. Install the required software first
+
+To run the project on your computer, you need **Node.js 20.19 or newer**. The `npm` package manager is installed together with Node.js.
+
+After installing Node.js, open **Terminal**, **PowerShell**, or **Command Prompt** and run:
+
+```bash
+node --version
+npm --version
+```
+
+If both commands display version numbers, the installation is ready.
+
+> On Windows, you can open PowerShell by searching for **PowerShell** in the Start menu.
+
+### 2. Get the project files
+
+There are two ways to do this.
+
+#### Option A — simplest: download a ZIP file
+
+This option does not require Git.
+
+1. Open the repository page on GitHub.
+2. Click **Code**.
+3. Choose **Download ZIP**.
+4. When the download finishes, extract the ZIP file to a folder of your choice.
+5. Open the extracted folder.
+
+Example:
+
+```text
+C:\Users\YourName\Documents\xadrez-do-mercado
+```
+
+#### Option B — using Git
+
+If Git is already installed, you can clone the repository:
+
+```bash
+git clone https://github.com/pablopcdossantos2-sys/xadrez-do-mercado.git
+cd xadrez-do-mercado
+```
+
+If you have never used Git, **Option A (Download ZIP)** is completely sufficient.
+
+### 3. Open a terminal inside the project folder
+
+The terminal must be opened **in the same folder that contains `package.json`**.
+
+On Windows, an easy method is:
+
+1. open the project folder in File Explorer;
+2. click the address bar that shows the folder path;
+3. type `powershell`;
+4. press **Enter**.
+
+PowerShell will open directly in the correct folder.
+
+### 4. Install the dependencies
+
+Run:
+
+```bash
+npm install
+```
+
+This automatically downloads the libraries required by the project, including React, Vite, and Lightweight Charts.
+
+You normally need to run this only the first time, or after the project's dependencies change.
+
+### 5. Start the application in development mode
+
+Run:
+
+```bash
+npm run dev
+```
+
+The terminal will display an address similar to:
+
+```text
+http://localhost:5173/
+```
+
+Open that address in your web browser.
+
+> Keep the terminal window open while using the application this way. To stop the server, return to the terminal and press `Ctrl + C`.
+
+### 6. Optional: load real historical MES and MNQ samples
+
+The application works without this step and uses the synthetic fallback whenever required.
+
+To download and prepare the free FirstRate Data samples for local use, run:
+
+```bash
+npm run historical:firstrate:sample
+```
+
+Then start the application normally:
+
+```bash
+npm run dev
+```
+
+These files are stored locally under `private-data/` and are not included in the production build.
+
+### 7. Create the compiled production version
+
+To generate the final application files, run:
+
+```bash
+npm run build
+```
+
+This command:
+
+1. checks the TypeScript code;
+2. compiles and optimizes the application with Vite;
+3. creates the `dist/` folder containing the files ready to be published to a web server.
+
+### 8. Preview the compiled version locally
+
+After running `npm run build`, you can preview the production version with:
+
+```bash
+npm run preview
+```
+
+The terminal will display a local address. Open it in your browser just as you did in development mode.
+
+### Quick summary for users who only want to run the project
+
+After downloading and extracting the project, the essential commands are:
 
 ```bash
 npm install
 npm run dev
 ```
 
-For production:
+When you want to generate the final compiled version:
 
 ```bash
 npm run build
