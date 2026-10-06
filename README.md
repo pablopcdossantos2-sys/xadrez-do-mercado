@@ -66,10 +66,10 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 - O gerador sintético continua disponível como fallback.
 - WINFUT/WDOFUT usam a biblioteca B3 real em 1m, 5m e 15m; 1h continua sintético nesses ativos.
-- MES/MNQ possuem pipeline histórico real CME Globex via Databento. Quando a biblioteca CME autorizada está publicada, 1m, 5m, 15m e 1h usam sessões reais; sem dataset autorizado disponível, o fallback sintético é mantido.
+- MES/MNQ podem usar gratuitamente os samples reais da FirstRate em desenvolvimento local com `npm run historical:firstrate:sample`. Esses arquivos ficam em `private-data/`, não são versionados nem entram no build de produção. Sem a biblioteca local, o fallback sintético é mantido.
 - A integração de dados reais está sendo orientada para **datasets históricos**, não para streaming em tempo real.
 - A curadoria histórica cobre WINFUT/WDOFUT e o pipeline estrangeiro cobre MES/MNQ reais sem usar ES/NQ como substitutos.
-- Dados históricos brutos podem ter regras próprias de uso/redistribuição; o projeto deve manter separados o código e os arquivos de mercado quando necessário.
+- Dados históricos brutos podem ter regras próprias de uso/redistribuição; por isso os samples FirstRate permanecem privados/local-only e a biblioteca B3 pública fica separada.
 - WINFUT e WDOFUT usam os códigos de produto B3 WIN e WDO, respectivamente.
 - A avaliação do analista usa somente o histórico disponível até o ponto de decisão. Isso não valida uma estratégia nem demonstra capacidade preditiva.
 - O projeto é uma ferramenta de treinamento e não executa ordens no mercado.
