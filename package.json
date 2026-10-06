@@ -15,7 +15,8 @@
     "test": "vitest run",
     "historical:build": "python scripts/build-historical-library.py",
     "historical:b3": "python scripts/build-historical-library.py",
-    "historical:cme": "python scripts/build-cme-historical-library.py"
+    "historical:cme": "python scripts/build-cme-historical-library.py",
+    "historical:firstrate:sample": "python scripts/build-firstrate-sample-library.py"
   },
   "dependencies": {
     "react": "^19.3.0",
