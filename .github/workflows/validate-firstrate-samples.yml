@@ -1,0 +1,46 @@
+name: Validate free FirstRate samples
+
+on:
+  pull_request:
+    paths:
+      - "scripts/build-firstrate-sample-library.py"
+      - "scripts/historical_curation.py"
+      - ".github/workflows/validate-firstrate-samples.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download and parse free MES/MNQ samples
+        run: |
+          python3 scripts/build-firstrate-sample-library.py \
+            --output-root /tmp/firstrate-historical \
+            --max-sessions 2
+
+      - name: Verify both foreign instruments
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("/tmp/firstrate-historical")
+          manifest = json.loads((root / "manifest.json").read_text())
+          counts = {}
+          for session in manifest["sessions"]:
+              counts[session["asset"]] = counts.get(session["asset"], 0) + 1
+              for timeframe in ("1m", "5m", "15m", "1h"):
+                  files = list((root / session["asset"] / session["contract"] / session["tradeDate"]).glob(f"{timeframe}.json"))
+                  assert files, f"missing {session['asset']} {timeframe}"
+
+          assert counts.get("MES", 0) >= 1, counts
+          assert counts.get("MNQ", 0) >= 1, counts
+          print("FirstRate sample validation:", counts)
+          PY
