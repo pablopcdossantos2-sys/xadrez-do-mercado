@@ -6,7 +6,7 @@
 
 > Enigmas de xadrez, mas para day traders de futuros.
 
-Ferramenta web de treinamento interativo para tomada de decisão em futuros, focada em leitura de price action e escolhas Long, Short ou Skip.
+Aplicação web de treinamento interativo para tomada de decisão em mercados futuros, focada em leitura de price action e escolhas Long, Short ou Skip.
 
 ## Início rápido
 
@@ -85,7 +85,7 @@ O estado interativo é centralizado em `useReducer`, evitando uma coleção de e
 
 ## 👤 Autoria e desenvolvimento
 
-Xadrez do Mercado é uma ferramenta de treinamento baseada em navegador, desenvolvida de forma independente por Pablo Phillipe Cândido dos Santos, destinada ao exercício de tomada de decisão de day traders de futuros por meio de puzzles de price action, replay de operações e debrief contrafactual.
+Xadrez do Mercado é uma aplicação web de treinamento interativo, desenvolvida de forma independente por Pablo Phillipe Cândido dos Santos, destinada ao exercício de tomada de decisão de day traders de futuros por meio de puzzles de price action, replay de sessões históricas reais quando disponíveis e geração sintética como fallback, com debrief contrafactual e registro local de desempenho.
 
 O desenvolvimento contou com a utilização de ferramentas de inteligência artificial generativa como recurso auxiliar no processo de desenvolvimento, mantendo-se sob responsabilidade do autor a concepção, implementação, integração e verificação do projeto.
 
