@@ -89,11 +89,13 @@ describe('real market data foundation',()=>{
     expect(a?.future).toHaveLength(38);
   });
 
-  it('uses intraday historical window shapes and keeps 1h on synthetic fallback',()=>{
-    expect(historicalWindowShape('1m')).toEqual({historyBars:82,futureBars:38});
-    expect(historicalWindowShape('5m')).toEqual({historyBars:72,futureBars:30});
-    expect(historicalWindowShape('15m')).toEqual({historyBars:26,futureBars:12});
-    expect(historicalWindowShape('1h')).toBeNull();
+  it('uses exchange-session historical window shapes and enables 1h only for CME micros',()=>{
+    expect(historicalWindowShape('1m','WINFUT')).toEqual({historyBars:82,futureBars:38});
+    expect(historicalWindowShape('5m','WDOFUT')).toEqual({historyBars:72,futureBars:30});
+    expect(historicalWindowShape('15m','MES')).toEqual({historyBars:26,futureBars:12});
+    expect(historicalWindowShape('1h','WINFUT')).toBeNull();
+    expect(historicalWindowShape('1h','MES')).toEqual({historyBars:12,futureBars:6});
+    expect(historicalWindowShape('1h','MNQ')).toEqual({historyBars:12,futureBars:6});
   });
 
   it('selects one deterministic historical session instead of stitching trading days',()=>{
@@ -108,6 +110,22 @@ describe('real market data foundation',()=>{
     const second=selectHistoricalSession(manifest,'WINFUT','15m',123);
     expect(first?.id).toBe(second?.id);
     expect(first?.tradeDate).toMatch(/^2026-09-2[3-5]$/);
+  });
+
+  it('rotates deterministic selection across curated regime buckets',()=>{
+    const base={timezone:'America/Sao_Paulo',source:'b3',sourceUrl:'x',tickCount:100,
+      stats:{first:1,last:1,high:1,low:1,rangePct:0.01,trendPct:0,volume:1,tags:[]},bars:{'15m':'/x.json'},barCount1m:120} as const;
+    const curated=(trend:'trend-up'|'trend-down'|'balanced',volatility:'low'|'normal'|'high')=>({
+      trend,volatility,gap:'none' as const,characters:[trend==='balanced'?'consolidation':'breakout'],
+      difficulty:'normal' as const,quality:'excellent' as const,score:90,tags:[trend,volatility+'-volatility']
+    });
+    const manifest={version:2,generatedAt:'x',source:{provider:'B3',feed:'deriv',endpoint:'x',notes:'x'},sessions:[
+      {...base,id:'up',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-23',curation:curated('trend-up','high')},
+      {...base,id:'down',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-24',curation:curated('trend-down','normal')},
+      {...base,id:'range',asset:'WINFUT',contract:'WINV26',tradeDate:'2026-09-25',curation:curated('balanced','low')}
+    ]} as const;
+    const ids=new Set(Array.from({length:24},(_,seed)=>selectHistoricalSession(manifest,'WINFUT','15m',seed+1)?.id));
+    expect(ids).toEqual(new Set(['up','down','range']));
   });
 
   it('prefers the longest same-contract historical run',()=>{
