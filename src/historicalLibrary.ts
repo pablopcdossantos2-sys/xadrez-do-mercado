@@ -1,5 +1,22 @@
 import type { Bar, Instrument, Timeframe } from './types';
 
+export type HistoricalTrendRegime='trend-up'|'trend-down'|'balanced';
+export type HistoricalVolatilityRegime='low'|'normal'|'high';
+export type HistoricalGapRegime='gap-up'|'gap-down'|'none'|'unknown';
+export type HistoricalDifficulty='easy'|'normal'|'hard';
+export type HistoricalQuality='usable'|'good'|'excellent';
+
+export interface HistoricalCuration {
+  trend:HistoricalTrendRegime;
+  volatility:HistoricalVolatilityRegime;
+  gap:HistoricalGapRegime;
+  characters:string[];
+  difficulty:HistoricalDifficulty;
+  quality:HistoricalQuality;
+  score:number;
+  tags:string[];
+}
+
 export interface HistoricalSession {
   id:string;
   asset:Instrument;
@@ -8,16 +25,31 @@ export interface HistoricalSession {
   timezone:string;
   source:string;
   sourceUrl:string;
-  tickCount:number;
-  stats:{first:number;last:number;high:number;low:number;rangePct:number;trendPct:number;volume:number;tags:string[]};
+  tickCount?:number;
+  recordCount?:number;
+  stats:{
+    first:number;last:number;high:number;low:number;rangePct:number;trendPct:number;volume:number;tags:string[];
+    gapPct?:number|null;continuityPct?:number;openingMovePct?:number;closeLocation?:number;trendStrength?:number;
+  };
+  curation?:HistoricalCuration;
+  session?:{kind:string;start:string;end:string;regularStart?:string;regularEnd?:string};
   bars:Partial<Record<Timeframe,string>>;
   barCount1m:number;
+}
+
+export interface HistoricalLibrarySource {
+  provider:string;
+  feed:string;
+  endpoint:string;
+  notes:string;
 }
 
 export interface HistoricalLibraryManifest {
   version:number;
   generatedAt:string;
-  source:{provider:string;feed:string;endpoint:string;notes:string};
+  source:HistoricalLibrarySource;
+  sources?:HistoricalLibrarySource[];
+  coverage?:Record<string,string[]>;
   sessions:HistoricalSession[];
 }
 
@@ -35,6 +67,16 @@ function seededIndex(seed:number,length:number){
   let x=(seed>>>0)||1;
   x=(1664525*x+1013904223)>>>0;
   return x%length;
+}
+
+function curationBucket(session:HistoricalSession){
+  const c=session.curation;
+  if(!c)return'uncurated';
+  return[c.trend,c.volatility,c.characters[0]??'other',c.difficulty].join('|');
+}
+
+function activity(session:HistoricalSession){
+  return session.tickCount??session.recordCount??session.stats.volume??0;
 }
 
 export async function loadHistoricalManifest(base=defaultBase()):Promise<HistoricalLibraryManifest>{
@@ -68,12 +110,24 @@ export function selectHistoricalSession(
   const sessions=selectHistoricalSessions(manifest,asset,timeframe)
     .slice()
     .sort((a,b)=>a.tradeDate.localeCompare(b.tradeDate)||a.contract.localeCompare(b.contract)||a.id.localeCompare(b.id));
-  const index=seededIndex(seed,sessions.length);
-  return index>=0?sessions[index]??null:null;
+  if(!sessions.length)return null;
+
+  const byRegime=new Map<string,HistoricalSession[]>();
+  for(const session of sessions){
+    const key=curationBucket(session);
+    const group=byRegime.get(key)??[];
+    group.push(session);
+    byRegime.set(key,group);
+  }
+  const regimeKeys=[...byRegime.keys()].sort();
+  const regimeIndex=seededIndex(seed,regimeKeys.length);
+  const group=byRegime.get(regimeKeys[regimeIndex]!)??sessions;
+  const itemIndex=seededIndex(seed^0x9e3779b9,group.length);
+  return itemIndex>=0?group[itemIndex]??null:null;
 }
 
-// Kept for compatibility with callers/tests that need to inspect the longest run of one contract.
-// Puzzle generation itself must select one session at a time so a window never crosses a trading day.
+// Kept for compatibility with callers/tests that inspect the longest run of one contract.
+// Puzzle generation itself selects one session at a time so a window never crosses a trading day.
 export function selectHistoricalContractSessions(
   manifest:HistoricalLibraryManifest,
   asset:Instrument,
@@ -87,16 +141,16 @@ export function selectHistoricalContractSessions(
     byContract.set(session.contract,group);
   }
   return [...byContract.values()]
-    .sort((a,b)=>b.length-a.length||b.reduce((n,s)=>n+s.tickCount,0)-a.reduce((n,s)=>n+s.tickCount,0))
+    .sort((a,b)=>b.length-a.length||b.reduce((n,s)=>n+activity(s),0)-a.reduce((n,s)=>n+activity(s),0))
     .at(0)?.sort((a,b)=>a.tradeDate.localeCompare(b.tradeDate))??[];
 }
 
-export function historicalWindowShape(timeframe:Timeframe):HistoricalWindowShape|null{
-  // A B3 intraday session cannot fit the synthetic 82+38 shape in higher timeframes.
-  // Keep each real puzzle inside one trading day instead of stitching separate sessions.
+export function historicalWindowShape(timeframe:Timeframe,asset?:Instrument):HistoricalWindowShape|null{
+  // Real puzzles stay inside one exchange session rather than stitching days.
   if(timeframe==='1m')return{historyBars:82,futureBars:38};
   if(timeframe==='5m')return{historyBars:72,futureBars:30};
   if(timeframe==='15m')return{historyBars:26,futureBars:12};
+  if(timeframe==='1h'&&(asset==='MES'||asset==='MNQ'))return{historyBars:12,futureBars:6};
   return null;
 }
 
